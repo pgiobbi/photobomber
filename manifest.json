@@ -1,0 +1,21 @@
+{
+  "name": "Photobomb Us at Tomorrowland",
+  "short_name": "Photobomb",
+  "description": "Take a picture with us at Tomorrowland!",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ff6b6b",
+  "theme_color": "#ff6b6b",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
