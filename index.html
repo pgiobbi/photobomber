@@ -148,7 +148,10 @@
         </h1>
         <span class="text-4xl shake">💣</span>
       </div>
-      <div class="h-2 w-48 mx-auto bg-gradient-to-r from-pink-500 via-blue-500 to-purple-500 rounded-full mt-2"></div>
+      <div class="h-2 w-48 mx-auto bg-gradient-to-r from-pink-500 via-blue-500 to-purple-500 rounded-full mt-2 mb-4"></div>
+      <p class="text-lg sm:text-xl festival-text glow">
+        Join <span id="bomber-count">Loading...</span> Photo Bombers!
+      </p>
     </div>
   </div>
   
@@ -207,14 +210,38 @@
       const video = document.getElementById('videoElement');
       const canvas = document.getElementById('canvasElement');
       const ctx = canvas.getContext('2d');
+      const bomberCount = document.getElementById('bomber-count');
+
+      // Fetch photo bomber count on startup
+      async function fetchBomberCount() {
+        try {
+          const response = await fetch('/api/count');
+          if (!response.ok) throw new Error('API request failed');
+          const data = await response.json();
+          bomberCount.textContent = data.count.toLocaleString();
+        } catch (err) {
+          console.error('Failed to fetch count:', err);
+          bomberCount.textContent = 'N/A';
+        }
+      }
+
+      fetchBomberCount();
+
+      // Detect mobile devices (iOS or Android)
+      const isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
 
       cameraLabel.addEventListener('click', async (e) => {
         e.preventDefault();
 
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        if (isMobile && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
           try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-              video: { facingMode: 'user' }
+            let stream = await navigator.mediaDevices.getUserMedia({
+              video: { facingMode: { exact: 'user' } }
+            }).catch(async (err) => {
+              console.warn('Exact facingMode failed, trying loose:', err);
+              return await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'user' }
+              });
             });
             video.srcObject = stream;
             video.style.display = 'block';
