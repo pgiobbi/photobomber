@@ -1,0 +1,9 @@
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "127.0.0.1:80:80"
+    volumes:
+      - ./frontend:/var/local/frontend:ro
+      - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf:ro
+    restart: unless-stopped
