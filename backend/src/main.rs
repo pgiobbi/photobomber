@@ -1,9 +1,7 @@
 use actix_cors::Cors;
 use actix_web::middleware::NormalizePath;
 use actix_web::{App, Error, HttpResponse, HttpServer, Responder, get, http, post, web};
-use rand::random_range;
 use serde::Serialize;
-use serde_json::json;
 use std::path::Path;
 use uuid::Uuid;
 
@@ -12,9 +10,13 @@ use actix_multipart::form::{
     tempfile::{TempFile, TempFileConfig},
 };
 use mime::{IMAGE, Mime};
+use tokio::fs;
 
 const MAX_FILE_SIZE: u64 = 10 * 1024 * 1024; // 10MB in bytes
 const UPLOAD_DIR: &str = "./uploads";
+
+// Whitelist of allowed image extensions
+const ALLOWED_EXTENSIONS: &[&str] = &["jpg", "jpeg", "png", "gif", "webp"];
 
 // Structure for the multipart form
 #[derive(Debug, MultipartForm)]
@@ -28,6 +30,12 @@ struct ImageUploadForm {
 struct UploadResponse {
     file_id: String,
     file_name: String,
+}
+
+// Structure for the count response
+#[derive(Serialize)]
+struct CountResponse {
+    count: u64,
 }
 
 // Map MIME type to file extension
@@ -100,12 +108,27 @@ async fn upload_images(
     Ok(HttpResponse::Ok().json(responses))
 }
 
+// Count endpoint
 #[get("/count")]
-async fn hello() -> impl Responder {
-    let count = random_range(0..=20);
-    HttpResponse::Ok().json(json!({
-        "count": count
-    }))
+async fn get_upload_count() -> Result<impl Responder, Error> {
+    let mut count = 0;
+    let mut entries = fs::read_dir(UPLOAD_DIR)
+        .await
+        .map_err(|e| actix_web::error::ErrorInternalServerError(e))?;
+
+    while let Some(entry) = entries
+        .next_entry()
+        .await
+        .map_err(|e| actix_web::error::ErrorInternalServerError(e))?
+    {
+        if let Some(ext) = entry.path().extension().and_then(|e| e.to_str()) {
+            if ALLOWED_EXTENSIONS.contains(&ext) {
+                count += 1;
+            }
+        }
+    }
+
+    Ok(HttpResponse::Ok().json(CountResponse { count }))
 }
 
 #[actix_web::main]
@@ -135,7 +158,11 @@ async fn main() -> std::io::Result<()> {
                     .max_age(3600),
             )
             .wrap(NormalizePath::trim())
-            .service(web::scope("/api").service(hello).service(upload_images))
+            .service(
+                web::scope("/api")
+                    .service(get_upload_count)
+                    .service(upload_images),
+            )
     })
     .bind(("0.0.0.0", 3002))?
     .run()
