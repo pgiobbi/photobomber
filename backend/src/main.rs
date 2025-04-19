@@ -1,22 +1,233 @@
 use actix_cors::Cors;
 use actix_web::middleware::NormalizePath;
-use actix_web::{App, HttpResponse, HttpServer, Responder, get, http, web};
-use rand;
-use rand::random_range;
-use serde_json::json;
+use actix_web::{App, Error, HttpResponse, HttpServer, Responder, get, http, post, web};
+use serde::Serialize;
+use std::path::Path;
+use std::string::ToString;
+use uuid::Uuid;
 
+use actix_multipart::form::{
+    MultipartForm,
+    tempfile::{TempFile, TempFileConfig},
+};
+use actix_web::http::header::{ContentDisposition, DispositionParam, DispositionType};
+use mime::{IMAGE, Mime};
+use sanitize_filename::sanitize;
+use std::env;
+use tokio::fs;
+
+const MAX_FILE_SIZE: u64 = 10 * 1024 * 1024; // 10MB in bytes
+
+// Whitelist of allowed image extensions
+const ALLOWED_EXTENSIONS: &[&str] = &["jpg", "jpeg", "png", "gif", "webp"];
+
+// Structure for the multipart form
+#[derive(Debug, MultipartForm)]
+struct ImageUploadForm {
+    #[multipart(rename = "images", limit = "10MB")]
+    images: Vec<TempFile>,
+}
+
+// Structure for the response
+#[derive(Serialize)]
+struct UploadResponse {
+    file_id: String,
+    file_name: String,
+}
+
+// Structure for the count response
+#[derive(Serialize)]
+struct CountResponse {
+    count: u64,
+}
+
+struct AppState {
+    upload_dir: String,
+}
+
+// Map MIME type to file extension
+fn get_extension_from_mime(mime: &Mime) -> &str {
+    match mime.subtype().as_str() {
+        "jpeg" => "jpg",
+        "png" => "png",
+        "gif" => "gif",
+        "bmp" => "bmp",
+        "webp" => "webp",
+        _ => "jpg", // Default to jpg for unknown image types
+    }
+}
+
+// Extract extension from filename
+fn get_extension_from_filename(filename: &str) -> Option<&str> {
+    Path::new(filename).extension().and_then(|ext| ext.to_str())
+}
+
+// // Validate image content
+// async fn validate_image_content(path: &str) -> Result<(), String> {
+//     let file = fs::read(path).await.map_err(|e| e.to_string())?;
+//     let format = image::guess_format(&file).map_err(|e| e.to_string())?;
+//     match format {
+//         ImageFormat::Jpeg | ImageFormat::Png | ImageFormat::Gif | ImageFormat::WebP => Ok(()),
+//         _ => Err("Unsupported image format".to_string()),
+//     }
+// }
+
+// Image upload endpoint
+#[post("/upload")]
+async fn upload_images(
+    MultipartForm(form): MultipartForm<ImageUploadForm>,
+    app_state: web::Data<AppState>,
+) -> Result<impl Responder, Error> {
+    let mut responses = Vec::new();
+
+    for file in form.images {
+        // Validate content type
+        let content_type = file.content_type.unwrap_or(mime::APPLICATION_OCTET_STREAM);
+        if !content_type.type_().eq(&IMAGE) {
+            return Ok(HttpResponse::BadRequest().json("Only image files are allowed"));
+        }
+
+        // Validate file size
+        if file.size > MAX_FILE_SIZE as usize {
+            return Ok(HttpResponse::BadRequest().json("File size exceeds 10MB limit"));
+        }
+
+        // Get or generate filename
+        let original_file_name = file
+            .file_name
+            .unwrap_or_else(|| format!("image_{}", Uuid::new_v4()));
+
+        // Determine file extension
+        let extension = get_extension_from_filename(&original_file_name)
+            .unwrap_or_else(|| get_extension_from_mime(&content_type));
+
+        // Generate unique file ID
+        let file_id = Uuid::new_v4().to_string();
+
+        // Create persistent file path with extension
+        let file_name_with_ext = format!("{}.{}", file_id, extension);
+        let file_path = format!("{}/{}", app_state.upload_dir, file_name_with_ext);
+
+        // Persist the file
+        file.file.persist(&file_path).map_err(|e| {
+            actix_web::error::ErrorInternalServerError(format!("Failed to save file: {}", e))
+        })?;
+
+        // // Validate image content
+        // if let Err(e) = validate_image_content(&sanitized_path).await {
+        //     fs::remove_file(&sanitized_path).await.ok();
+        //     return Ok(HttpResponse::BadRequest().json(format!("Invalid image: {}", e)));
+        // }
+
+        responses.push(UploadResponse {
+            file_id,
+            file_name: file_name_with_ext,
+        });
+    }
+
+    if responses.is_empty() {
+        return Ok(HttpResponse::BadRequest().json("No valid images uploaded"));
+    }
+
+    Ok(HttpResponse::Ok().json(responses))
+}
+
+// Simplified image retrieval endpoint
+#[get("/images/{filename}")]
+async fn get_image(
+    path: web::Path<String>,
+    app_state: web::Data<AppState>,
+) -> Result<impl Responder, Error> {
+    let filename = path.into_inner();
+
+    // Sanitize filename to prevent path traversal
+    let sanitized_filename = sanitize(&filename);
+    if sanitized_filename.contains("..")
+        || sanitized_filename.contains('/')
+        || sanitized_filename.contains('\\')
+    {
+        return Ok(HttpResponse::BadRequest().json("Invalid filename"));
+    }
+
+    // Check if extension is allowed
+    let ext = Path::new(&sanitized_filename)
+        .extension()
+        .and_then(|e| e.to_str())
+        .filter(|e| ALLOWED_EXTENSIONS.contains(e))
+        .ok_or_else(|| actix_web::error::ErrorBadRequest("Invalid file extension"))?;
+
+    // Construct and validate file path
+    let file_path = format!("{}/{}", app_state.upload_dir, sanitized_filename);
+    if !file_path.starts_with(&app_state.upload_dir) {
+        return Ok(HttpResponse::BadRequest().json("Invalid file path"));
+    }
+
+    // Check if file exists
+    if fs::metadata(&file_path).await.is_err() {
+        return Ok(HttpResponse::BadRequest().json("Image not found"));
+    }
+
+    // Read file
+    let content = fs::read(&file_path)
+        .await
+        .map_err(|e| actix_web::error::ErrorInternalServerError(e))?;
+
+    // Determine MIME type
+    let mime = match ext {
+        "jpg" | "jpeg" => mime::IMAGE_JPEG,
+        "png" => mime::IMAGE_PNG,
+        "gif" => mime::IMAGE_GIF,
+        // "webp" => mime::IMAGE_WEBP,
+        _ => mime::APPLICATION_OCTET_STREAM,
+    };
+
+    // Set content disposition for safe rendering
+    let disposition = ContentDisposition {
+        disposition: DispositionType::Inline,
+        parameters: vec![DispositionParam::Filename(sanitized_filename)],
+    };
+
+    Ok(HttpResponse::Ok()
+        .content_type(mime)
+        .append_header(disposition)
+        .body(content))
+}
+
+// Count endpoint
 #[get("/count")]
-async fn hello() -> impl Responder {
-    let count = random_range(0..=20);
-    HttpResponse::Ok().json(json!({
-        "count": count
-    }))
+async fn get_upload_count(app_state: web::Data<AppState>) -> Result<impl Responder, Error> {
+    let mut count = 0;
+    let mut entries = fs::read_dir(&app_state.upload_dir)
+        .await
+        .map_err(|e| actix_web::error::ErrorInternalServerError(e))?;
+
+    while let Some(entry) = entries
+        .next_entry()
+        .await
+        .map_err(|e| actix_web::error::ErrorInternalServerError(e))?
+    {
+        if let Some(ext) = entry.path().extension().and_then(|e| e.to_str()) {
+            if ALLOWED_EXTENSIONS.contains(&ext) {
+                count += 1;
+            }
+        }
+    }
+
+    Ok(HttpResponse::Ok().json(CountResponse { count }))
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
+    // Create upload directory
+    let upload_dir = env::var("UPLOAD_DIR").unwrap_or("./uploads".to_string());
+    std::fs::create_dir_all(upload_dir.clone().to_string())?;
+
+    HttpServer::new(move || {
         App::new()
+            .app_data(web::Data::new(AppState {
+                upload_dir: upload_dir.clone(),
+            }))
+            .app_data(TempFileConfig::default().directory(upload_dir.to_string()))
             .wrap(
                 Cors::default()
                     .allowed_origin_fn(|origin, _req_head| {
@@ -25,10 +236,10 @@ async fn main() -> std::io::Result<()> {
 
                         // Allow localhost variations (http://localhost, http://127.0.0.1, http://[::1], any port)
                         origin_str.starts_with("http://localhost") ||
-                        origin_str.starts_with("http://127.0.0.1") ||
-                        origin_str.starts_with("http://[::1]") ||
-                        // Allow https://photobomber.servebeer.com
-                        origin_str == "https://photobomber.servebeer.com"
+                            origin_str.starts_with("http://127.0.0.1") ||
+                            origin_str.starts_with("http://[::1]") ||
+                            // Allow https://photobomber.servebeer.com
+                            origin_str == "https://photobomber.servebeer.com"
                     })
                     .allowed_methods(vec!["GET", "POST", "PUT", "DELETE"])
                     .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
@@ -36,7 +247,12 @@ async fn main() -> std::io::Result<()> {
                     .max_age(3600),
             )
             .wrap(NormalizePath::trim())
-            .service(web::scope("/api").service(hello))
+            .service(
+                web::scope("/api")
+                    .service(get_upload_count)
+                    .service(upload_images)
+                    .service(get_image),
+            )
     })
     .bind(("0.0.0.0", 3002))?
     .run()
