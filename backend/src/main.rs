@@ -21,7 +21,7 @@ async fn main() -> std::io::Result<()> {
                 Cors::default()
                     .allowed_origin_fn(|origin, _req_head| {
                         // Extract the origin string
-                        let origin_str = origin.as_str();
+                        let origin_str = origin.to_str().unwrap();
 
                         // Allow localhost variations (http://localhost, http://127.0.0.1, http://[::1], any port)
                         origin_str.starts_with("http://localhost") ||
