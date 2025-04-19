@@ -1,264 +1,342 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#0e1b2b">
-  <meta name="description" content="Photobomb us at Tomorrowland ORBYZ 2025! Snap a selfie and join the fun!">
-  <title>Photobomb Us at Tomorrowland ORBYZ!</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="favicon.ico">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-  <style>
-    @import url('https://fonts.cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/7.0.96/css/materialdesignicons.min.css');
-    
-    html, body {
-      margin: 0;
-      padding: 0;
-      background-color: rgba(14, 27, 43, 0.1);
-      background-image: linear-gradient(135deg, rgba(14, 27, 43, 0.85), rgba(25, 40, 65, 0.7)), url('/assets/orbyz-notext.webp');
-      background-size: cover;
-      background-position: center;
-      background-blend-mode: overlay;
-      font-family: 'Arial', sans-serif;
-      overflow: hidden;
-      -webkit-tap-highlight-color: transparent;
-      height: 100vh;
-    }
-    
-    .glow {
-      text-shadow: 0 0 8px rgba(255, 255, 255, 0.7), 
-                  0 0 12px rgba(65, 176, 232, 0.5), 
-                  0 0 20px rgba(65, 176, 232, 0.4);
-    }
-    
-    .title-glow {
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.9), 
-                  0 0 20px rgba(65, 176, 232, 0.8), 
-                  0 0 40px rgba(147, 51, 234, 0.6),
-                  0 0 60px rgba(239, 68, 68, 0.4);
-      letter-spacing: 3px;
-    }
-    
-    .gradient-animate {
-      background-size: 400% 400%;
-      background-image: linear-gradient(
-        45deg, 
-        #3b82f6, 
-        #8b5cf6, 
-        #ec4899, 
-        #3b82f6
-      );
-      animation: gradient 8s ease infinite;
-    }
-    
-    @keyframes gradient {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    
-    .particle {
-      position: absolute;
-      background: white;
-      border-radius: 50%;
-      opacity: 0;
-      animation: float 6s infinite ease-in-out;
-    }
-    
-    @keyframes float {
-      0%, 100% { transform: translateY(0); opacity: 0; }
-      10%, 90% { opacity: 0.7; }
-      50% { transform: translateY(-100px); opacity: 0.3; }
-    }
-    
-    .halo {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(20px);
-      opacity: 0.15;
-      z-index: -1;
-    }
-    
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-15px); }
-    }
-    
-    .bounce {
-      animation: bounce 2s infinite;
-    }
-    
-    @keyframes shake {
-      0%, 100% { transform: rotate(0deg); }
-      10% { transform: rotate(-10deg); }
-      20% { transform: rotate(10deg); }
-      30% { transform: rotate(-10deg); }
-      40% { transform: rotate(10deg); }
-      50% { transform: rotate(0deg); }
-    }
-    
-    .shake {
-      animation: shake 2s infinite;
-      animation-delay: 1s;
-    }
-    
-    input[type="file"] {
-      display: none;
-    }
-    
-    .festival-text {
-      font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-      font-weight: 800;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      line-height: 1;
-    }
-    
-    #videoElement {
-      display: none;
-    }
-    
-    #canvasElement {
-      display: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0e1b2b">
+    <meta name="description" content="Photobomb us at Tomorrowland ORBYZ 2025! Snap a selfie and join the fun!">
+    <title>Photobomb Us at Tomorrowland ORBYZ!</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/7.0.96/css/materialdesignicons.min.css');
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            background-color: rgba(14, 27, 43, 0.1);
+            background-image: linear-gradient(135deg, rgba(14, 27, 43, 0.85), rgba(25, 40, 65, 0.7)), url('/assets/orbyz-notext.webp');
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: overlay;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            height: 100vh;
+        }
+
+        .glow {
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.7),
+            0 0 12px rgba(65, 176, 232, 0.5),
+            0 0 20px rgba(65, 176, 232, 0.4);
+        }
+
+        .title-glow {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.9),
+            0 0 20px rgba(65, 176, 232, 0.8),
+            0 0 40px rgba(147, 51, 234, 0.6),
+            0 0 60px rgba(239, 68, 68, 0.4);
+            letter-spacing: 3px;
+        }
+
+        .gradient-animate {
+            background-size: 400% 400%;
+            background-image: linear-gradient(
+                    45deg,
+                    #3b82f6,
+                    #8b5cf6,
+                    #ec4899,
+                    #3b82f6
+            );
+            animation: gradient 8s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+            animation: float 6s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+                opacity: 0;
+            }
+            10%, 90% {
+                opacity: 0.7;
+            }
+            50% {
+                transform: translateY(-100px);
+                opacity: 0.3;
+            }
+        }
+
+        .halo {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(20px);
+            opacity: 0.15;
+            z-index: -1;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+
+        .bounce {
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% {
+                transform: rotate(0deg);
+            }
+            10% {
+                transform: rotate(-10deg);
+            }
+            20% {
+                transform: rotate(10deg);
+            }
+            30% {
+                transform: rotate(-10deg);
+            }
+            40% {
+                transform: rotate(10deg);
+            }
+            50% {
+                transform: rotate(0deg);
+            }
+        }
+
+        .shake {
+            animation: shake 2s infinite;
+            animation-delay: 1s;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .festival-text {
+            font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+
+        #videoElement {
+            display: none;
+        }
+
+        #canvasElement {
+            display: none;
+        }
+    </style>
 </head>
 <body class="h-screen flex flex-col items-center justify-between text-white">
-  <!-- Decorative elements -->
-  <div class="halo bg-blue-400 w-64 h-64 top-0 left-0"></div>
-  <div class="halo bg-purple-500 w-48 h-48 bottom-0 right-0"></div>
-  
-  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+<!-- Decorative elements -->
+<div class="halo bg-blue-400 w-64 h-64 top-0 left-0"></div>
+<div class="halo bg-purple-500 w-48 h-48 bottom-0 right-0"></div>
+
+<div class="absolute inset-0 overflow-hidden pointer-events-none">
     <div class="particle w-1 h-1 top-1/4 left-1/4"></div>
     <div class="particle w-2 h-2 top-1/3 left-1/2" style="animation-delay: 1s;"></div>
     <div class="particle w-1 h-1 top-1/2 left-3/4" style="animation-delay: 2s;"></div>
     <div class="particle w-2 h-2 top-2/3 left-1/4" style="animation-delay: 3s;"></div>
     <div class="particle w-1 h-1 top-3/4 left-1/2" style="animation-delay: 4s;"></div>
-  </div>
-  
-  <!-- Header -->
-  <div class="w-full pt-10 px-5">
+</div>
+
+<!-- Header -->
+<div class="w-full pt-10 px-5">
     <div class="text-center">
-      <div class="flex items-center justify-center space-x-3 mb-2">
-        <span class="text-4xl bounce">📸</span>
-        <h1 class="text-4xl sm:text-5xl font-bold festival-text title-glow" style="text-shadow: 2px 2px 8px #ec4899, -2px -2px 8px #3b82f6;">
-          PHOTOBOMB US!
-        </h1>
-        <span class="text-4xl shake">💣</span>
-      </div>
-      <div class="h-2 w-48 mx-auto bg-gradient-to-r from-pink-500 via-blue-500 to-purple-500 rounded-full mt-2 mb-4"></div>
-      <p class="text-lg sm:text-xl festival-text glow">
-        Join <span id="bomber-count">Loading...</span> Photo Bombers!
-      </p>
-    </div>
-  </div>
-  
-  <!-- Main content -->
-  <div class="text-center p-4 sm:p-6 max-w-md mx-auto flex-grow flex flex-col justify-center">
-    <div class="space-y-6">
-      <p class="text-xl sm:text-2xl mb-6 leading-relaxed">
-        We're at <span class="font-extrabold text-blue-300 glow">Tomorrowland ORBYZ</span>!<br> 
-        Snap a selfie with us! 🤳
-      </p>
-      
-      <div class="bg-white bg-opacity-10 backdrop-filter backdrop-blur-sm text-white rounded-xl p-4 sm:p-5 shadow-lg border border-white border-opacity-20">
-        <p class="text-lg sm:text-xl font-semibold">
-          Find us: Two friends in neon gear, dancing like nobody's watching! 🕺💃
+        <div class="flex items-center justify-center space-x-3 mb-2">
+            <span class="text-4xl bounce">📸</span>
+            <h1 class="text-4xl sm:text-5xl font-bold festival-text title-glow"
+                style="text-shadow: 2px 2px 8px #ec4899, -2px -2px 8px #3b82f6;">
+                PHOTOBOMB US!
+            </h1>
+            <span class="text-4xl shake">💣</span>
+        </div>
+        <div class="h-2 w-48 mx-auto bg-gradient-to-r from-pink-500 via-blue-500 to-purple-500 rounded-full mt-2 mb-4"></div>
+        <p class="text-lg sm:text-xl festival-text glow">
+            Join <span id="bomber-count">Loading...</span> Photo Bombers!
         </p>
-      </div>
-      
-      <div class="pt-4">
-        <label for="cameraInput" 
-               class="block mx-auto gradient-animate text-white font-bold py-4 px-10 rounded-full text-xl sm:text-2xl transition shadow-lg relative overflow-hidden cursor-pointer">
-          TAKE THE SHOT! 📸
-          <span class="absolute inset-0 bg-white opacity-10 rounded-full"></span>
-        </label>
-        <input type="file" id="cameraInput" accept="image/*" capture="user">
-      </div>
     </div>
-  </div>
-  
-  <!-- Footer -->
-  <div class="w-full pb-10 px-5">
+</div>
+
+<!-- Main content -->
+<div class="text-center p-4 sm:p-6 max-w-md mx-auto flex-grow flex flex-col justify-center">
+    <div class="space-y-6">
+        <p class="text-xl sm:text-2xl mb-6 leading-relaxed">
+            We're at <span class="font-extrabold text-blue-300 glow">Tomorrowland ORBYZ</span>!<br>
+            Snap a selfie with us! 🤳
+        </p>
+
+        <div class="bg-white bg-opacity-10 backdrop-filter backdrop-blur-sm text-white rounded-xl p-4 sm:p-5 shadow-lg border border-white border-opacity-20">
+            <p class="text-lg sm:text-xl font-semibold">
+                Find us: Two friends in neon gear, dancing like nobody's watching! 🕺💃
+            </p>
+        </div>
+
+        <div class="pt-4">
+            <label for="cameraInput"
+                   class="block mx-auto gradient-animate text-white font-bold py-4 px-10 rounded-full text-xl sm:text-2xl transition shadow-lg relative overflow-hidden cursor-pointer">
+                TAKE THE SHOT! 📸
+                <span class="absolute inset-0 bg-white opacity-10 rounded-full"></span>
+            </label>
+            <input type="file" id="cameraInput" accept="image/*" capture="user">
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="w-full pb-10 px-5">
     <p class="text-center text-sm sm:text-base mb-3">
-      Share with <span class="font-bold text-blue-300 glow">#TomorrowlandPhotobomb</span>
+        Share with <span class="font-bold text-blue-300 glow">#TomorrowlandPhotobomb</span>
     </p>
     <div class="flex justify-center space-x-4">
-      <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12z" clip-rule="evenodd"/>
-          <path fill-rule="evenodd" d="M10.76 9.24a1 1 0 10-1.52 1.28 1 1 0 001.52-1.28zM10 6a4 4 0 00-4 4h2a2 2 0 114 0h2a4 4 0 00-4-4z" clip-rule="evenodd"/>
-        </svg>
-      </div>
-      <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M6.29 18.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0020 3.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.073 4.073 0 01.8 7.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 010 16.407a11.616 11.616 0 006.29 1.84"/>
-        </svg>
-      </div>
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12z"
+                      clip-rule="evenodd"/>
+                <path fill-rule="evenodd"
+                      d="M10.76 9.24a1 1 0 10-1.52 1.28 1 1 0 001.52-1.28zM10 6a4 4 0 00-4 4h2a2 2 0 114 0h2a4 4 0 00-4-4z"
+                      clip-rule="evenodd"/>
+            </svg>
+        </div>
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M6.29 18.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0020 3.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.073 4.073 0 01.8 7.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 010 16.407a11.616 11.616 0 006.29 1.84"/>
+            </svg>
+        </div>
     </div>
-  </div>
-  
-  <video id="videoElement" autoplay playsinline></video>
-  <canvas id="canvasElement"></canvas>
-  
-  <script>
+</div>
+
+<video id="videoElement" autoplay playsinline></video>
+<canvas id="canvasElement"></canvas>
+
+<script>
     document.addEventListener('DOMContentLoaded', () => {
-      const cameraInput = document.getElementById('cameraInput');
-      const bomberCount = document.getElementById('bomber-count');
+        const cameraInput = document.getElementById('cameraInput');
+        const bomberCount = document.getElementById('bomber-count');
 
-      // Fetch photo bomber count on startup
-      async function fetchBomberCount() {
-        try {
-          const response = await fetch('/api/count');
-          if (!response.ok) throw new Error('API request failed');
-          const data = await response.json();
-          bomberCount.textContent = data.count.toLocaleString();
-        } catch (err) {
-          console.error('Failed to fetch count:', err);
-          bomberCount.textContent = 'N/A';
+        // Fetch photo bomber count on startup (unchanged)
+        async function fetchBomberCount() {
+            try {
+                const response = await fetch('/api/count');
+                if (!response.ok) throw new Error('API request failed');
+                const data = await response.json();
+                bomberCount.textContent = data.count.toLocaleString();
+            } catch (err) {
+                console.error('Failed to fetch count:', err);
+                bomberCount.textContent = 'N/A';
+            }
         }
-      }
 
-      fetchBomberCount();
+        fetchBomberCount();
 
-      cameraInput.addEventListener('change', (event) => {
-        if (event.target.files.length > 0) {
-          showModal();
-        }
-      });
+        // Handle file input change and upload images
+        cameraInput.addEventListener('change', async (event) => {
+            const files = event.target.files;
+            if (files.length === 0) return;
 
-      function showModal() {
-        const modal = document.createElement('div');
-        modal.className = 'fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50';
-        
-        const modalContent = document.createElement('div');
-        modalContent.className = 'bg-gray-900 bg-opacity-90 p-6 rounded-xl max-w-sm w-full mx-4 text-center';
-        
-        const thankYouText = document.createElement('h2');
-        thankYouText.className = 'text-2xl font-bold mb-4 text-white glow';
-        thankYouText.innerHTML = 'Awesome Shot! 🎉';
-        
-        const message = document.createElement('p');
-        message.className = 'mb-6 text-white';
-        message.innerHTML = 'Share your pic with<br>#TomorrowlandPhotobomb!';
-        
-        const closeButton = document.createElement('button');
-        closeButton.className = 'gradient-animate text-white font-bold py-3 px-6 rounded-full';
-        closeButton.textContent = 'Keep Dancing! 🕺';
-        closeButton.addEventListener('click', () => {
-          document.body.removeChild(modal);
+            // Create FormData and append files
+            const formData = new FormData();
+            for (const file of files) {
+                formData.append('images', file);
+            }
+
+            // Show loading modal
+            showModal('Uploading...', 'Your photobomb is being sent! 🚀');
+
+            try {
+                const response = await fetch('http://localhost:3002/api/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Upload failed');
+                }
+
+                const data = await response.json();
+                // Show success modal
+                showModal(
+                    'Awesome Shot! 🎉',
+                    `Uploaded ${data.length} photo${data.length > 1 ? 's' : ''}! Share with #TomorrowlandPhotobomb!`
+                );
+
+                // Reset input
+                cameraInput.value = '';
+            } catch (err) {
+                console.error('Upload error:', err);
+                // Show error modal
+                showModal(
+                    'Oops! 😅',
+                    `Failed to upload: ${err.message}. Try again!`,
+                    'Retry'
+                );
+            }
         });
-        
-        modalContent.appendChild(thankYouText);
-        modalContent.appendChild(message);
-        modalContent.appendChild(closeButton);
-        modal.appendChild(modalContent);
-        
-        document.body.appendChild(modal);
-      }
+
+        // Modal display function
+        function showModal(title, message, buttonText = 'Keep Dancing! 🕺') {
+            // Remove existing modal if any
+            const existingModal = document.querySelector('.modal');
+            if (existingModal) document.body.removeChild(existingModal);
+
+            const modal = document.createElement('div');
+            modal.className = 'modal fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50';
+
+            const modalContent = document.createElement('div');
+            modalContent.className = 'bg-gray-900 bg-opacity-90 p-6 rounded-xl max-w-sm w-full mx-4 text-center';
+
+            const titleEl = document.createElement('h2');
+            titleEl.className = 'text-2xl font-bold mb-4 text-white glow';
+            titleEl.textContent = title;
+
+            const messageEl = document.createElement('p');
+            messageEl.className = 'mb-6 text-white';
+            messageEl.innerHTML = message;
+
+            const button = document.createElement('button');
+            button.className = 'gradient-animate text-white font-bold py-3 px-6 rounded-full';
+            button.textContent = buttonText;
+            button.addEventListener('click', () => {
+                document.body.removeChild(modal);
+            });
+
+            modalContent.appendChild(titleEl);
+            modalContent.appendChild(messageEl);
+            modalContent.appendChild(button);
+            modal.appendChild(modalContent);
+
+            document.body.appendChild(modal);
+        }
     });
-  </script>
+</script>
 </body>
 </html>
