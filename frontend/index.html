@@ -9,9 +9,9 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/impact" rel="stylesheet">
     <style>
-        @import url('https://fonts.cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/7.0.96/css/materialdesignicons.min.css');
+        @import url('https://fonts.cdnfonts.com/css/materialdesignicons');
 
         html, body {
             margin: 0;
@@ -206,7 +206,7 @@
                 TAKE THE SHOT! 📸
                 <span class="absolute inset-0 bg-white opacity-10 rounded-full"></span>
             </label>
-            <input type="file" id="cameraInput" accept="image/*" capture="user">
+            <input type="file" id="cameraInput" accept="image/*" capture="user" multiple>
         </div>
     </div>
 </div>
@@ -242,7 +242,7 @@
         const cameraInput = document.getElementById('cameraInput');
         const bomberCount = document.getElementById('bomber-count');
 
-        // Fetch photo bomber count on startup (unchanged)
+        // Fetch photo bomber count
         async function fetchBomberCount() {
             try {
                 const response = await fetch('/api/count');
@@ -261,6 +261,19 @@
         cameraInput.addEventListener('change', async (event) => {
             const files = event.target.files;
             if (files.length === 0) return;
+
+            // Client-side validation
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            for (const file of files) {
+                if (!allowedTypes.includes(file.type)) {
+                    showModal('Invalid File', 'Please upload only JPG, PNG, GIF, or WebP images.');
+                    return;
+                }
+                if (file.size > 10 * 1024 * 1024) {
+                    showModal('File Too Large', 'Images must be under 10MB. Try a smaller file!');
+                    return;
+                }
+            }
 
             // Create FormData and append files
             const formData = new FormData();
@@ -283,10 +296,14 @@
                 }
 
                 const data = await response.json();
-                // Show success modal
+                // Refresh bomber count
+                await fetchBomberCount();
+                // Show success modal with image previews
                 showModal(
                     'Awesome Shot! 🎉',
-                    `Uploaded ${data.length} photo${data.length > 1 ? 's' : ''}! Share with #TomorrowlandPhotobomb!`
+                    `Uploaded ${data.length} photo${data.length > 1 ? 's' : ''}! Share with #TomorrowlandPhotobomb!`,
+                    'Keep Dancing! 🕺',
+                    data.map(item => `/api/images/${item.file_name}`) // Use file_name with extension
                 );
 
                 // Reset input
@@ -302,8 +319,8 @@
             }
         });
 
-        // Modal display function
-        function showModal(title, message, buttonText = 'Keep Dancing! 🕺') {
+        // Modal display function with image previews
+        function showModal(title, message, buttonText = 'Keep Dancing! 🕺', imageUrls = []) {
             // Remove existing modal if any
             const existingModal = document.querySelector('.modal');
             if (existingModal) document.body.removeChild(existingModal);
@@ -321,6 +338,19 @@
             const messageEl = document.createElement('p');
             messageEl.className = 'mb-6 text-white';
             messageEl.innerHTML = message;
+
+            if (imageUrls.length > 0) {
+                const previewContainer = document.createElement('div');
+                previewContainer.className = 'flex flex-wrap justify-center gap-2 mb-4';
+                imageUrls.forEach(url => {
+                    const img = document.createElement('img');
+                    img.src = url;
+                    img.className = 'w-16 h-16 object-cover rounded';
+                    img.alt = 'Uploaded photobomb';
+                    previewContainer.appendChild(img);
+                });
+                modalContent.appendChild(previewContainer);
+            }
 
             const button = document.createElement('button');
             button.className = 'gradient-animate text-white font-bold py-3 px-6 rounded-full';

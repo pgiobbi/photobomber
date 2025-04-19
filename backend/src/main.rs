@@ -9,7 +9,9 @@ use actix_multipart::form::{
     MultipartForm,
     tempfile::{TempFile, TempFileConfig},
 };
+use actix_web::http::header::{ContentDisposition, DispositionParam, DispositionType};
 use mime::{IMAGE, Mime};
+use sanitize_filename::sanitize;
 use tokio::fs;
 
 const MAX_FILE_SIZE: u64 = 10 * 1024 * 1024; // 10MB in bytes
@@ -55,6 +57,16 @@ fn get_extension_from_filename(filename: &str) -> Option<&str> {
     Path::new(filename).extension().and_then(|ext| ext.to_str())
 }
 
+// // Validate image content
+// async fn validate_image_content(path: &str) -> Result<(), String> {
+//     let file = fs::read(path).await.map_err(|e| e.to_string())?;
+//     let format = image::guess_format(&file).map_err(|e| e.to_string())?;
+//     match format {
+//         ImageFormat::Jpeg | ImageFormat::Png | ImageFormat::Gif | ImageFormat::WebP => Ok(()),
+//         _ => Err("Unsupported image format".to_string()),
+//     }
+// }
+
 // Image upload endpoint
 #[post("/upload")]
 async fn upload_images(
@@ -95,6 +107,12 @@ async fn upload_images(
             actix_web::error::ErrorInternalServerError(format!("Failed to save file: {}", e))
         })?;
 
+        // // Validate image content
+        // if let Err(e) = validate_image_content(&sanitized_path).await {
+        //     fs::remove_file(&sanitized_path).await.ok();
+        //     return Ok(HttpResponse::BadRequest().json(format!("Invalid image: {}", e)));
+        // }
+
         responses.push(UploadResponse {
             file_id,
             file_name: file_name_with_ext,
@@ -106,6 +124,64 @@ async fn upload_images(
     }
 
     Ok(HttpResponse::Ok().json(responses))
+}
+
+// Simplified image retrieval endpoint
+#[get("/images/{filename}")]
+async fn get_image(path: web::Path<String>) -> Result<impl Responder, Error> {
+    let filename = path.into_inner();
+
+    // Sanitize filename to prevent path traversal
+    let sanitized_filename = sanitize(&filename);
+    if sanitized_filename.contains("..")
+        || sanitized_filename.contains('/')
+        || sanitized_filename.contains('\\')
+    {
+        return Ok(HttpResponse::BadRequest().json("Invalid filename"));
+    }
+
+    // Check if extension is allowed
+    let ext = Path::new(&sanitized_filename)
+        .extension()
+        .and_then(|e| e.to_str())
+        .filter(|e| ALLOWED_EXTENSIONS.contains(e))
+        .ok_or_else(|| actix_web::error::ErrorBadRequest("Invalid file extension"))?;
+
+    // Construct and validate file path
+    let file_path = format!("{}/{}", UPLOAD_DIR, sanitized_filename);
+    if !file_path.starts_with(UPLOAD_DIR) {
+        return Ok(HttpResponse::BadRequest().json("Invalid file path"));
+    }
+
+    // Check if file exists
+    if fs::metadata(&file_path).await.is_err() {
+        return Ok(HttpResponse::BadRequest().json("Image not found"));
+    }
+
+    // Read file
+    let content = fs::read(&file_path)
+        .await
+        .map_err(|e| actix_web::error::ErrorInternalServerError(e))?;
+
+    // Determine MIME type
+    let mime = match ext {
+        "jpg" | "jpeg" => mime::IMAGE_JPEG,
+        "png" => mime::IMAGE_PNG,
+        "gif" => mime::IMAGE_GIF,
+        // "webp" => mime::IMAGE_WEBP,
+        _ => mime::APPLICATION_OCTET_STREAM,
+    };
+
+    // Set content disposition for safe rendering
+    let disposition = ContentDisposition {
+        disposition: DispositionType::Inline,
+        parameters: vec![DispositionParam::Filename(sanitized_filename)],
+    };
+
+    Ok(HttpResponse::Ok()
+        .content_type(mime)
+        .append_header(disposition)
+        .body(content))
 }
 
 // Count endpoint
@@ -161,7 +237,8 @@ async fn main() -> std::io::Result<()> {
             .service(
                 web::scope("/api")
                     .service(get_upload_count)
-                    .service(upload_images),
+                    .service(upload_images)
+                    .service(get_image),
             )
     })
     .bind(("0.0.0.0", 3002))?
