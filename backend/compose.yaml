@@ -6,9 +6,12 @@ services:
       args:
         RUST_VERSION: 1.85.1
         APP_NAME: photobomb-backend
+    volumes:
+      - ./uploads:/var/local/uploads
     ports:
       - "127.0.0.1:3002:3002"
     environment:
       - RUST_LOG=info
+      - UPLOAD_DIR=/var/local/uploads
     platform: linux/arm64
     restart: unless-stopped

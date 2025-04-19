@@ -3,6 +3,7 @@ use actix_web::middleware::NormalizePath;
 use actix_web::{App, Error, HttpResponse, HttpServer, Responder, get, http, post, web};
 use serde::Serialize;
 use std::path::Path;
+use std::string::ToString;
 use uuid::Uuid;
 
 use actix_multipart::form::{
@@ -12,10 +13,10 @@ use actix_multipart::form::{
 use actix_web::http::header::{ContentDisposition, DispositionParam, DispositionType};
 use mime::{IMAGE, Mime};
 use sanitize_filename::sanitize;
+use std::env;
 use tokio::fs;
 
 const MAX_FILE_SIZE: u64 = 10 * 1024 * 1024; // 10MB in bytes
-const UPLOAD_DIR: &str = "./uploads";
 
 // Whitelist of allowed image extensions
 const ALLOWED_EXTENSIONS: &[&str] = &["jpg", "jpeg", "png", "gif", "webp"];
@@ -38,6 +39,10 @@ struct UploadResponse {
 #[derive(Serialize)]
 struct CountResponse {
     count: u64,
+}
+
+struct AppState {
+    upload_dir: String,
 }
 
 // Map MIME type to file extension
@@ -71,6 +76,7 @@ fn get_extension_from_filename(filename: &str) -> Option<&str> {
 #[post("/upload")]
 async fn upload_images(
     MultipartForm(form): MultipartForm<ImageUploadForm>,
+    app_state: web::Data<AppState>,
 ) -> Result<impl Responder, Error> {
     let mut responses = Vec::new();
 
@@ -100,7 +106,7 @@ async fn upload_images(
 
         // Create persistent file path with extension
         let file_name_with_ext = format!("{}.{}", file_id, extension);
-        let file_path = format!("{}/{}", UPLOAD_DIR, file_name_with_ext);
+        let file_path = format!("{}/{}", app_state.upload_dir, file_name_with_ext);
 
         // Persist the file
         file.file.persist(&file_path).map_err(|e| {
@@ -128,7 +134,10 @@ async fn upload_images(
 
 // Simplified image retrieval endpoint
 #[get("/images/{filename}")]
-async fn get_image(path: web::Path<String>) -> Result<impl Responder, Error> {
+async fn get_image(
+    path: web::Path<String>,
+    app_state: web::Data<AppState>,
+) -> Result<impl Responder, Error> {
     let filename = path.into_inner();
 
     // Sanitize filename to prevent path traversal
@@ -148,8 +157,8 @@ async fn get_image(path: web::Path<String>) -> Result<impl Responder, Error> {
         .ok_or_else(|| actix_web::error::ErrorBadRequest("Invalid file extension"))?;
 
     // Construct and validate file path
-    let file_path = format!("{}/{}", UPLOAD_DIR, sanitized_filename);
-    if !file_path.starts_with(UPLOAD_DIR) {
+    let file_path = format!("{}/{}", app_state.upload_dir, sanitized_filename);
+    if !file_path.starts_with(&app_state.upload_dir) {
         return Ok(HttpResponse::BadRequest().json("Invalid file path"));
     }
 
@@ -186,9 +195,9 @@ async fn get_image(path: web::Path<String>) -> Result<impl Responder, Error> {
 
 // Count endpoint
 #[get("/count")]
-async fn get_upload_count() -> Result<impl Responder, Error> {
+async fn get_upload_count(app_state: web::Data<AppState>) -> Result<impl Responder, Error> {
     let mut count = 0;
-    let mut entries = fs::read_dir(UPLOAD_DIR)
+    let mut entries = fs::read_dir(&app_state.upload_dir)
         .await
         .map_err(|e| actix_web::error::ErrorInternalServerError(e))?;
 
@@ -210,11 +219,15 @@ async fn get_upload_count() -> Result<impl Responder, Error> {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     // Create upload directory
-    std::fs::create_dir_all(UPLOAD_DIR)?;
+    let upload_dir = env::var("UPLOAD_DIR").unwrap_or("./uploads".to_string());
+    std::fs::create_dir_all(upload_dir.clone().to_string())?;
 
-    HttpServer::new(|| {
+    HttpServer::new(move || {
         App::new()
-            .app_data(TempFileConfig::default().directory(UPLOAD_DIR))
+            .app_data(web::Data::new(AppState {
+                upload_dir: upload_dir.clone(),
+            }))
+            .app_data(TempFileConfig::default().directory(upload_dir.to_string()))
             .wrap(
                 Cors::default()
                     .allowed_origin_fn(|origin, _req_head| {
@@ -223,10 +236,10 @@ async fn main() -> std::io::Result<()> {
 
                         // Allow localhost variations (http://localhost, http://127.0.0.1, http://[::1], any port)
                         origin_str.starts_with("http://localhost") ||
-                        origin_str.starts_with("http://127.0.0.1") ||
-                        origin_str.starts_with("http://[::1]") ||
-                        // Allow https://photobomber.servebeer.com
-                        origin_str == "https://photobomber.servebeer.com"
+                            origin_str.starts_with("http://127.0.0.1") ||
+                            origin_str.starts_with("http://[::1]") ||
+                            // Allow https://photobomber.servebeer.com
+                            origin_str == "https://photobomber.servebeer.com"
                     })
                     .allowed_methods(vec!["GET", "POST", "PUT", "DELETE"])
                     .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
