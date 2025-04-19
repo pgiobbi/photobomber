@@ -211,7 +211,7 @@
       // Fetch photo bomber count on startup
       async function fetchBomberCount() {
         try {
-          const response = await fetch('http://localhost:3002/api/count');
+          const response = await fetch('/api/count');
           if (!response.ok) throw new Error('API request failed');
           const data = await response.json();
           bomberCount.textContent = data.count.toLocaleString();
