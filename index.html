@@ -206,10 +206,6 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const cameraInput = document.getElementById('cameraInput');
-      const cameraLabel = document.querySelector('label[for="cameraInput"]');
-      const video = document.getElementById('videoElement');
-      const canvas = document.getElementById('canvasElement');
-      const ctx = canvas.getContext('2d');
       const bomberCount = document.getElementById('bomber-count');
 
       // Fetch photo bomber count on startup
@@ -226,56 +222,6 @@
       }
 
       fetchBomberCount();
-
-      // Detect mobile devices (iOS or Android)
-      const isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
-
-      cameraLabel.addEventListener('click', async (e) => {
-        e.preventDefault();
-
-        if (isMobile && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-          try {
-            let stream = await navigator.mediaDevices.getUserMedia({
-              video: { facingMode: { exact: 'user' } }
-            }).catch(async (err) => {
-              console.warn('Exact facingMode failed, trying loose:', err);
-              return await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'user' }
-              });
-            });
-            video.srcObject = stream;
-            video.style.display = 'block';
-            video.style.position = 'fixed';
-            video.style.top = '0';
-            video.style.left = '0';
-            video.style.width = '100%';
-            video.style.height = '100%';
-            video.style.zIndex = '1000';
-            video.style.objectFit = 'cover';
-
-            cameraLabel.innerHTML = 'CAPTURE! 📸';
-            cameraLabel.addEventListener('click', capturePhoto, { once: true });
-          } catch (err) {
-            console.error('WebRTC failed:', err);
-            cameraInput.click();
-          }
-        } else {
-          cameraInput.click();
-        }
-      });
-
-      function capturePhoto() {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL('image/jpeg');
-
-        video.srcObject.getTracks().forEach(track => track.stop());
-        video.style.display = 'none';
-        cameraLabel.innerHTML = 'TAKE THE SHOT! 📸 <span class="absolute inset-0 bg-white opacity-10 rounded-full"></span>';
-
-        showModal();
-      }
 
       cameraInput.addEventListener('change', (event) => {
         if (event.target.files.length > 0) {
