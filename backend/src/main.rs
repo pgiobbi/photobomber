@@ -13,7 +13,7 @@ use actix_web::{App, HttpServer, http, web};
 use env_logger::Env;
 use jwt_compact::alg::{Ed25519, Hs256Key};
 use jwt_compact::jwk::KeyType::KeyPair;
-use log::{error, info};
+use log::{debug, error, info};
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::string::ToString;
@@ -72,7 +72,7 @@ async fn main() -> std::io::Result<()> {
                             || origin_str.starts_with("http://[::1]")
                             || origin_str == "https://photobomber.servebeer.com";
 
-                        info!(
+                        debug!(
                             "{}",
                             format!(
                                 "CORS check for origin {}: {}",
@@ -94,7 +94,7 @@ async fn main() -> std::io::Result<()> {
             )
             .service(
                 web::scope("/api/images")
-                    // .wrap(AuthMiddlewareFactory) // TODO: enable
+                    .wrap(AuthMiddlewareFactory)
                     .service(get_upload_count)
                     .service(upload_images)
                     .service(get_image),
