@@ -275,9 +275,10 @@
             // Create FormData and append files
             const formData = new FormData();
             for (const file of files) {
-                const {compressedBlob, fileSizeKB} = await compressImage(file);
+                const res = await compressImage(file);
+                const {compressedBlob, fileSizeKB} = res;
                 if (fileSizeKB > 1024) {
-                    showModal('File Too Large', 'Images must be under 1MB. Try a smaller file!');
+                    showModal('File Too Large', 'Images must be under 1MB. Try a smaller file!' + fileSizeKB + ' ' + JSON.stringify(res.dimensions) + ' ' + res.qualityUsed);
                     return;
                 }
                 formData.append('images', compressedBlob);
