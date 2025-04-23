@@ -11,7 +11,10 @@ services:
     ports:
       - "127.0.0.1:3002:3002"
     environment:
-      - RUST_LOG=info
+      - RUST_LOG=debug
       - UPLOAD_DIR=/var/local/uploads
+      - FPX_JWT_SECRET=your-jwt-secret-here
+      - FPX_ACCESS_TOKEN_DURATION_MINUTES=1440
+      - FPX_REFRESH_TOKEN_DURATION_MINUTES=10080
     platform: linux/arm64
     restart: unless-stopped
