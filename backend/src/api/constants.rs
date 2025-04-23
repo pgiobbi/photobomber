@@ -1,3 +1,5 @@
+pub const APP_NAME: &str = "photobomber-api";
+
 pub const DEFAULT_MAX_FILE_SIZE: u64 = 1024 * 1024; // 1MB in bytes
 
 // Whitelist of allowed image extensions

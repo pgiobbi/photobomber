@@ -2,13 +2,19 @@ mod api;
 mod types;
 
 use crate::api::constants::DEFAULT_MAX_FILE_SIZE;
+use crate::api::extractors::auth_middleware::AuthMiddlewareFactory;
+use crate::api::routes::auth::login;
 use crate::api::routes::images::{get_image, get_upload_count, upload_images};
 use actix_cors::Cors;
+use actix_jwt_auth_middleware::{Authority, FromRequest, TokenSigner};
 use actix_multipart::form::tempfile::TempFileConfig;
 use actix_web::middleware::NormalizePath;
 use actix_web::{App, HttpServer, http, web};
 use env_logger::Env;
+use jwt_compact::alg::{Ed25519, Hs256Key};
+use jwt_compact::jwk::KeyType::KeyPair;
 use log::{error, info};
+use serde::{Deserialize, Serialize};
 use std::env;
 use std::string::ToString;
 
@@ -83,7 +89,12 @@ async fn main() -> std::io::Result<()> {
             )
             .wrap(NormalizePath::trim())
             .service(
-                web::scope("/api")
+                web::scope("/api/auth")
+                    .service(web::resource("login").route(web::post().to(login))),
+            )
+            .service(
+                web::scope("/api/images")
+                    // .wrap(AuthMiddlewareFactory) // TODO: enable
                     .service(get_upload_count)
                     .service(upload_images)
                     .service(get_image),

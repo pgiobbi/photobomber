@@ -12,6 +12,35 @@ use std::path::Path;
 use tokio::fs;
 use uuid::Uuid;
 
+// Count endpoint
+#[get("/count")]
+pub async fn get_upload_count(app_state: web::Data<AppState>) -> Result<impl Responder, Error> {
+    info!("Fetching upload count");
+
+    let mut count = 0;
+    let mut entries = match fs::read_dir(&app_state.upload_dir).await {
+        Ok(entries) => entries,
+        Err(e) => {
+            error!("{}", format!("Failed to read upload directory: {}", e));
+            return Err(actix_web::error::ErrorInternalServerError(e));
+        }
+    };
+
+    while let Some(entry) = entries.next_entry().await.map_err(|e| {
+        error!("{}", format!("Error reading directory entry: {}", e));
+        actix_web::error::ErrorInternalServerError(e)
+    })? {
+        if let Some(ext) = entry.path().extension().and_then(|e| e.to_str()) {
+            if ALLOWED_EXTENSIONS.contains(&ext) {
+                count += 1;
+            }
+        }
+    }
+
+    info!("{}", format!("Retrieved upload count: {}", count));
+    Ok(HttpResponse::Ok().json(ImageCountResponse { count }))
+}
+
 // Image upload endpoint
 #[post("/upload")]
 pub async fn upload_images(
@@ -91,7 +120,7 @@ pub async fn upload_images(
 }
 
 // Simplified image retrieval endpoint
-#[get("/images/{filename}")]
+#[get("/{filename}")]
 pub async fn get_image(
     path: web::Path<String>,
     app_state: web::Data<AppState>,
@@ -160,33 +189,4 @@ pub async fn get_image(
         .content_type(mime)
         .append_header(disposition)
         .body(content))
-}
-
-// Count endpoint
-#[get("/count")]
-pub async fn get_upload_count(app_state: web::Data<AppState>) -> Result<impl Responder, Error> {
-    info!("Fetching upload count");
-
-    let mut count = 0;
-    let mut entries = match fs::read_dir(&app_state.upload_dir).await {
-        Ok(entries) => entries,
-        Err(e) => {
-            error!("{}", format!("Failed to read upload directory: {}", e));
-            return Err(actix_web::error::ErrorInternalServerError(e));
-        }
-    };
-
-    while let Some(entry) = entries.next_entry().await.map_err(|e| {
-        error!("{}", format!("Error reading directory entry: {}", e));
-        actix_web::error::ErrorInternalServerError(e)
-    })? {
-        if let Some(ext) = entry.path().extension().and_then(|e| e.to_str()) {
-            if ALLOWED_EXTENSIONS.contains(&ext) {
-                count += 1;
-            }
-        }
-    }
-
-    info!("{}", format!("Retrieved upload count: {}", count));
-    Ok(HttpResponse::Ok().json(ImageCountResponse { count }))
 }
