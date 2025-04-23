@@ -17,7 +17,7 @@ use std::string::ToString;
 use tokio::fs;
 use uuid::Uuid;
 
-const MAX_FILE_SIZE: u64 = 10 * 1024 * 1024; // 10MB in bytes
+const MAX_FILE_SIZE: u64 = 1024 * 1024; // 1MB in bytes
 
 // Whitelist of allowed image extensions
 const ALLOWED_EXTENSIONS: &[&str] = &["jpg", "jpeg", "png", "gif", "webp"];
@@ -25,7 +25,7 @@ const ALLOWED_EXTENSIONS: &[&str] = &["jpg", "jpeg", "png", "gif", "webp"];
 // Structure for the multipart form
 #[derive(Debug, MultipartForm)]
 struct ImageUploadForm {
-    #[multipart(rename = "images", limit = "10MB")]
+    #[multipart(rename = "images", limit = "1MB")]
     images: Vec<TempFile>,
 }
 
@@ -83,8 +83,8 @@ async fn upload_images(
 
         // Validate file size
         if file.size > MAX_FILE_SIZE as usize {
-            warn!("{}", format!("File size {} exceeds 10MB limit", file.size));
-            return Ok(HttpResponse::BadRequest().json("File size exceeds 10MB limit"));
+            warn!("{}", format!("File size {} exceeds 1MB limit", file.size));
+            return Ok(HttpResponse::BadRequest().json("File size exceeds 1MB limit"));
         }
 
         // Get or generate filename
