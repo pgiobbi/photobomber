@@ -246,7 +246,7 @@
         // Fetch photo bomber count
         async function fetchBomberCount() {
             try {
-                const response = await fetch('/api/count');
+                const response = await fetch('/api/images/count');
                 if (!response.ok) throw new Error('API request failed');
                 const data = await response.json();
                 bomberCount.textContent = data.count.toLocaleString();
@@ -288,7 +288,7 @@
             showModal('Uploading...', 'Your photobomb is being sent! 🚀');
 
             try {
-                const response = await fetch('/api/upload', {
+                const response = await fetch('/api/images/upload', {
                     method: 'POST',
                     body: formData,
                 });
