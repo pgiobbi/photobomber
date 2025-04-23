@@ -17,7 +17,7 @@ use std::string::ToString;
 use tokio::fs;
 use uuid::Uuid;
 
-const MAX_FILE_SIZE: u64 = 1024 * 1024; // 1MB in bytes
+const DEFAULT_MAX_FILE_SIZE: u64 = 1024 * 1024; // 1MB in bytes
 
 // Whitelist of allowed image extensions
 const ALLOWED_EXTENSIONS: &[&str] = &["jpg", "jpeg", "png", "gif", "webp"];
@@ -42,8 +42,14 @@ struct CountResponse {
     count: u64,
 }
 
+type Bytes = u64;
+
+#[derive(Clone)]
 struct AppState {
+    /// Path to the upload directory.
     upload_dir: String,
+    /// Max upload file size (bytes).
+    max_file_size: Bytes,
 }
 
 // Map MIME type to file extension
@@ -82,7 +88,7 @@ async fn upload_images(
         }
 
         // Validate file size
-        if file.size > MAX_FILE_SIZE as usize {
+        if file.size > app_state.max_file_size as usize {
             warn!("{}", format!("File size {} exceeds 1MB limit", file.size));
             return Ok(HttpResponse::BadRequest().json("File size exceeds 1MB limit"));
         }
@@ -252,19 +258,26 @@ async fn main() -> std::io::Result<()> {
     // Create upload directory
     let upload_dir = env::var("UPLOAD_DIR").unwrap_or("./uploads".to_string());
     match std::fs::create_dir_all(upload_dir.clone()) {
-        Ok(_) => {
-            info!("{}", format!("Created upload directory: {}", upload_dir));
-        }
+        Ok(_) => {}
         Err(e) => {
             error!("{}", format!("Failed to create upload directory: {}", e));
             return Err(e);
         }
     }
 
+    let max_file_size = env::var("MAX_FILE_SIZE")
+        .unwrap_or(DEFAULT_MAX_FILE_SIZE.to_string())
+        .parse::<u64>()
+        .unwrap_or(DEFAULT_MAX_FILE_SIZE);
+
+    info!("UPLOAD_DIR    {:>16}: {}", "", &upload_dir);
+    info!("MAX_FILE_SIZE {:>16}: {}", "", &max_file_size);
+
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(AppState {
                 upload_dir: upload_dir.clone(),
+                max_file_size,
             }))
             .app_data(TempFileConfig::default().directory(upload_dir.to_string()))
             .wrap(
@@ -279,11 +292,14 @@ async fn main() -> std::io::Result<()> {
                             || origin_str.starts_with("http://[::1]")
                             || origin_str == "https://photobomber.servebeer.com";
 
-                        info!("{}", format!(
-                            "CORS check for origin {}: {}",
-                            origin_str,
-                            if allowed { "allowed" } else { "denied" }
-                        ));
+                        info!(
+                            "{}",
+                            format!(
+                                "CORS check for origin {}: {}",
+                                origin_str,
+                                if allowed { "allowed" } else { "denied" }
+                            )
+                        );
                         allowed
                     })
                     .allowed_methods(vec!["GET", "POST", "PUT", "DELETE"])
