@@ -3,7 +3,7 @@ mod types;
 
 use crate::api::constants::DEFAULT_MAX_FILE_SIZE;
 use crate::api::extractors::auth_middleware::AuthMiddlewareFactory;
-use crate::api::routes::auth::{get_profile, login};
+use crate::api::routes::auth::{get_profile, login, logout};
 use crate::api::routes::images::{get_image, get_upload_count, upload_images};
 use crate::api::routes::location::{get_location, post_location};
 use crate::types::state::{AppState, CredentialState, LocationState};
@@ -93,6 +93,7 @@ async fn main() -> std::io::Result<()> {
             .service(
                 web::scope("/api/auth")
                     .service(web::resource("login").route(web::post().to(login)))
+                    .service(web::resource("logout").route(web::post().to(logout)))
                     .service(
                         web::resource("profile")
                             .wrap(AuthMiddlewareFactory)
