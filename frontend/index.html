@@ -44,24 +44,24 @@
         }
 
         .gradient-animate {
-            background: linear-gradient(60deg, #ff00ff, #00ffff, #ff4444, #ff00ff);
-            background-size: 300% 300%;
-            animation: animatedGradient 6s ease infinite alternate, ctaPulse 1.5s ease-in-out infinite;
+            background: linear-gradient(60deg, #ff00ff, #d7ef00, #ff4444, #ff00ff);
+            background-size: 200% 200%;
+            animation: animatedGradient 8s ease-in-out infinite alternate, ctaPulse 1.5s ease-in-out infinite;
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: #fff;
         }
 
         @keyframes animatedGradient {
             0% {
-                background-position: 0% 50%;
+                background-position: 70% 100%;
             }
             100% {
-                background-position: 300% 50%;
+                background-position: 180% 50%;
             }
         }
 
         .count-glow {
-            text-shadow: 0 0 15px #ff00ff, 0 0 25px #00ffff, 0 0 35px #ff4444;
+            text-shadow: 0 0 15px #ff00ff, 0 0 25px #d7ef00, 0 0 35px #ff4444;
             animation: pulse 2s ease-in-out infinite;
         }
 
@@ -162,17 +162,17 @@
         }
 
         .cta-pulse {
-            box-shadow: 0 0 20px #ff00ff, 0 0 30px #00ffff;
+            box-shadow: 0 0 20px #ff00ff, 0 0 30px #d7ef00;
         }
 
         @keyframes ctaPulse {
             0%, 100% {
                 transform: scale(1);
-                box-shadow: 0 0 20px #ff00ff, 0 0 30px #00ffff;
+                /*box-shadow: 0 0 20px #ff00ff, 0 0 30px #d7ef00;*/
             }
             50% {
-                transform: scale(1.05);
-                box-shadow: 0 0 30px #ff00ff, 0 0 40px #00ffff;
+                transform: scale(1.02);
+                /*box-shadow: 0 0 30px #ff00ff, 0 0 40px #d7ef00;*/
             }
         }
     </style>
@@ -196,14 +196,14 @@
         <div class="flex items-center justify-center space-x-3 mb-2">
             <span class="text-4xl bounce">📸</span>
             <h1 class="text-4xl sm:text-5xl font-bold festival-text title-glow"
-                style="text-shadow: 2px 2px 8px #ff00ff, -2px -2px 8px #00ffff;">
+                style="text-shadow: 2px 2px 8px #ff00ff, -2px -2px 8px #d7ef00;">
                 PHOTOBOMB US!
             </h1>
             <span class="text-4xl shake">💣</span>
         </div>
         <div class="h-2 w-48 mx-auto bg-gradient-to-r from-pink-500 via-blue-500 to-purple-500 rounded-full mt-2 mb-4"></div>
         <p class="text-lg sm:text-xl festival-text glow">
-            Join <span id="bomber-count" class="text-3xl count-glow">Loading...</span> Photo Bombers!
+            Join <span id="bomber-count" class="text-3xl count-glow">...</span> Photo Bombers!
         </p>
     </div>
 </div>
