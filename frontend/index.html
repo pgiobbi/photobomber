@@ -168,21 +168,245 @@
         @keyframes ctaPulse {
             0%, 100% {
                 transform: scale(1);
-                /*box-shadow: 0 0 20px #ff00ff, 0 0 30px #d7ef00;*/
             }
             50% {
                 transform: scale(1.02);
-                /*box-shadow: 0 0 30px #ff00ff, 0 0 40px #d7ef00;*/
             }
+        }
+
+        /* New styles for high contrast mode */
+        .high-contrast-mode {
+            background-image: linear-gradient(135deg, rgba(5, 10, 20, 0.95), rgba(15, 25, 40, 0.9)), url('/assets/orbyz-notext.webp');
+        }
+
+        .high-contrast-mode .text-white {
+            color: #ffffff !important;
+            text-shadow: 0 0 3px #000000;
+        }
+
+        /* Progress indicators */
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .step {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin: 0 4px;
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .step.active {
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Gallery of example photos */
+        .example-gallery {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 8px 0;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .example-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+            scroll-snap-align: start;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .example-photo:hover {
+            transform: scale(1.05);
+            border-color: #ffffff;
+        }
+
+        /* Power saving mode toggle */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 24px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.2);
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #41B0E8;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(22px);
+        }
+
+        /* Badge styles */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin: 0.25rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Map marker positioning */
+        .map-container {
+            position: relative;
+            width: 100%;
+            height: 120px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .map-marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #ff4444;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 0 4px rgba(255, 68, 68, 0.4);
+            animation: markerPulse 1.5s infinite;
+        }
+
+        @keyframes markerPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 12px rgba(255, 68, 68, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 68, 68, 0);
+            }
+        }
+
+        /* Preview screen */
+        .preview-container {
+            position: relative;
+            width: 100%;
+            max-width: 320px;
+            height: 320px;
+            margin: 0 auto;
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+
+        #previewImage {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Social share buttons */
+        .social-share {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 1rem;
+        }
+
+        .social-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-3px);
+        }
+
+        .instagram {
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+        }
+
+        .twitter {
+            background-color: #1DA1F2;
+        }
+
+        .tiktok {
+            background: linear-gradient(45deg, #000000, #25F4EE, #FE2C55, #000000);
         }
     </style>
 </head>
 <body class="h-screen flex flex-col items-center justify-between text-white">
+<!-- Power saving mode toggle -->
+<div class="absolute top-4 right-4 z-50 flex items-center">
+    <span class="text-xs">🔋</span>
+    <label class="toggle-switch">
+        <input type="checkbox" id="powerSaveToggle">
+        <span class="toggle-slider"></span>
+    </label>
+</div>
+
+<!-- High contrast mode toggle -->
+<div class="absolute top-4 left-4 z-50 flex items-center">
+    <span class="text-xs">👁️</span>
+    <label class="toggle-switch">
+        <input type="checkbox" id="contrastToggle">
+        <span class="toggle-slider"></span>
+    </label>
+</div>
+
 <!-- Decorative elements -->
 <div class="halo bg-blue-400 w-64 h-64 top-0 left-0"></div>
 <div class="halo bg-purple-500 w-48 h-48 bottom-0 right-0"></div>
 
-<div class="absolute inset-0 overflow-hidden pointer-events-none">
+<div class="absolute inset-0 overflow-hidden pointer-events-none" id="particlesContainer">
     <div class="particle w-1 h-1 top-1/4 left-1/4"></div>
     <div class="particle w-2 h-2 top-1/3 left-1/2" style="animation-delay: 1s;"></div>
     <div class="particle w-1 h-1 top-1/2 left-3/4" style="animation-delay: 2s;"></div>
@@ -190,86 +414,242 @@
     <div class="particle w-1 h-1 top-3/4 left-1/2" style="animation-delay: 4s;"></div>
 </div>
 
-<!-- Header -->
-<div class="w-full pt-10 px-5">
-    <div class="text-center">
-        <div class="flex items-center justify-center space-x-3 mb-2">
-            <span class="text-4xl bounce">📸</span>
-            <h1 class="text-4xl sm:text-5xl font-bold festival-text title-glow"
-                style="text-shadow: 2px 2px 8px #ff00ff, -2px -2px 8px #d7ef00;">
-                PHOTOBOMB US!
-            </h1>
-            <span class="text-4xl shake">💣</span>
-        </div>
-        <div class="h-2 w-48 mx-auto bg-gradient-to-r from-pink-500 via-blue-500 to-purple-500 rounded-full mt-2 mb-4"></div>
-        <p class="text-lg sm:text-xl festival-text glow">
-            Join <span id="bomber-count" class="text-3xl count-glow">...</span> Photo Bombers!
-        </p>
-    </div>
-</div>
-
-<!-- Main content -->
-<div class="text-center p-4 sm:p-6 max-w-md mx-auto flex-grow flex flex-col justify-center">
-    <div class="space-y-6">
-        <p class="text-xl sm:text-2xl mb-6 leading-relaxed">
-            We're at <span class="font-extrabold text-blue-300 glow">Tomorrowland!</span><br>
-            Snap a selfie with us! 🤳
-        </p>
-
-        <div class="bg-white bg-opacity-10 backdrop-filter backdrop-blur-sm text-white rounded-xl p-4 sm:p-5 shadow-lg border border-white border-opacity-20">
-            <p class="text-lg sm:text-xl font-semibold">
-                Find us: Two friends in neon gear, dancing like nobody's watching! 🕺💃
+<!-- Main flex container -->
+<div class="flex flex-col min-h-screen w-full">
+    <!-- Header -->
+    <header class="pt-8 px-5">
+        <div class="text-center">
+            <div class="flex items-center justify-center space-x-3 mb-2">
+                <span class="text-4xl bounce" id="cameraEmoji">📸</span>
+                <h1 class="text-4xl sm:text-5xl font-bold festival-text title-glow"
+                    style="text-shadow: 2px 2px 8px #ff00ff, -2px -2px 8px #d7ef00;">
+                    PHOTOBOMB US!
+                </h1>
+                <span class="text-4xl shake" id="bombEmoji">💣</span>
+            </div>
+            <div class="h-2 w-48 mx-auto bg-gradient-to-r from-pink-500 via-blue-500 to-purple-500 rounded-full mt-2 mb-4"></div>
+            <p class="text-lg sm:text-xl festival-text glow">
+                Join <span id="bomber-count" class="text-3xl count-glow">...</span> Photo Bombers!
             </p>
         </div>
+    </header>
 
-        <div class="pt-4">
-            <p class="text-sm sm:text-base text-center mb-2 glow">
-                Ready to photobomb? 📸 You’re saying you’re 18+, got everyone’s OK in the pic, and are cool with our
-                <a href="privacy-policy.html" class="text-blue-300 hover:underline">Privacy Policy</a> &
-                <a href="terms-of-use.html" class="text-blue-300 hover:underline">Terms of Use</a>! 😎
-            </p>
-            <label for="cameraInput"
-                   class="block mx-auto gradient-animate text-white font-bold py-6 px-10 rounded-xl text-xl sm:text-2xl transition shadow-lg relative overflow-hidden cursor-pointer cta-pulse">
-                TAKE THE SHOT! 📸
-                <span class="absolute inset-0 bg-white opacity-10 rounded-full"></span>
-            </label>
-            <input type="file" id="cameraInput" accept="image/*" capture="user">
+    <!-- Main content -->
+    <main class="flex-grow flex items-center justify-center p-4 my-2">
+        <div class="space-y-5 max-w-md w-full" id="mainContent">
+            <!-- Step 1: Initial Screen -->
+            <div id="step1" class="text-center">
+                <div class="step-indicator mb-2">
+                    <div class="step active"></div>
+                    <div class="step"></div>
+                    <div class="step"></div>
+                </div>
+
+                <p class="text-xl sm:text-2xl mb-4 leading-relaxed">
+                    We're at <span class="font-extrabold text-blue-300 glow">Tomorrowland!</span><br>
+                    Snap a selfie with us! 🤳
+                </p>
+
+                <div class="bg-white bg-opacity-10 backdrop-filter backdrop-blur-sm text-white rounded-xl p-4 sm:p-5 shadow-lg border border-white border-opacity-20 mb-4">
+                    <p class="text-lg font-semibold mb-2">
+                        Find us: Two friends in neon gear, dancing like nobody's watching! 🕺💃
+                    </p>
+
+                    <!-- Current location information -->
+                    <p class="text-sm mb-3">
+                        <span class="inline-block animate-pulse">📍</span> Current area: <span id="currentLocation"
+                                                                                              class="font-bold text-blue-300">Main Stage</span>
+                    </p>
+
+                    <!-- Simple map -->
+                    <div class="map-container bg-blue-900 bg-opacity-30">
+<!--                        <img src="/api/placeholder/400/120" alt="Festival map"-->
+<!--                             class="w-full h-full object-cover opacity-50">-->
+                        <div class="map-marker"></div>
+                    </div>
+
+<!--                    <div class="mt-3 flex flex-wrap justify-center gap-1">-->
+<!--                        <span class="badge">🎵 Main Stage</span>-->
+<!--                        <span class="badge">🌴 Near Palm Trees</span>-->
+<!--                        <span class="badge">⚡ By LED Wall</span>-->
+<!--                    </div>-->
+                </div>
+
+                <!-- Example photobombs -->
+                <p class="text-sm mb-2">See some awesome photobombs:</p>
+                <div class="example-gallery mb-4 px-1">
+                    <img src="/assets/placeholders/example-1.webp" alt="Example photobomb 1" class="example-photo">
+                    <img src="/assets/placeholders/example-1.webp" alt="Example photobomb 2" class="example-photo">
+                    <img src="/assets/placeholders/example-1.webp" alt="Example photobomb 3" class="example-photo">
+                    <img src="/assets/placeholders/example-1.webp" alt="Example photobomb 4" class="example-photo">
+                </div>
+
+                <div class="pt-2">
+                    <p class="text-sm text-center mb-3 glow">
+                        Ready to photobomb? 📸 You're saying you're 18+, got everyone's OK in the pic, and are cool with
+                        our
+                        <a href="privacy-policy.html" class="text-blue-300 hover:underline">Privacy Policy</a> &
+                        <a href="terms-of-use.html" class="text-blue-300 hover:underline">Terms of Use</a>! 😎
+                    </p>
+                    <label for="cameraInput"
+                           class="block mx-auto gradient-animate text-white font-bold py-5 px-8 rounded-xl text-xl sm:text-2xl transition shadow-lg relative overflow-hidden cursor-pointer cta-pulse">
+                        TAKE THE SHOT! 📸
+                        <span class="absolute inset-0 bg-white opacity-10 rounded-full"></span>
+                    </label>
+                    <input type="file" id="cameraInput" accept="image/*" capture="user">
+                </div>
+            </div>
+
+            <!-- Step 2: Preview Screen (hidden by default) -->
+            <div id="step2" class="text-center hidden">
+                <div class="step-indicator mb-2">
+                    <div class="step"></div>
+                    <div class="step active"></div>
+                    <div class="step"></div>
+                </div>
+
+                <h2 class="text-2xl font-bold mb-3 glow">Preview Your Photobomb!</h2>
+
+                <div class="preview-container mb-4">
+                    <img id="previewImage" src="" alt="Preview">
+                </div>
+
+                <div class="flex justify-center space-x-4 mt-4">
+                    <button id="retakeBtn"
+                            class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white py-3 px-6 rounded-lg transition">
+                        Retake 📸
+                    </button>
+                    <button id="uploadBtn"
+                            class="gradient-animate text-white font-bold py-3 px-6 rounded-lg transition">
+                        Upload! 🚀
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Success Screen (hidden by default) -->
+            <div id="step3" class="text-center hidden">
+                <div class="step-indicator mb-2">
+                    <div class="step"></div>
+                    <div class="step"></div>
+                    <div class="step active"></div>
+                </div>
+
+                <h2 class="text-2xl font-bold mb-2 title-glow">AWESOME SHOT! 🎉</h2>
+
+                <div class="preview-container mb-3">
+                    <img id="finalImage" src="" alt="Your photobomb">
+                </div>
+
+                <div class="mb-4">
+                    <p class="mb-2">You earned a badge!</p>
+                    <div class="badge bg-gradient-to-r from-purple-600 to-blue-500 py-2 px-4">
+                        🌟 PHOTOBOMB HERO 🌟
+                    </div>
+                </div>
+
+                <p class="mb-3">Share with #TomorrowlandPhotobomb:</p>
+                <div class="social-share mb-4">
+                    <div class="social-btn instagram" id="shareInstagram">
+                        <span>📱</span>
+                    </div>
+                    <div class="social-btn twitter" id="shareTwitter">
+                        <span>🐦</span>
+                    </div>
+                    <div class="social-btn tiktok" id="shareTiktok">
+                        <span>🎵</span>
+                    </div>
+                </div>
+
+                <button id="newPhotoBtn"
+                        class="gradient-animate text-white font-bold py-3 px-6 rounded-lg transition mb-2">
+                    Take Another Shot! 🤳
+                </button>
+            </div>
         </div>
-    </div>
-</div>
+    </main>
 
-<!-- Footer -->
-<div class="w-full pb-10 px-5">
-    <p class="text-center text-base sm:text-lg mt-3 glow">
-        <a href="privacy-policy.html" class="text-blue-300 hover:underline font-bold">Privacy Policy</a> |
-        <a href="terms-of-use.html" class="text-blue-300 hover:underline font-bold">Terms of Use</a>
-    </p>
-    <p class="text-center text-sm sm:text-base mt-2">
-        Impressum: Tomorrowland Photobomb Crew, Italy, <a href="mailto:contact@yourdomain.com"
-                                                          class="text-blue-300 hover:underline">contact@yourdomain.com</a>
-    </p>
+    <!-- Footer -->
+    <footer class="pb-8 px-5">
+        <p class="text-center text-base sm:text-lg mt-1 glow">
+            <a href="privacy-policy.html" class="text-blue-300 hover:underline font-bold">Privacy Policy</a> |
+            <a href="terms-of-use.html" class="text-blue-300 hover:underline font-bold">Terms of Use</a>
+        </p>
+        <p class="text-center text-sm sm:text-base mt-2">
+            Impressum: Tomorrowland Photobomb Crew, Italy, <a href="mailto:contact@yourdomain.com"
+                                                              class="text-blue-300 hover:underline">contact@yourdomain.com</a>
+        </p>
+    </footer>
 </div>
 
 <canvas id="canvasElement"></canvas>
 
 <script>
-    async function login() {
-        try {
-            // Tokens are stored in cookies
-            await fetch('/api/auth/login', {
-                method: 'POST',
-                body: {}
-            });
-        } catch (err) {
-            console.error('Failed to fetch count:', err);
-        }
-    }
-</script>
-<script defer src="compress.js"></script>
-<script defer>
     document.addEventListener('DOMContentLoaded', () => {
         const cameraInput = document.getElementById('cameraInput');
         const bomberCount = document.getElementById('bomber-count');
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+        const previewImage = document.getElementById('previewImage');
+        const finalImage = document.getElementById('finalImage');
+        const retakeBtn = document.getElementById('retakeBtn');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const newPhotoBtn = document.getElementById('newPhotoBtn');
+        const powerSaveToggle = document.getElementById('powerSaveToggle');
+        const contrastToggle = document.getElementById('contrastToggle');
+        const particlesContainer = document.getElementById('particlesContainer');
+        const cameraEmoji = document.getElementById('cameraEmoji');
+        const bombEmoji = document.getElementById('bombEmoji');
+        const locationElement = document.getElementById('currentLocation');
+
+        // Sample locations to rotate through
+        const locations = [
+            "Main Stage",
+            "Atmosphere Stage",
+            "Freedom Stage",
+            "Core Stage",
+            "Garden of Madness"
+        ];
+
+        // Rotate location every few minutes
+        let locationIndex = 0;
+        setInterval(() => {
+            locationIndex = (locationIndex + 1) % locations.length;
+            locationElement.textContent = locations[locationIndex];
+            // Add a brief highlight effect
+            locationElement.classList.add('text-yellow-300');
+            setTimeout(() => locationElement.classList.remove('text-yellow-300'), 1000);
+        }, 180000); // Every 3 minutes
+
+        // Power saving mode toggle
+        powerSaveToggle.addEventListener('change', () => {
+            if (powerSaveToggle.checked) {
+                // Disable animations
+                document.body.classList.add('power-save');
+                particlesContainer.style.display = 'none';
+                cameraEmoji.classList.remove('bounce');
+                bombEmoji.classList.remove('shake');
+                // Remove other animations
+                document.querySelectorAll('.count-glow, .pulse, .cta-pulse').forEach(el => {
+                    el.style.animation = 'none';
+                });
+            } else {
+                // Re-enable animations
+                document.body.classList.remove('power-save');
+                particlesContainer.style.display = 'block';
+                cameraEmoji.classList.add('bounce');
+                bombEmoji.classList.add('shake');
+                // Reset animations
+                document.querySelectorAll('.count-glow, .pulse, .cta-pulse').forEach(el => {
+                    el.style.animation = '';
+                });
+            }
+        });
+
+        // High contrast mode toggle
+        contrastToggle.addEventListener('change', () => {
+            document.body.classList.toggle('high-contrast-mode', contrastToggle.checked);
+        });
 
         // Fetch photo bomber count
         async function fetchBomberCount() {
@@ -284,37 +664,72 @@
             }
         }
 
+        async function login() {
+            try {
+                // Tokens are stored in cookies
+                await fetch('/api/auth/login', {
+                    method: 'POST',
+                    body: {}
+                });
+            } catch (err) {
+                console.error('Failed to fetch count:', err);
+            }
+        }
+
         login().then(fetchBomberCount);
 
-        // Handle file input change and upload images
+        // Handle file input change
         cameraInput.addEventListener('change', async (event) => {
             const files = event.target.files;
             if (files.length !== 1) return;
 
             // Client-side validation
             const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-            for (const file of files) {
-                if (!allowedTypes.includes(file.type)) {
-                    showModal('Invalid File', 'Please upload only JPG, PNG, GIF, HEIC, HEIF, or WebP images.');
-                    return;
-                }
+            if (!allowedTypes.includes(files[0].type)) {
+                showModal('Invalid File', 'Please upload only JPG, PNG, GIF, HEIC, HEIF, or WebP images.');
+                return;
             }
 
+            // Display preview screen
+            const file = files[0];
+            const fileURL = URL.createObjectURL(file);
+            previewImage.src = fileURL;
+            step1.classList.add('hidden');
+            step2.classList.remove('hidden');
+        });
+
+        // Retake button
+        retakeBtn.addEventListener('click', () => {
+            step2.classList.add('hidden');
+            step1.classList.remove('hidden');
+            cameraInput.value = ''; // Reset input
+        });
+
+        // Upload button
+        uploadBtn.addEventListener('click', async () => {
             // Create FormData and append files
-            const formData = new FormData();
-            for (const file of files) {
-                const res = await compressImage(file);
-                const {compressedBlob, fileSizeKB} = res;
-                if (fileSizeKB > 1024) {
-                    showModal('File Too Large', 'Images must be under 1MB. Try a smaller file!' + fileSizeKB + ' ' + JSON.stringify(res.dimensions) + ' ' + res.qualityUsed);
-                    return;
-                }
-                formData.append('images', compressedBlob);
-            }
+            const files = cameraInput.files;
+            if (!files.length) return;
 
-            showModal('Uploading...', 'Your photobomb is being sent! 🚀');
+            const formData = new FormData();
 
             try {
+                uploadBtn.textContent = "Uploading...";
+                uploadBtn.disabled = true;
+
+                const file = files[0];
+                const res = await compressImage(file);
+                const {compressedBlob, fileSizeKB} = res;
+
+                if (fileSizeKB > 1024) {
+                    showModal('File Too Large', 'Images must be under 1MB. Try a smaller file!');
+                    uploadBtn.textContent = "Upload! 🚀";
+                    uploadBtn.disabled = false;
+                    return;
+                }
+
+                formData.append('images', compressedBlob);
+
                 const response = await fetch('/api/images/upload', {
                     method: 'POST',
                     body: formData,
@@ -327,14 +742,18 @@
 
                 const data = await response.json();
                 await fetchBomberCount();
-                showModal(
-                    'Awesome Shot! 🎉',
-                    `Uploaded ${data.length} photo${data.length > 1 ? 's' : ''}! Share with #TomorrowlandPhotobomb!`,
-                    'Keep Dancing! 🕺',
-                    data.map(item => `/api/images/${item.file_name}`)
-                );
 
-                cameraInput.value = '';
+                // Show success screen
+                finalImage.src = previewImage.src;
+                step2.classList.add('hidden');
+                step3.classList.remove('hidden');
+
+                uploadBtn.textContent = "Upload! 🚀";
+                uploadBtn.disabled = false;
+
+                // Confetti effect
+                createConfetti();
+
             } catch (err) {
                 console.error('Upload error:', err);
                 showModal(
@@ -342,8 +761,123 @@
                     `Failed to upload: ${err.message}. Try again!`,
                     'Retry'
                 );
+                uploadBtn.textContent = "Upload! 🚀";
+                uploadBtn.disabled = false;
             }
         });
+
+        // New photo button
+        newPhotoBtn.addEventListener('click', () => {
+            step3.classList.add('hidden');
+            step1.classList.remove('hidden');
+            cameraInput.value = ''; // Reset input
+        });
+
+        // Social share buttons
+        document.getElementById('shareInstagram').addEventListener('click', () => {
+            shareToSocial('instagram');
+        });
+
+        document.getElementById('shareTwitter').addEventListener('click', () => {
+            shareToSocial('twitter');
+        });
+
+        document.getElementById('shareTiktok').addEventListener('click', () => {
+            shareToSocial('tiktok');
+        });
+
+        //// Social sharing function
+        function shareToSocial(platform) {
+            const text = "Just photobombed my friends at Tomorrowland! #TomorrowlandPhotobomb";
+            const url = window.location.href;
+
+            let shareUrl = '';
+
+            switch (platform) {
+                case 'instagram':
+                    // Instagram doesn't support direct sharing, show instructions
+                    showModal(
+                        'Share to Instagram',
+                        'Save this photo to your device, then open Instagram and create a new post with #TomorrowlandPhotobomb!',
+                        'Got it!'
+                    );
+                    return;
+                case 'twitter':
+                    shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+                    break;
+                case 'tiktok':
+                    showModal(
+                        'Share to TikTok',
+                        'Save this photo to your device, then open TikTok and create a new post with #TomorrowlandPhotobomb!',
+                        'Got it!'
+                    );
+                    return;
+            }
+
+            if (shareUrl) {
+                window.open(shareUrl, '_blank');
+            }
+        }
+
+        // Create confetti effect for celebration
+        function createConfetti() {
+            const confettiCount = 100;
+            const container = document.body;
+
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+
+                // Random colors
+                const colors = ['#ff00ff', '#d7ef00', '#ff4444', '#41B0E8', '#FFC0CB'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+
+                // Random size
+                const size = Math.random() * 10 + 5;
+
+                // Random position
+                const posX = Math.random() * window.innerWidth;
+                const posY = -20; // Start above the screen
+
+                // Apply styles
+                confetti.style.backgroundColor = color;
+                confetti.style.width = `${size}px`;
+                confetti.style.height = `${size}px`;
+                confetti.style.position = 'fixed';
+                confetti.style.left = `${posX}px`;
+                confetti.style.top = `${posY}px`;
+                confetti.style.borderRadius = '50%';
+                confetti.style.zIndex = '9999';
+
+                // Animation
+                const duration = Math.random() * 3 + 2; // 2-5 seconds
+                const delay = Math.random() * 3; // 0-3 seconds
+
+                confetti.style.animation = `confettiFall ${duration}s ease-in ${delay}s 1 forwards`;
+
+                container.appendChild(confetti);
+
+                // Remove after animation
+                setTimeout(() => {
+                    container.removeChild(confetti);
+                }, (duration + delay) * 1000);
+            }
+        }
+
+        // Add confetti animation
+        const styleSheet = document.styleSheets[0];
+        styleSheet.insertRule(`
+                @keyframes confettiFall {
+                    0% {
+                        transform: translateY(0) rotate(0deg);
+                        opacity: 1;
+                    }
+                    100% {
+                        transform: translateY(${window.innerHeight}px) rotate(720deg);
+                        opacity: 0;
+                    }
+                }
+            `, styleSheet.cssRules.length);
 
         // Modal display function with image previews
         function showModal(title, message, buttonText = 'Keep Dancing! 🕺', imageUrls = []) {
@@ -391,7 +925,127 @@
 
             document.body.appendChild(modal);
         }
+
+        // Periodically update the badge text to show current stats
+        function updateBadgeStats() {
+            const stats = [
+                "🌟 PHOTOBOMB HERO 🌟",
+                "🔥 TOP BOMBER 🔥",
+                "💯 FESTIVAL PRO 💯",
+                "🎪 STAGE CRUSHER 🎪"
+            ];
+
+            const randomStat = stats[Math.floor(Math.random() * stats.length)];
+            const badges = document.querySelectorAll('.badge');
+
+            badges.forEach(badge => {
+                if (badge.textContent.includes('PHOTOBOMB') ||
+                    badge.textContent.includes('BOMBER') ||
+                    badge.textContent.includes('FESTIVAL') ||
+                    badge.textContent.includes('STAGE')) {
+                    badge.textContent = randomStat;
+                }
+            });
+        }
+
+        // Simulate festival crowd energy
+        let festivalEnergy = 80; // 0-100 scale
+        function simulateFestivalEnergy() {
+            console.log('simulateFestivalEnergy')
+            const energyChange = Math.random() * 10 - 5; // -5 to +5
+            festivalEnergy += energyChange;
+
+            // Keep in range
+            festivalEnergy = Math.max(50, Math.min(100, festivalEnergy));
+
+            // Visually reflect energy
+            const intensity = festivalEnergy / 100;
+            document.documentElement.style.setProperty('--festival-intensity', intensity.toString());
+
+            // If energy is really high, add additional visual effects
+            console.log(festivalEnergy)
+            if (festivalEnergy > 90 && !powerSaveToggle.checked) {
+                createBurstEffect();
+            }
+        }
+
+        function createBurstEffect() {
+            const burst = document.createElement('div');
+            burst.className = 'energy-burst';
+            burst.style.position = 'fixed';
+            burst.style.width = '300px';
+            burst.style.height = '300px';
+            burst.style.borderRadius = '50%';
+            burst.style.background = 'radial-gradient(circle, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 70%)';
+            burst.style.left = `${Math.random() * window.innerWidth}px`;
+            burst.style.top = `${Math.random() * window.innerHeight}px`;
+            burst.style.transform = 'scale(0)';
+            burst.style.transition = 'transform 0.5s ease-out, opacity 0.5s ease-out';
+            burst.style.opacity = '0.7';
+            burst.style.zIndex = '1';
+
+            document.body.appendChild(burst);
+
+            // Animate burst
+            setTimeout(() => {
+                burst.style.transform = 'scale(1)';
+                burst.style.opacity = '0';
+            }, 10);
+
+            // Remove after animation
+            setTimeout(() => {
+                document.body.removeChild(burst);
+            }, 600);
+        }
+
+        // Only run energy simulation occasionally to save battery
+        setInterval(simulateFestivalEnergy, 5_000); // Every 10 seconds
+
+        // Apply time-of-day optimizations
+        function applyTimeBasedOptimizations() {
+            const hour = new Date().getHours();
+            const isDaytime = hour >= 7 && hour < 19;
+
+            // Automatically enable high contrast mode during daytime
+            if (isDaytime && !contrastToggle.checked) {
+                contrastToggle.checked = true;
+                document.body.classList.add('high-contrast-mode');
+            }
+
+            // Automatically enable power saving mode during late night
+            if ((hour >= 2 && hour < 7) && !powerSaveToggle.checked) {
+                powerSaveToggle.checked = true;
+                document.body.classList.add('power-save');
+                particlesContainer.style.display = 'none';
+            }
+        }
+
+        // Run once on load
+        applyTimeBasedOptimizations();
+
+        // Track usage time to intelligently conserve battery
+        let sessionStartTime = Date.now();
+        let batteryWarningShown = false;
+
+        function checkSessionDuration() {
+            const sessionDuration = (Date.now() - sessionStartTime) / 1000 / 60; // minutes
+
+            // If using the app for more than 15 minutes and not in power save mode, suggest it
+            if (sessionDuration > 15 && !powerSaveToggle.checked && !batteryWarningShown) {
+                showModal(
+                    'Battery Tip 🔋',
+                    'Want to save battery for more festival fun? Try enabling power saving mode!',
+                    'Good idea!'
+                );
+                batteryWarningShown = true;
+            }
+        }
+
+        // Check session duration every 5 minutes
+        setInterval(checkSessionDuration, 300000);
     });
 </script>
+
+<script defer src="compress.js"></script>
 </body>
 </html>
