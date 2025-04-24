@@ -62,11 +62,16 @@ async fn main() -> std::io::Result<()> {
                         // Extract the origin string
                         let origin_str = origin.to_str().unwrap();
 
+                        let cors_allow_all = env::var("PHOTOBOMBER_CORS_ALLOW_ALL")
+                            .unwrap_or("false".to_string())
+                            .eq("true");
+
                         // Allow localhost variations and specific domain
                         let allowed = origin_str.starts_with("http://localhost")
                             || origin_str.starts_with("http://127.0.0.1")
                             || origin_str.starts_with("http://[::1]")
-                            || origin_str == "https://photobomber.servebeer.com";
+                            || origin_str == "https://photobomber.servebeer.com"
+                            || cors_allow_all;
 
                         debug!(
                             "{}",
