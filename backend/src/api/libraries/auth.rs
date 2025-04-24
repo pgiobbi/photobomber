@@ -36,6 +36,12 @@ pub struct AuthenticatedUser {
     pub claims: TokenClaims,
 }
 
+impl AuthenticatedUser {
+    pub fn is_admin(&self) -> bool {
+        self.user_id == 1
+    }
+}
+
 #[derive(Clone)]
 pub struct TokenRefresh {
     pub access_token: String,

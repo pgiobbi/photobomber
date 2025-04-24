@@ -6,6 +6,7 @@ use log::info;
 use std::ops::Deref;
 use std::panic::Location;
 use std::sync::LockResult;
+use crate::api::libraries::auth::AuthenticatedUser;
 
 #[get("")]
 pub async fn get_location(app_state: web::Data<AppState>) -> impl Responder {
@@ -16,10 +17,13 @@ pub async fn get_location(app_state: web::Data<AppState>) -> impl Responder {
 #[post("")]
 pub async fn post_location(
     body: web::Json<PostLocationRequest>,
+    user: AuthenticatedUser,
     app_state: web::Data<AppState>,
 ) -> impl Responder {
-    // TODO: guard: admin only
-    info!("{:?}", body.0);
+    info!("{:?} {:?}", body.0, user);
+    if !user.is_admin() {
+        return HttpResponse::Forbidden().json("Not allowed");
+    };
     {
         let mut location_state = app_state.location_state.write().unwrap();
         location_state.location = body.0.location.clone();
