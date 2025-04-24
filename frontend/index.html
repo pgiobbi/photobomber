@@ -26,7 +26,7 @@
             font-family: 'Arial', sans-serif;
             overflow: hidden;
             -webkit-tap-highlight-color: transparent;
-            height: 100vh;
+            height: 100dvh;
         }
 
         .glow {
@@ -383,7 +383,7 @@
         }
     </style>
 </head>
-<body class="h-screen flex flex-col items-center justify-between text-white">
+<body class="flex min-h-dvh h-dvh flex-col items-center justify-between text-white">
 <!-- Power saving mode toggle -->
 <div class="absolute top-4 right-4 z-50 flex items-center hidden">
     <span class="text-xs">🔋</span>
@@ -415,17 +415,17 @@
 </div>
 
 <!-- Main flex container -->
-<div class="flex flex-col min-h-screen w-full">
+<div class="flex flex-col min-h-dvh w-full">
     <!-- Header -->
-    <header class="pt-8 px-5">
+    <header class="pt-4 px-4 sm:px-5 flex-shrink-0">
         <div class="text-center">
             <div class="flex items-center justify-center space-x-3 mb-2">
-                <span class="text-4xl bounce" id="cameraEmoji">📸</span>
-                <h1 class="text-4xl sm:text-5xl font-bold festival-text title-glow"
+                <span class="text-2xl bounce" id="cameraEmoji">📸</span>
+                <h1 class="text-3xl sm:text-2xl font-bold festival-text title-glow"
                     style="text-shadow: 2px 2px 8px #ff00ff, -2px -2px 8px #d7ef00;">
                     PHOTOBOMB US!
                 </h1>
-                <span class="text-4xl shake" id="bombEmoji">💣</span>
+                <span class="text-2xl shake" id="bombEmoji">💣</span>
             </div>
             <div class="h-2 w-48 mx-auto bg-gradient-to-r from-pink-500 via-blue-500 to-purple-500 rounded-full mt-2 mb-4"></div>
             <p class="text-lg sm:text-xl festival-text glow">
@@ -435,23 +435,23 @@
     </header>
 
     <!-- Main content -->
-    <main class="flex-grow flex items-center justify-center p-4 my-2">
+    <main class="flex-grow flex items-center justify-center p-2 sm:p-4 flex-shrink">
         <div class="space-y-5 max-w-md w-full" id="mainContent">
             <!-- Step 1: Initial Screen -->
             <div id="step1" class="text-center">
-                <div class="step-indicator mb-2">
+                <div class="step-indicator sm:mb-2">
                     <div class="step active"></div>
                     <div class="step"></div>
                     <div class="step"></div>
                 </div>
 
-                <p class="text-xl sm:text-2xl mb-4 leading-relaxed">
+                <p class="text-xl sm:text-2xl sm:mb-4  leading-relaxed">
                     We're at <span class="font-extrabold text-blue-300 glow">Tomorrowland!</span><br>
                     Snap a selfie with us! 🤳
                 </p>
 
-                <div class="bg-white bg-opacity-10 backdrop-filter backdrop-blur-sm text-white rounded-xl p-4 sm:p-5 shadow-lg border border-white border-opacity-20 mb-4">
-                    <p class="text-lg font-semibold mb-2">
+                <div class="bg-white bg-opacity-10 backdrop-filter backdrop-blur-sm text-white rounded-xl p-2 sm:p-5 shadow-lg border border-white border-opacity-20">
+                    <p class="text-sm sm:text-lg font-semibold mb-2">
                         Find us: Two friends in neon gear, dancing like nobody's watching! 🕺💃
                     </p>
 
@@ -476,8 +476,8 @@
                 </div>
 
                 <!-- Example photobombs -->
-                <p class="text-sm mb-2">See some awesome photobombs:</p>
-                <div class="example-gallery flex flex-row justify-center mb-4 px-1">
+                <p class="text-sm mt-2">See some awesome photobombs:</p>
+                <div class="example-gallery flex flex-row justify-center px-1">
                     <img src="/assets/placeholders/example-1.webp" alt="Example photobomb 1" class="example-photo">
                     <img src="/assets/placeholders/example-2.webp" alt="Example photobomb 2" class="example-photo">
                     <img src="/assets/placeholders/example-3.webp" alt="Example photobomb 3" class="example-photo">
@@ -485,14 +485,14 @@
                 </div>
 
                 <div class="pt-2">
-                    <p class="text-sm text-center mb-3 glow">
+                    <p class="text-xs sm:text-sm text-center mb-2 glow">
                         Ready to photobomb? 📸 You're saying you're 18+, got everyone's OK in the pic, and are cool with
                         our
                         <a href="privacy-policy.html" class="text-blue-300 hover:underline">Privacy Policy</a> &
                         <a href="terms-of-use.html" class="text-blue-300 hover:underline">Terms of Use</a>! 😎
                     </p>
                     <label for="cameraInput"
-                           class="block mx-auto gradient-animate text-white font-bold py-5 px-8 rounded-xl text-xl sm:text-2xl transition shadow-lg relative overflow-hidden cursor-pointer cta-pulse">
+                           class="block mx-auto gradient-animate text-white font-bold py-3 sm:py-5 px-8 rounded-xl text-xl sm:text-2xl transition shadow-lg relative overflow-hidden cursor-pointer cta-pulse">
                         TAKE THE SHOT! 📸
                         <span class="absolute inset-0 bg-white opacity-10 rounded-full"></span>
                     </label>
@@ -508,7 +508,7 @@
                     <div class="step"></div>
                 </div>
 
-                <h2 class="text-2xl font-bold mb-3 glow">Preview Your Photobomb!</h2>
+                <h2 class="text-xl sm:text-2xl font-bold sm:mb-3 glow">Preview Your Photobomb!</h2>
 
                 <div class="preview-container mb-4">
                     <img id="previewImage" src="" alt="Preview">
@@ -569,7 +569,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="pb-8 px-5">
+    <footer class="w-full pb-2 sm:pb-8 px-4 sm:px-5 flex-shrink-0">
         <p class="text-center text-base sm:text-lg mt-1 glow">
             <a href="privacy-policy.html" class="text-blue-300 hover:underline font-bold">Privacy Policy</a> |
             <a href="terms-of-use.html" class="text-blue-300 hover:underline font-bold">Terms of Use</a>
