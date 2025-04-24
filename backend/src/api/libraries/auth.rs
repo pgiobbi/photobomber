@@ -1,4 +1,4 @@
-use crate::api::constants::APP_NAME;
+use crate::api::constants::{ADMIN_ID, APP_NAME};
 use actix_web::ResponseError;
 use chrono::{Duration, Utc};
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, Validation, decode, encode};
@@ -38,7 +38,7 @@ pub struct AuthenticatedUser {
 
 impl AuthenticatedUser {
     pub fn is_admin(&self) -> bool {
-        self.user_id == 1
+        self.user_id == ADMIN_ID
     }
 }
 

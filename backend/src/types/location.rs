@@ -61,6 +61,7 @@ pub enum Stage {
     PortalToParadise,
     #[serde(rename = "Sylvira")]
     Sylvira,
+    // TODO: add other areas, such as Dreamville etc.
 }
 
 #[derive(Debug, Serialize, Deserialize)]

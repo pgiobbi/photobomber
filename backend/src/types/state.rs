@@ -3,6 +3,8 @@ use crate::types::location::Stage;
 use serde::Serialize;
 use std::env;
 use std::sync::RwLock;
+use std::thread::sleep;
+use std::time::Duration;
 
 type Bytes = u64;
 
@@ -22,13 +24,20 @@ impl CredentialState {
         }
     }
 
-    pub fn is_admin(&self, login_request: &LoginRequest) -> bool {
+    pub fn is_admin(&self, login_request: &LoginRequest) -> Result<bool, ()> {
         match login_request {
             LoginRequest {
                 username: Some(username),
                 password: Some(password),
-            } => self.username.eq(username) && self.password.eq(password),
-            _ => false,
+            } => {
+                sleep(Duration::from_millis(500));
+                if self.username.eq(username) && self.password.eq(password) {
+                    Ok(true)
+                } else {
+                    Err(())
+                }
+            }
+            _ => Ok(false),
         }
     }
 }
