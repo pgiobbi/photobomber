@@ -385,7 +385,7 @@
 </head>
 <body class="h-screen flex flex-col items-center justify-between text-white">
 <!-- Power saving mode toggle -->
-<div class="absolute top-4 right-4 z-50 flex items-center">
+<div class="absolute top-4 right-4 z-50 flex items-center hidden">
     <span class="text-xs">🔋</span>
     <label class="toggle-switch">
         <input type="checkbox" id="powerSaveToggle">
@@ -394,7 +394,7 @@
 </div>
 
 <!-- High contrast mode toggle -->
-<div class="absolute top-4 left-4 z-50 flex items-center">
+<div class="absolute top-4 left-4 z-50 flex items-center hidden">
     <span class="text-xs">👁️</span>
     <label class="toggle-switch">
         <input type="checkbox" id="contrastToggle">
@@ -456,32 +456,32 @@
                     </p>
 
                     <!-- Current location information -->
-                    <p class="text-sm mb-3">
+                    <p class="text-sm">
                         <span class="inline-block animate-pulse">📍</span> Current area: <span id="currentLocation"
                                                                                               class="font-bold text-blue-300">Main Stage</span>
                     </p>
 
                     <!-- Simple map -->
-                    <div class="map-container bg-blue-900 bg-opacity-30">
-<!--                        <img src="/api/placeholder/400/120" alt="Festival map"-->
-<!--                             class="w-full h-full object-cover opacity-50">-->
-                        <div class="map-marker"></div>
-                    </div>
+                    <!--                    <div class="map-container bg-blue-900 bg-opacity-30">-->
+                    <!--                        <img src="/api/placeholder/400/120" alt="Festival map"-->
+                    <!--                             class="w-full h-full object-cover opacity-50">-->
+                    <!--                        <div class="map-marker"></div>-->
+                    <!--                    </div>-->
 
-<!--                    <div class="mt-3 flex flex-wrap justify-center gap-1">-->
-<!--                        <span class="badge">🎵 Main Stage</span>-->
-<!--                        <span class="badge">🌴 Near Palm Trees</span>-->
-<!--                        <span class="badge">⚡ By LED Wall</span>-->
-<!--                    </div>-->
+                    <!--                    <div class="mt-3 flex flex-wrap justify-center gap-1">-->
+                    <!--                        <span class="badge">🎵 Main Stage</span>-->
+                    <!--                        <span class="badge">🌴 Near Palm Trees</span>-->
+                    <!--                        <span class="badge">⚡ By LED Wall</span>-->
+                    <!--                    </div>-->
                 </div>
 
                 <!-- Example photobombs -->
                 <p class="text-sm mb-2">See some awesome photobombs:</p>
-                <div class="example-gallery mb-4 px-1">
+                <div class="example-gallery flex flex-row justify-center mb-4 px-1">
                     <img src="/assets/placeholders/example-1.webp" alt="Example photobomb 1" class="example-photo">
-                    <img src="/assets/placeholders/example-1.webp" alt="Example photobomb 2" class="example-photo">
-                    <img src="/assets/placeholders/example-1.webp" alt="Example photobomb 3" class="example-photo">
-                    <img src="/assets/placeholders/example-1.webp" alt="Example photobomb 4" class="example-photo">
+                    <img src="/assets/placeholders/example-2.webp" alt="Example photobomb 2" class="example-photo">
+                    <img src="/assets/placeholders/example-3.webp" alt="Example photobomb 3" class="example-photo">
+                    <img src="/assets/placeholders/example-4.webp" alt="Example photobomb 4" class="example-photo">
                 </div>
 
                 <div class="pt-2">
@@ -951,7 +951,6 @@
         // Simulate festival crowd energy
         let festivalEnergy = 80; // 0-100 scale
         function simulateFestivalEnergy() {
-            console.log('simulateFestivalEnergy')
             const energyChange = Math.random() * 10 - 5; // -5 to +5
             festivalEnergy += energyChange;
 
@@ -963,7 +962,6 @@
             document.documentElement.style.setProperty('--festival-intensity', intensity.toString());
 
             // If energy is really high, add additional visual effects
-            console.log(festivalEnergy)
             if (festivalEnergy > 90 && !powerSaveToggle.checked) {
                 createBurstEffect();
             }
