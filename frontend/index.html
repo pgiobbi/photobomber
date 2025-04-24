@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#0e1b2b">
-    <meta name="description" content="Photobomb us at Tomorrowland ORBYZ 2025! Snap a selfie and join the fun!">
-    <title>Photobomb Us at Tomorrowland ORBYZ!</title>
+    <meta name="description" content="Photobomb us at Tomorrowland 2025! Snap a selfie and join the fun!">
+    <title>Photobomb Us at Tomorrowland!</title>
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96"/>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <link rel="shortcut icon" href="/favicon.ico"/>
@@ -44,26 +44,35 @@
         }
 
         .gradient-animate {
-            background-size: 400% 400%;
-            background-image: linear-gradient(
-                    45deg,
-                    #3b82f6,
-                    #8b5cf6,
-                    #ec4899,
-                    #3b82f6
-            );
-            animation: gradient 8s ease infinite;
+            background: linear-gradient(60deg, #ff00ff, #00ffff, #ff4444, #ff00ff);
+            background-size: 300% 300%;
+            animation: animatedGradient 6s ease infinite alternate, ctaPulse 1.5s ease-in-out infinite;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
         }
 
-        @keyframes gradient {
+        @keyframes animatedGradient {
             0% {
                 background-position: 0% 50%;
             }
-            50% {
-                background-position: 100% 50%;
-            }
             100% {
-                background-position: 0% 50%;
+                background-position: 300% 50%;
+            }
+        }
+
+        .count-glow {
+            text-shadow: 0 0 15px #ff00ff, 0 0 25px #00ffff, 0 0 35px #ff4444;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
             }
         }
 
@@ -151,6 +160,21 @@
         #canvasElement {
             display: none;
         }
+
+        .cta-pulse {
+            box-shadow: 0 0 20px #ff00ff, 0 0 30px #00ffff;
+        }
+
+        @keyframes ctaPulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 20px #ff00ff, 0 0 30px #00ffff;
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 30px #ff00ff, 0 0 40px #00ffff;
+            }
+        }
     </style>
 </head>
 <body class="h-screen flex flex-col items-center justify-between text-white">
@@ -172,14 +196,14 @@
         <div class="flex items-center justify-center space-x-3 mb-2">
             <span class="text-4xl bounce">📸</span>
             <h1 class="text-4xl sm:text-5xl font-bold festival-text title-glow"
-                style="text-shadow: 2px 2px 8px #ec4899, -2px -2px 8px #3b82f6;">
+                style="text-shadow: 2px 2px 8px #ff00ff, -2px -2px 8px #00ffff;">
                 PHOTOBOMB US!
             </h1>
             <span class="text-4xl shake">💣</span>
         </div>
         <div class="h-2 w-48 mx-auto bg-gradient-to-r from-pink-500 via-blue-500 to-purple-500 rounded-full mt-2 mb-4"></div>
         <p class="text-lg sm:text-xl festival-text glow">
-            Join <span id="bomber-count">Loading...</span> Photo Bombers!
+            Join <span id="bomber-count" class="text-3xl count-glow">Loading...</span> Photo Bombers!
         </p>
     </div>
 </div>
@@ -188,7 +212,7 @@
 <div class="text-center p-4 sm:p-6 max-w-md mx-auto flex-grow flex flex-col justify-center">
     <div class="space-y-6">
         <p class="text-xl sm:text-2xl mb-6 leading-relaxed">
-            We're at <span class="font-extrabold text-blue-300 glow">Tomorrowland ORBYZ</span>!<br>
+            We're at <span class="font-extrabold text-blue-300 glow">Tomorrowland!</span><br>
             Snap a selfie with us! 🤳
         </p>
 
@@ -205,7 +229,7 @@
                 <a href="terms-of-use.html" class="text-blue-300 hover:underline">Terms of Use</a>! 😎
             </p>
             <label for="cameraInput"
-                   class="block mx-auto gradient-animate text-white font-bold py-4 px-10 rounded-full text-xl sm:text-2xl transition shadow-lg relative overflow-hidden cursor-pointer">
+                   class="block mx-auto gradient-animate text-white font-bold py-4 px-10 rounded-full text-xl sm:text-2xl transition shadow-lg relative overflow-hidden cursor-pointer cta-pulse">
                 TAKE THE SHOT! 📸
                 <span class="absolute inset-0 bg-white opacity-10 rounded-full"></span>
             </label>
@@ -260,7 +284,7 @@
             }
         }
 
-        login().then(fetchBomberCount)
+        login().then(fetchBomberCount);
 
         // Handle file input change and upload images
         cameraInput.addEventListener('change', async (event) => {
@@ -288,7 +312,6 @@
                 formData.append('images', compressedBlob);
             }
 
-            // Show loading modal
             showModal('Uploading...', 'Your photobomb is being sent! 🚀');
 
             try {
@@ -303,21 +326,17 @@
                 }
 
                 const data = await response.json();
-                // Refresh bomber count
                 await fetchBomberCount();
-                // Show success modal with image previews
                 showModal(
                     'Awesome Shot! 🎉',
                     `Uploaded ${data.length} photo${data.length > 1 ? 's' : ''}! Share with #TomorrowlandPhotobomb!`,
                     'Keep Dancing! 🕺',
-                    data.map(item => `/api/images/${item.file_name}`) // Use file_name with extension
+                    data.map(item => `/api/images/${item.file_name}`)
                 );
 
-                // Reset input
                 cameraInput.value = '';
             } catch (err) {
                 console.error('Upload error:', err);
-                // Show error modal
                 showModal(
                     'Oops! 😅',
                     `Failed to upload: ${err.message}. Try again!`,
@@ -328,7 +347,6 @@
 
         // Modal display function with image previews
         function showModal(title, message, buttonText = 'Keep Dancing! 🕺', imageUrls = []) {
-            // Remove existing modal if any
             const existingModal = document.querySelector('.modal');
             if (existingModal) document.body.removeChild(existingModal);
 
