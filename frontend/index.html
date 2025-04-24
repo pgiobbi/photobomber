@@ -669,7 +669,8 @@
                 // Tokens are stored in cookies
                 await fetch('/api/auth/login', {
                     method: 'POST',
-                    body: {}
+                    headers: {'Content-Type': 'application/json'},
+                    body: '{}'
                 });
             } catch (err) {
                 console.error('Failed to fetch count:', err);

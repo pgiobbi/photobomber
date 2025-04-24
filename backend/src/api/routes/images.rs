@@ -170,6 +170,8 @@ pub async fn get_image(
         }
     };
 
+    // TODO: return not found if image was created more than 10 mins ago
+
     // Determine MIME type
     let mime = match ext {
         "jpg" | "jpeg" => mime::IMAGE_JPEG,

@@ -6,7 +6,7 @@ use crate::api::extractors::auth_middleware::AuthMiddlewareFactory;
 use crate::api::routes::auth::login;
 use crate::api::routes::images::{get_image, get_upload_count, upload_images};
 use crate::api::routes::location::{get_location, post_location};
-use crate::types::state::{AppState, LocationState};
+use crate::types::state::{AppState, CredentialState, LocationState};
 use actix_cors::Cors;
 use actix_multipart::form::tempfile::TempFileConfig;
 use actix_web::middleware::NormalizePath;
@@ -50,6 +50,7 @@ async fn main() -> std::io::Result<()> {
         upload_dir: upload_dir.clone(),
         max_file_size,
         location_state: RwLock::new(LocationState::default()),
+        credential_state: CredentialState::from_env(),
     });
 
     HttpServer::new(move || {
