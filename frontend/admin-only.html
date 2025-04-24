@@ -272,41 +272,17 @@
                 <div class="stage-card" data-stage="Roaming Around...">
                     <p class="text-sm sm:text-base font-semibold glow">Roaming Around...</p>
                 </div>
-                <div class="stage-card" data-stage="Portal to Paradise by Tulum">
-                    <p class="text-sm sm:text-base font-semibold glow">Portal to Paradise by Tulum</p>
+                <div class="stage-card" data-stage="">
+                    <p class="text-sm sm:text-base font-semibold glow">No Location</p>
                 </div>
-                <div class="stage-card" data-stage="Sylvira">
-                    <p class="text-sm sm:text-base font-semibold glow">Sylvira</p>
-                </div>
-                <!-- Stages from previous JSON not in Rust enum -->
-                <div class="stage-card" data-stage="FREEDOM BY BUD">
-                    <p class="text-sm sm:text-base font-semibold glow">FREEDOM BY BUD</p>
-                </div>
-                <div class="stage-card" data-stage="MAINSTAGE">
-                    <p class="text-sm sm:text-base font-semibold glow">MAINSTAGE</p>
-                </div>
-                <div class="stage-card" data-stage="HOUSE OF FORTUNE BY JBL">
-                    <p class="text-sm sm:text-base font-semibold glow">HOUSE OF FORTUNE BY JBL</p>
-                </div>
-                <div class="stage-card" data-stage="MELODIA BY CORONA">
-                    <p class="text-sm sm:text-base font-semibold glow">MELODIA BY CORONA</p>
-                </div>
+                <!--                <div class="stage-card" data-stage="Portal to Paradise by Tulum">-->
+                <!--                    <p class="text-sm sm:text-base font-semibold glow">Portal to Paradise by Tulum</p>-->
+                <!--                </div>-->
+                <!--                <div class="stage-card" data-stage="Sylvira">-->
+                <!--                    <p class="text-sm sm:text-base font-semibold glow">Sylvira</p>-->
+                <!--                </div>-->
             </div>
         </main>
-
-        <!-- Footer -->
-        <footer class="w-full pb-2 sm:pb-8 px-4 sm:px-5 flex-shrink-0">
-            <p class="text-center text-base sm:text-lg mt-1 glow">
-                <a href="privacy-policy.html" class="text-blue-300 hover:underline font-bold">Privacy Policy</a> |
-                <a href="terms-of-use.html" class="text-blue-300 hover:underline font-bold">Terms of Use</a>
-            </p>
-            <p class="text-center text-sm sm:text-base mt-2">
-                Impressum: Tomorrowland Photobomb Crew, Italy, <a
-                    href="/cdn-cgi/l/email-protection#c0a3afaeb4a1a3b480b9afb5b2a4afada1a9aeeea3afad"
-                    class="text-blue-300 hover:underline"><span class="__cf_email__"
-                                                                data-cfemail="55767a7b61767463556c7a6067797278767e7b3b767a78">[email&#160;protected]</span></a>
-            </p>
-        </footer>
     </div>
 </div>
 
@@ -362,13 +338,11 @@
                 const currentLocation = data.location;
                 const updatedAgo = data.updatedAgo;
 
-                if (currentLocation) {
-                    stageCards.forEach(card => {
-                        if (card.dataset.stage === currentLocation) {
-                            card.classList.add('active');
-                        }
-                    });
-                }
+                stageCards.forEach(card => {
+                    if ((card.dataset.stage || null) === currentLocation) {
+                        card.classList.add('active');
+                    }
+                });
 
                 if (updatedAgo !== null && updatedAgo !== undefined) {
                     lastUpdatedSpan.textContent = secondsToHumanReadable(Math.floor(updatedAgo / 1000));
@@ -454,8 +428,9 @@
         // Handle stage card clicks
         stageCards.forEach(card => {
             card.addEventListener('click', async () => {
-                const stage = card.dataset.stage;
+                const stage = card.dataset.stage || null;
 
+                const originalContent = card.textContent;
                 try {
                     card.textContent = 'Updating...';
 
@@ -481,10 +456,11 @@
 
                 } catch (err) {
                     console.error('Update error:', err);
+                    card.textContent = originalContent;
                     showModal('Error', `Failed to update location: ${err.message}. Please try again.`);
-
                 } finally {
-                    card.innerHTML = `<p class="text-sm sm:text-base font-semibold glow">${stage}</p>`;
+                    // card.innerHTML = `<p class="text-sm sm:text-base font-semibold glow">${stage}</p>`;
+                    card.textContent = originalContent;
                 }
             });
         });
