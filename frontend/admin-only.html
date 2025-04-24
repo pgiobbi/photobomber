@@ -282,6 +282,15 @@
                 <!--                    <p class="text-sm sm:text-base font-semibold glow">Sylvira</p>-->
                 <!--                </div>-->
             </div>
+
+            <div class="w-full text-center mt-4">
+                <button id="logoutBtn"
+                        class="bg-red-400/40 hover:bg-opacity-50 text-white py-3 px-6 rounded-lg transition">
+                    Logout
+                </button>
+
+            </div>
+
         </main>
     </div>
 </div>
@@ -294,6 +303,7 @@
         const passwordInput = document.getElementById('password');
         const togglePassword = document.getElementById('togglePassword');
         const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
         const stageCards = document.querySelectorAll('.stage-card');
         const lastUpdatedSpan = document.getElementById('lastUpdated');
 
@@ -305,15 +315,13 @@
                     headers: {'Content-Type': 'application/json'}
                 });
 
-                if (response.ok) {
+                const data = await response.json();
+                if (response.ok && data.user_id === 1) {
                     // Authenticated, show main content and load current location
                     mainContent.classList.remove('hidden');
                     await fetchCurrentLocation();
-                } else if (response.status === 401) {
-                    // Unauthorized, show login screen
-                    loginScreen.classList.remove('hidden');
                 } else {
-                    throw new Error('Unexpected response status');
+                    throw new Error('Not authenticated');
                 }
             } catch (err) {
                 console.error('Auth check failed:', err);
@@ -395,6 +403,8 @@
                 // Successful login, show main content
                 loginScreen.classList.add('hidden');
                 mainContent.classList.remove('hidden');
+                usernameInput.value = ''
+                passwordInput.value = ''
                 await fetchCurrentLocation();
 
             } catch (err) {
@@ -407,6 +417,30 @@
             }
         }
 
+        // Handle logout
+        async function logout() {
+            try {
+                logoutBtn.textContent = 'Logging out...';
+                logoutBtn.disabled = true;
+
+                await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({})
+                });
+
+                // Successful login, show main content
+                loginScreen.classList.remove('hidden');
+                mainContent.classList.add('hidden');
+            } catch (err) {
+                console.error('Logout error:', err);
+                showModal('Logout Failed', `Failed to logout: ${err.message}. Please try again.`);
+            } finally {
+                logoutBtn.textContent = 'Logout';
+                logoutBtn.disabled = false;
+            }
+        }
+
         // Toggle password visibility
         togglePassword.addEventListener('click', () => {
             const type = passwordInput.type === 'password' ? 'text' : 'password';
@@ -414,8 +448,9 @@
             togglePassword.textContent = type === 'password' ? '👁️' : '🙈';
         });
 
-        // Handle login button click
+        // Handle login/logout button click
         loginBtn.addEventListener('click', login);
+        logoutBtn.addEventListener('click', logout);
 
         // Handle Enter key for login
         usernameInput.addEventListener('keypress', (e) => {
