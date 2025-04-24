@@ -1,4 +1,4 @@
-use crate::api::constants::APP_NAME;
+use crate::api::constants::{ADMIN_ID, APP_NAME};
 use actix_web::ResponseError;
 use chrono::{Duration, Utc};
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, Validation, decode, encode};
@@ -34,6 +34,12 @@ impl ResponseError for TokenError {}
 pub struct AuthenticatedUser {
     pub user_id: i64,
     pub claims: TokenClaims,
+}
+
+impl AuthenticatedUser {
+    pub fn is_admin(&self) -> bool {
+        self.user_id == ADMIN_ID
+    }
 }
 
 #[derive(Clone)]

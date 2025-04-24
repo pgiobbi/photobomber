@@ -3,10 +3,11 @@ mod types;
 
 use crate::api::constants::DEFAULT_MAX_FILE_SIZE;
 use crate::api::extractors::auth_middleware::AuthMiddlewareFactory;
-use crate::api::routes::auth::login;
+use crate::api::routes::auth::{get_profile, login, logout};
 use crate::api::routes::images::{get_image, get_upload_count, upload_images};
+use crate::api::routes::location::{get_location, post_location};
+use crate::types::state::{AppState, CredentialState, LocationState};
 use actix_cors::Cors;
-use actix_jwt_auth_middleware::{Authority, FromRequest, TokenSigner};
 use actix_multipart::form::tempfile::TempFileConfig;
 use actix_web::middleware::NormalizePath;
 use actix_web::{App, HttpServer, http, web};
@@ -17,16 +18,8 @@ use log::{debug, error, info};
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::string::ToString;
-
-type Bytes = u64;
-
-#[derive(Clone)]
-struct AppState {
-    /// Path to the upload directory.
-    upload_dir: String,
-    /// Max upload file size (bytes).
-    max_file_size: Bytes,
-}
+use std::sync::{Arc, RwLock};
+use tokio::sync::Mutex;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -53,12 +46,16 @@ async fn main() -> std::io::Result<()> {
     info!("UPLOAD_DIR    {:>16}: {}", "", &upload_dir);
     info!("MAX_FILE_SIZE {:>16}: {}", "", &max_file_size);
 
+    let app_state = web::Data::new(AppState {
+        upload_dir: upload_dir.clone(),
+        max_file_size,
+        location_state: RwLock::new(LocationState::default()),
+        credential_state: CredentialState::from_env(),
+    });
+
     HttpServer::new(move || {
         App::new()
-            .app_data(web::Data::new(AppState {
-                upload_dir: upload_dir.clone(),
-                max_file_size,
-            }))
+            .app_data(app_state.clone())
             .app_data(TempFileConfig::default().directory(upload_dir.to_string()))
             .wrap(
                 Cors::default()
@@ -66,11 +63,16 @@ async fn main() -> std::io::Result<()> {
                         // Extract the origin string
                         let origin_str = origin.to_str().unwrap();
 
+                        let cors_allow_all = env::var("PHOTOBOMBER_CORS_ALLOW_ALL")
+                            .unwrap_or("false".to_string())
+                            .eq("true");
+
                         // Allow localhost variations and specific domain
                         let allowed = origin_str.starts_with("http://localhost")
                             || origin_str.starts_with("http://127.0.0.1")
                             || origin_str.starts_with("http://[::1]")
-                            || origin_str == "https://photobomber.servebeer.com";
+                            || origin_str == "https://photobomber.servebeer.com"
+                            || cors_allow_all;
 
                         debug!(
                             "{}",
@@ -90,7 +92,13 @@ async fn main() -> std::io::Result<()> {
             .wrap(NormalizePath::trim())
             .service(
                 web::scope("/api/auth")
-                    .service(web::resource("login").route(web::post().to(login))),
+                    .service(web::resource("login").route(web::post().to(login)))
+                    .service(web::resource("logout").route(web::post().to(logout)))
+                    .service(
+                        web::resource("profile")
+                            .wrap(AuthMiddlewareFactory)
+                            .route(web::get().to(get_profile)),
+                    ),
             )
             .service(
                 web::scope("/api/images")
@@ -98,6 +106,12 @@ async fn main() -> std::io::Result<()> {
                     .service(get_upload_count)
                     .service(upload_images)
                     .service(get_image),
+            )
+            .service(
+                web::scope("/api/location")
+                    .wrap(AuthMiddlewareFactory)
+                    .service(get_location)
+                    .service(post_location),
             )
     })
     .bind(("0.0.0.0", 3002))

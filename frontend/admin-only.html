@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0e1b2b">
+    <meta name="description" content="Admin panel to update location at Tomorrowland 2025">
+    <title>Admin - Update Location | Tomorrowland Photobomb</title>
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96"/>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+    <link rel="shortcut icon" href="/favicon.ico"/>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
+    <meta name="apple-mobile-web-app-title" content="Photobomb Admin"/>
+    <link rel="manifest" href="/manifest.json"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.cdnfonts.com/css/impact" rel="stylesheet">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            background-color: rgba(14, 27, 43, 0.1);
+            background-image: linear-gradient(135deg, rgba(14, 27, 43, 0.85), rgba(25, 40, 65, 0.7)), url('/assets/orbyz-notext.webp');
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: overlay;
+            font-family: 'Arial', sans-serif;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            height: 100dvh;
+        }
+
+        .glow {
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.7),
+            0 0 12px rgba(65, 176, 232, 0.5),
+            0 0 20px rgba(65, 176, 232, 0.4);
+        }
+
+        .title-glow {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.9),
+            0 0 20px rgba(65, 176, 232, 0.8),
+            0 0 40px rgba(147, 51, 234, 0.6),
+            0 0 60px rgba(239, 68, 68, 0.4);
+            letter-spacing: 3px;
+        }
+
+        .gradient-animate {
+            background: linear-gradient(60deg, #ff00ff, #d7ef00, #ff4444, #ff00ff);
+            background-size: 200% 200%;
+            animation: animatedGradient 8s ease-in-out infinite alternate, ctaPulse 1.5s ease-in-out infinite;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        @keyframes animatedGradient {
+            0% {
+                background-position: 70% 100%;
+            }
+            100% {
+                background-position: 180% 50%;
+            }
+        }
+
+        @keyframes ctaPulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.02);
+            }
+        }
+
+        .festival-text {
+            font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+
+        .halo {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(20px);
+            opacity: 0.15;
+            z-index: -1;
+        }
+
+        input[type="text"], input[type="password"] {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            width: 100%;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: #41B0E8;
+            box-shadow: 0 0 8px rgba(65, 176, 232, 0.5);
+        }
+
+        /* Password toggle */
+        .password-container {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #41B0E8;
+        }
+
+        /* Stage card styles */
+        .stage-card {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .stage-card:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: scale(1.02);
+        }
+
+        .stage-card.active {
+            background-color: rgba(255, 215, 0, 0.3); /* Yellow background */
+            border-color: #FFD700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+
+        /* Modal styles */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+
+        .modal-content {
+            background-color: rgba(31, 41, 55, 0.95);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            max-width: 20rem;
+            width: 100%;
+            margin: 1rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="flex min-h-dvh h-dvh flex-col items-center justify-between text-white">
+<!-- Decorative elements -->
+<div class="halo bg-blue-400 w-64 h-64 top-0 left-0"></div>
+<div class="halo bg-purple-500 w-48 h-48 bottom-0 right-0"></div>
+
+<!-- Main flex container -->
+<div class="flex flex-col min-h-dvh w-full">
+    <!-- Login Screen (hidden by default) -->
+    <div id="loginScreen" class="flex-grow flex items-center justify-center p-4 sm:p-5 hidden">
+        <div class="space-y-6 max-w-md w-full">
+            <div class="text-center">
+                <h1 class="text-3xl sm:text-4xl font-bold festival-text title-glow">
+                    ADMIN LOGIN
+                </h1>
+                <div class="h-2 w-48 mx-auto bg-gradient-to-r from-pink-500 via-blue-500 to-purple-500 rounded-full mt-2 mb-4"></div>
+                <p class="text-lg sm:text-xl festival-text glow">
+                    Authenticate to update your location 📍
+                </p>
+            </div>
+
+            <div>
+                <label for="username" class="block text-sm sm:text-base font-semibold mb-2 glow">
+                    Username
+                </label>
+                <input type="text" id="username" placeholder="Enter username" class="backdrop-blur-sm">
+            </div>
+
+            <div>
+                <label for="password" class="block text-sm sm:text-base font-semibold mb-2 glow">
+                    Password
+                </label>
+                <div class="password-container">
+                    <input type="password" id="password" placeholder="Enter password" class="backdrop-blur-sm">
+                    <span id="togglePassword" class="toggle-password">👁️</span>
+                </div>
+            </div>
+
+            <button id="loginBtn"
+                    class="w-full gradient-animate text-white font-bold py-3 sm:py-4 rounded-xl text-xl sm:text-2xl transition shadow-lg cta-pulse">
+                Login 🔑
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content (hidden by default) -->
+    <div id="mainContent" class="flex flex-col min-h-dvh w-full hidden">
+        <!-- Header -->
+        <header class="pt-4 px-4 sm:px-5 flex-shrink-0">
+            <div class="text-center">
+                <h1 class="text-3xl sm:text-4xl font-bold festival-text title-glow">
+                    UPDATE LOCATION
+                </h1>
+                <div class="h-2 w-48 mx-auto bg-gradient-to-r from-pink-500 via-blue-500 to-purple-500 rounded-full mt-2 mb-2"></div>
+                <p class="text-lg sm:text-xl festival-text glow">
+                    Where are you? 📍
+                </p>
+                <p class="text-sm sm:text-base mt-2 glow">
+                    Last Updated: <span id="lastUpdated">Not set</span>
+                </p>
+            </div>
+        </header>
+
+        <!-- Main content -->
+        <main class="flex-grow p-4 sm:p-5 flex-shrink overflow-y-auto">
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
+                <!-- Stage Cards -->
+                <div class="stage-card" data-stage="Main Stage">
+                    <p class="text-sm sm:text-base font-semibold glow">Main Stage</p>
+                </div>
+                <div class="stage-card" data-stage="Freedom Stage">
+                    <p class="text-sm sm:text-base font-semibold glow">Freedom Stage</p>
+                </div>
+                <div class="stage-card" data-stage="The Rose Garden">
+                    <p class="text-sm sm:text-base font-semibold glow">The Rose Garden</p>
+                </div>
+                <div class="stage-card" data-stage="Elixir">
+                    <p class="text-sm sm:text-base font-semibold glow">Elixir</p>
+                </div>
+                <div class="stage-card" data-stage="Cage">
+                    <p class="text-sm sm:text-base font-semibold glow">Cage</p>
+                </div>
+                <div class="stage-card" data-stage="The Rave Cave">
+                    <p class="text-sm sm:text-base font-semibold glow">The Rave Cave</p>
+                </div>
+                <div class="stage-card" data-stage="Planaxis">
+                    <p class="text-sm sm:text-base font-semibold glow">Planaxis</p>
+                </div>
+                <div class="stage-card" data-stage="Rise By Coke Studio">
+                    <p class="text-sm sm:text-base font-semibold glow">Rise By Coke Studio</p>
+                </div>
+                <div class="stage-card" data-stage="Atmosphere">
+                    <p class="text-sm sm:text-base font-semibold glow">Atmosphere</p>
+                </div>
+                <div class="stage-card" data-stage="CORE">
+                    <p class="text-sm sm:text-base font-semibold glow">CORE</p>
+                </div>
+                <div class="stage-card" data-stage="Crystal Garden">
+                    <p class="text-sm sm:text-base font-semibold glow">Crystal Garden</p>
+                </div>
+                <div class="stage-card" data-stage="The Library">
+                    <p class="text-sm sm:text-base font-semibold glow">The Library</p>
+                </div>
+                <div class="stage-card" data-stage="Melodia">
+                    <p class="text-sm sm:text-base font-semibold glow">Melodia</p>
+                </div>
+                <div class="stage-card" data-stage="House Of Fortune">
+                    <p class="text-sm sm:text-base font-semibold glow">House Of Fortune</p>
+                </div>
+                <div class="stage-card" data-stage="Roaming Around...">
+                    <p class="text-sm sm:text-base font-semibold glow">Roaming Around...</p>
+                </div>
+                <div class="stage-card" data-stage="">
+                    <p class="text-sm sm:text-base font-semibold glow">No Location</p>
+                </div>
+                <!--                <div class="stage-card" data-stage="Portal to Paradise by Tulum">-->
+                <!--                    <p class="text-sm sm:text-base font-semibold glow">Portal to Paradise by Tulum</p>-->
+                <!--                </div>-->
+                <!--                <div class="stage-card" data-stage="Sylvira">-->
+                <!--                    <p class="text-sm sm:text-base font-semibold glow">Sylvira</p>-->
+                <!--                </div>-->
+            </div>
+
+            <div class="w-full text-center mt-4">
+                <button id="logoutBtn"
+                        class="bg-red-400/40 hover:bg-opacity-50 text-white py-3 px-6 rounded-lg transition">
+                    Logout
+                </button>
+
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const loginScreen = document.getElementById('loginScreen');
+        const mainContent = document.getElementById('mainContent');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const togglePassword = document.getElementById('togglePassword');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const stageCards = document.querySelectorAll('.stage-card');
+        const lastUpdatedSpan = document.getElementById('lastUpdated');
+
+        // Check authentication status on page load
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/auth/profile', {
+                    method: 'GET',
+                    headers: {'Content-Type': 'application/json'}
+                });
+
+                const data = await response.json();
+                if (response.ok && data.user_id === 1) {
+                    // Authenticated, show main content and load current location
+                    mainContent.classList.remove('hidden');
+                    await fetchCurrentLocation();
+                } else {
+                    throw new Error('Not authenticated');
+                }
+            } catch (err) {
+                console.error('Auth check failed:', err);
+                showModal('Error', 'Failed to check authentication status. Please try again later.');
+                loginScreen.classList.remove('hidden');
+            }
+        }
+
+        // Fetch and highlight current location, update timestamp
+        async function fetchCurrentLocation() {
+            try {
+                const response = await fetch('/api/location', {
+                    method: 'GET',
+                    headers: {'Content-Type': 'application/json'}
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch current location');
+                }
+
+                const data = await response.json();
+                const currentLocation = data.location;
+                const updatedAgo = data.updatedAgo;
+
+                stageCards.forEach(card => {
+                    if ((card.dataset.stage || null) === currentLocation) {
+                        card.classList.add('active');
+                    }
+                });
+
+                if (updatedAgo !== null && updatedAgo !== undefined) {
+                    lastUpdatedSpan.textContent = secondsToHumanReadable(Math.floor(updatedAgo / 1000));
+                } else {
+                    lastUpdatedSpan.textContent = 'Not set';
+                }
+            } catch (err) {
+                console.error('Failed to fetch current location:', err);
+                showModal('Error', 'Failed to load current location. You can still update your location.');
+                lastUpdatedSpan.textContent = 'Failed to load';
+            }
+        }
+
+        // Convert seconds to human-readable format
+        function secondsToHumanReadable(seconds) {
+            if (seconds < 60) return `${seconds} seconds ago`;
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+            const days = Math.floor(hours / 24);
+            return `${days} day${days === 1 ? '' : 's'} ago`;
+        }
+
+        // Handle login
+        async function login() {
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+
+            if (!username || !password) {
+                showModal('Missing Info', 'Please enter both username and password.');
+                return;
+            }
+
+            try {
+                loginBtn.textContent = 'Logging in...';
+                loginBtn.disabled = true;
+
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({username, password})
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Login failed');
+                }
+
+                // Successful login, show main content
+                loginScreen.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+                usernameInput.value = ''
+                passwordInput.value = ''
+                await fetchCurrentLocation();
+
+            } catch (err) {
+                console.error('Login error:', err);
+                showModal('Login Failed', `Failed to login: ${err.message}. Please try again.`);
+
+            } finally {
+                loginBtn.textContent = 'Login 🔑';
+                loginBtn.disabled = false;
+            }
+        }
+
+        // Handle logout
+        async function logout() {
+            try {
+                logoutBtn.textContent = 'Logging out...';
+                logoutBtn.disabled = true;
+
+                await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({})
+                });
+
+                // Successful login, show main content
+                loginScreen.classList.remove('hidden');
+                mainContent.classList.add('hidden');
+            } catch (err) {
+                console.error('Logout error:', err);
+                showModal('Logout Failed', `Failed to logout: ${err.message}. Please try again.`);
+            } finally {
+                logoutBtn.textContent = 'Logout';
+                logoutBtn.disabled = false;
+            }
+        }
+
+        // Toggle password visibility
+        togglePassword.addEventListener('click', () => {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            togglePassword.textContent = type === 'password' ? '👁️' : '🙈';
+        });
+
+        // Handle login/logout button click
+        loginBtn.addEventListener('click', login);
+        logoutBtn.addEventListener('click', logout);
+
+        // Handle Enter key for login
+        usernameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') login();
+        });
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') login();
+        });
+
+        // Handle stage card clicks
+        stageCards.forEach(card => {
+            card.addEventListener('click', async () => {
+                const stage = card.dataset.stage || null;
+
+                const originalContent = card.textContent;
+                try {
+                    card.textContent = 'Updating...';
+
+                    const response = await fetch('/api/location', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({location: stage})
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Failed to update location');
+                    }
+
+                    // Update highlight
+                    stageCards.forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+
+                    // Update timestamp
+                    lastUpdatedSpan.textContent = 'Just now';
+
+                    showModal('Success!', 'Location updated successfully! Your photobombers will be notified. 🎉');
+
+                } catch (err) {
+                    console.error('Update error:', err);
+                    card.textContent = originalContent;
+                    showModal('Error', `Failed to update location: ${err.message}. Please try again.`);
+                } finally {
+                    // card.innerHTML = `<p class="text-sm sm:text-base font-semibold glow">${stage}</p>`;
+                    card.textContent = originalContent;
+                }
+            });
+        });
+
+        // Modal display function
+        function showModal(title, message, buttonText = 'Close') {
+            const existingModal = document.querySelector('.modal');
+            if (existingModal) document.body.removeChild(existingModal);
+
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+
+            const modalContent = document.createElement('div');
+            modalContent.className = 'modal-content';
+
+            const titleEl = document.createElement('h2');
+            titleEl.className = 'text-xl font-bold mb-3 text-white glow';
+            titleEl.textContent = title;
+
+            const messageEl = document.createElement('p');
+            messageEl.className = 'mb-4 text-white';
+            messageEl.textContent = message;
+
+            const button = document.createElement('button');
+            button.className = 'gradient-animate text-white font-bold py-2 px-4 rounded-lg';
+            button.textContent = buttonText;
+            button.addEventListener('click', () => {
+                document.body.removeChild(modal);
+            });
+
+            modalContent.appendChild(titleEl);
+            modalContent.appendChild(messageEl);
+            modalContent.appendChild(button);
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+        }
+
+        // Check authentication on page load
+        checkAuth();
+    });
+</script>
+</body>
+</html>
