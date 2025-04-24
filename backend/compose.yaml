@@ -13,11 +13,11 @@ services:
     environment:
       - RUST_LOG=debug
       - UPLOAD_DIR=/var/local/uploads
-      - FPX_JWT_SECRET=your-jwt-secret-here
+      - FPX_JWT_SECRET=${FPX_JWT_SECRET:-your-jwt-secret-here}
       - FPX_ACCESS_TOKEN_DURATION_MINUTES=1440
       - FPX_REFRESH_TOKEN_DURATION_MINUTES=10080
       - PHOTOBOMBER_CORS_ALLOW_ALL=false
-      - PHOTOBOMBER_ADMIN_USERNAME=username-change-me
-      - PHOTOBOMBER_ADMIN_PASSWORD=password-change-me;
+      - PHOTOBOMBER_ADMIN_USERNAME=${PHOTOBOMBER_ADMIN_USERNAME:-username-change-me}
+      - PHOTOBOMBER_ADMIN_PASSWORD=${PHOTOBOMBER_ADMIN_PASSWORD:-password-change-me};
     platform: linux/arm64
     restart: unless-stopped
