@@ -43,10 +43,10 @@ impl CredentialState {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-#[serde(rename_all = "camelCase")]
+#[serde(tag = "type", rename_all = "camelCase")]
 pub enum LocationVariant {
     Tomorrowland(TomorrowlandStage),
-    Custom(String),
+    Custom { name: String },
 }
 
 #[derive(Default, Serialize)]
