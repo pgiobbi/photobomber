@@ -622,8 +622,8 @@
                 const currentLocation = data.location;
                 const updatedAgo = data.updatedAgo;
 
-                if (currentLocation) {
-                    locationElement.textContent = currentLocation;
+                if (currentLocation && currentLocation.name) {
+                    locationElement.textContent = currentLocation.name;
                     locationElement.classList.add('text-yellow-300');
                 } else {
                     locationElement.textContent = 'Not set';

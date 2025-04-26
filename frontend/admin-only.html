@@ -102,6 +102,13 @@
             box-shadow: 0 0 8px rgba(65, 176, 232, 0.5);
         }
 
+        /* Highlight style for custom location input */
+        input[type="text"].active {
+            background-color: rgba(255, 215, 0, 0.3);
+            border-color: #FFD700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+
         /* Password toggle */
         .password-container {
             position: relative;
@@ -225,72 +232,38 @@
 
         <!-- Main content -->
         <main class="flex-grow p-4 sm:p-5 flex-shrink overflow-y-auto">
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
-                <!-- Stage Cards -->
-                <div class="stage-card" data-stage="Main Stage">
-                    <p class="text-sm sm:text-base font-semibold glow">Main Stage</p>
+            <div class="max-w-2xl mx-auto space-y-4">
+                <!-- Custom Location Input -->
+                <div>
+                    <label for="customLocation" class="block text-sm sm:text-base font-semibold mb-2 glow">
+                        Custom Location
+                    </label>
+                    <div class="flex gap-2">
+                        <input type="text" id="customLocation" placeholder="Enter custom location"
+                               class="backdrop-blur-sm">
+                        <button id="submitCustomLocation"
+                                class="gradient-animate text-white font-bold py-3 px-6 rounded-lg transition" disabled>
+                            Set
+                        </button>
+                    </div>
                 </div>
-                <div class="stage-card" data-stage="Freedom Stage">
-                    <p class="text-sm sm:text-base font-semibold glow">Freedom Stage</p>
+
+                <!-- Stage Cards Container -->
+                <div id="stageCards" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    <!-- Dynamically populated stage cards -->
+                    <!-- Reset Location Card -->
+                    <div class="stage-card" data-location-type="reset">
+                        <p class="text-sm sm:text-base font-semibold glow">No Location</p>
+                    </div>
                 </div>
-                <div class="stage-card" data-stage="The Rose Garden">
-                    <p class="text-sm sm:text-base font-semibold glow">The Rose Garden</p>
+
+                <div class="w-full text-center mt-4">
+                    <button id="logoutBtn"
+                            class="bg-red-400/40 hover:bg-opacity-50 text-white py-3 px-6 rounded-lg transition">
+                        Logout
+                    </button>
                 </div>
-                <div class="stage-card" data-stage="Elixir">
-                    <p class="text-sm sm:text-base font-semibold glow">Elixir</p>
-                </div>
-                <div class="stage-card" data-stage="Cage">
-                    <p class="text-sm sm:text-base font-semibold glow">Cage</p>
-                </div>
-                <div class="stage-card" data-stage="The Rave Cave">
-                    <p class="text-sm sm:text-base font-semibold glow">The Rave Cave</p>
-                </div>
-                <div class="stage-card" data-stage="Planaxis">
-                    <p class="text-sm sm:text-base font-semibold glow">Planaxis</p>
-                </div>
-                <div class="stage-card" data-stage="Rise By Coke Studio">
-                    <p class="text-sm sm:text-base font-semibold glow">Rise By Coke Studio</p>
-                </div>
-                <div class="stage-card" data-stage="Atmosphere">
-                    <p class="text-sm sm:text-base font-semibold glow">Atmosphere</p>
-                </div>
-                <div class="stage-card" data-stage="CORE">
-                    <p class="text-sm sm:text-base font-semibold glow">CORE</p>
-                </div>
-                <div class="stage-card" data-stage="Crystal Garden">
-                    <p class="text-sm sm:text-base font-semibold glow">Crystal Garden</p>
-                </div>
-                <div class="stage-card" data-stage="The Library">
-                    <p class="text-sm sm:text-base font-semibold glow">The Library</p>
-                </div>
-                <div class="stage-card" data-stage="Melodia">
-                    <p class="text-sm sm:text-base font-semibold glow">Melodia</p>
-                </div>
-                <div class="stage-card" data-stage="House Of Fortune">
-                    <p class="text-sm sm:text-base font-semibold glow">House Of Fortune</p>
-                </div>
-                <div class="stage-card" data-stage="Roaming Around...">
-                    <p class="text-sm sm:text-base font-semibold glow">Roaming Around...</p>
-                </div>
-                <div class="stage-card" data-stage="">
-                    <p class="text-sm sm:text-base font-semibold glow">No Location</p>
-                </div>
-                <!--                <div class="stage-card" data-stage="Portal to Paradise by Tulum">-->
-                <!--                    <p class="text-sm sm:text-base font-semibold glow">Portal to Paradise by Tulum</p>-->
-                <!--                </div>-->
-                <!--                <div class="stage-card" data-stage="Sylvira">-->
-                <!--                    <p class="text-sm sm:text-base font-semibold glow">Sylvira</p>-->
-                <!--                </div>-->
             </div>
-
-            <div class="w-full text-center mt-4">
-                <button id="logoutBtn"
-                        class="bg-red-400/40 hover:bg-opacity-50 text-white py-3 px-6 rounded-lg transition">
-                    Logout
-                </button>
-
-            </div>
-
         </main>
     </div>
 </div>
@@ -304,8 +277,13 @@
         const togglePassword = document.getElementById('togglePassword');
         const loginBtn = document.getElementById('loginBtn');
         const logoutBtn = document.getElementById('logoutBtn');
-        const stageCards = document.querySelectorAll('.stage-card');
+        const stageCardsContainer = document.getElementById('stageCards');
         const lastUpdatedSpan = document.getElementById('lastUpdated');
+        const customLocationInput = document.getElementById('customLocation');
+        const submitCustomLocationBtn = document.getElementById('submitCustomLocation');
+
+        let stages = []; // Store stages from /api/stages
+        let currentCustomLocation = ''; // Track current custom location
 
         // Check authentication status on page load
         async function checkAuth() {
@@ -317,9 +295,9 @@
 
                 const data = await response.json();
                 if (response.ok && data.user_id === 1) {
-                    // Authenticated, show main content and load current location
+                    // Authenticated, show main content and load stages and current location
                     mainContent.classList.remove('hidden');
-                    await fetchCurrentLocation();
+                    await Promise.all([fetchStages(), fetchCurrentLocation()]);
                 } else {
                     throw new Error('Not authenticated');
                 }
@@ -328,6 +306,50 @@
                 showModal('Error', 'Failed to check authentication status. Please try again later.');
                 loginScreen.classList.remove('hidden');
             }
+        }
+
+        // Fetch available stages from /api/stages
+        async function fetchStages() {
+            try {
+                const response = await fetch('/api/stages', {
+                    method: 'GET',
+                    headers: {'Content-Type': 'application/json'}
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch stages');
+                }
+
+                stages = await response.json();
+                renderStageCards();
+            } catch (err) {
+                console.error('Failed to fetch stages:', err);
+                showModal('Error', 'Failed to load stages. You can still set a custom location or reset.');
+            }
+        }
+
+        // Render stage cards dynamically
+        function renderStageCards() {
+            // Clear existing stage cards except the reset card
+            stageCardsContainer.innerHTML = `
+                <div class="stage-card" data-location-type="reset">
+                    <p class="text-sm sm:text-base font-semibold glow">No Location</p>
+                </div>
+            `;
+
+            // Add stage cards
+            stages.forEach(stage => {
+                const card = document.createElement('div');
+                card.className = 'stage-card';
+                card.dataset.locationType = 'tomorrowland';
+                card.dataset.stageId = stage.id;
+                card.dataset.stageName = stage.name;
+                card.innerHTML = `<p class="text-sm sm:text-base font-semibold glow">${stage.name}</p>`;
+                stageCardsContainer.insertBefore(card, stageCardsContainer.lastElementChild);
+            });
+
+            // Re-attach event listeners to all cards
+            attachCardListeners();
         }
 
         // Fetch and highlight current location, update timestamp
@@ -343,14 +365,34 @@
                 }
 
                 const data = await response.json();
-                const currentLocation = data.location;
+                const location = data.location;
                 const updatedAgo = data.updatedAgo;
 
-                stageCards.forEach(card => {
-                    if ((card.dataset.stage || null) === currentLocation) {
-                        card.classList.add('active');
+                // Highlight the correct card or input
+                const stageCards = stageCardsContainer.querySelectorAll('.stage-card');
+                stageCards.forEach(card => card.classList.remove('active'));
+                customLocationInput.classList.remove('active');
+                submitCustomLocationBtn.disabled = true;
+
+                if (location) {
+                    if (location.type === 'tomorrowland') {
+                        stageCards.forEach(card => {
+                            if (card.dataset.locationType === 'tomorrowland' && card.dataset.stageId === location.id) {
+                                card.classList.add('active');
+                            }
+                        });
+                        customLocationInput.value = '';
+                        currentCustomLocation = '';
+                    } else if (location.type === 'custom') {
+                        customLocationInput.classList.add('active');
+                        customLocationInput.value = location.name;
+                        currentCustomLocation = location.name;
                     }
-                });
+                } else {
+                    stageCardsContainer.querySelector('[data-location-type="reset"]').classList.add('active');
+                    customLocationInput.value = '';
+                    currentCustomLocation = '';
+                }
 
                 if (updatedAgo !== null && updatedAgo !== undefined) {
                     lastUpdatedSpan.textContent = secondsToHumanReadable(Math.floor(updatedAgo / 1000));
@@ -403,9 +445,9 @@
                 // Successful login, show main content
                 loginScreen.classList.add('hidden');
                 mainContent.classList.remove('hidden');
-                usernameInput.value = ''
-                passwordInput.value = ''
-                await fetchCurrentLocation();
+                usernameInput.value = '';
+                passwordInput.value = '';
+                await Promise.all([fetchStages(), fetchCurrentLocation()]);
 
             } catch (err) {
                 console.error('Login error:', err);
@@ -429,7 +471,7 @@
                     body: JSON.stringify({})
                 });
 
-                // Successful login, show main content
+                // Show login screen
                 loginScreen.classList.remove('hidden');
                 mainContent.classList.add('hidden');
             } catch (err) {
@@ -460,45 +502,125 @@
             if (e.key === 'Enter') login();
         });
 
-        // Handle stage card clicks
-        stageCards.forEach(card => {
-            card.addEventListener('click', async () => {
-                const stage = card.dataset.stage || null;
+        // Handle custom location submission
+        submitCustomLocationBtn.addEventListener('click', async () => {
+            const customName = customLocationInput.value.trim();
+            if (!customName) {
+                showModal('Error', 'Please enter a custom location name.');
+                return;
+            }
 
-                const originalContent = card.textContent;
-                try {
-                    card.textContent = 'Updating...';
+            try {
+                submitCustomLocationBtn.textContent = 'Setting...';
+                submitCustomLocationBtn.disabled = true;
 
-                    const response = await fetch('/api/location', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({location: stage})
-                    });
+                const response = await fetch('/api/location', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        location: {
+                            type: 'custom',
+                            name: customName
+                        }
+                    })
+                });
 
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || 'Failed to update location');
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to update location');
+                }
+
+                // Update UI
+                const stageCards = stageCardsContainer.querySelectorAll('.stage-card');
+                stageCards.forEach(c => c.classList.remove('active'));
+                customLocationInput.classList.add('active');
+                currentCustomLocation = customName;
+                lastUpdatedSpan.textContent = 'Just now';
+
+                showModal('Success!', 'Location updated successfully! Your photobombers will be notified. 🎉');
+
+            } catch (err) {
+                console.error('Update error:', err);
+                showModal('Error', `Failed to update location: ${err.message}. Please try again.`);
+            } finally {
+                submitCustomLocationBtn.textContent = 'Set';
+                submitCustomLocationBtn.disabled = customName === currentCustomLocation;
+            }
+        });
+
+        // Enable/disable Set button based on input change
+        customLocationInput.addEventListener('input', () => {
+            const customName = customLocationInput.value.trim();
+            submitCustomLocationBtn.disabled = customName === currentCustomLocation || customName === '';
+        });
+
+        // Handle Enter key for custom location
+        customLocationInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !submitCustomLocationBtn.disabled) {
+                submitCustomLocationBtn.click();
+            }
+        });
+
+        // Attach listeners to stage cards
+        function attachCardListeners() {
+            const stageCards = stageCardsContainer.querySelectorAll('.stage-card');
+            stageCards.forEach(card => {
+                card.addEventListener('click', async () => {
+                    let requestBody;
+                    const originalText = card.querySelector('p').textContent;
+
+                    if (card.dataset.locationType === 'tomorrowland') {
+                        requestBody = {
+                            location: {
+                                type: 'tomorrowland',
+                                id: card.dataset.stageId,
+                                name: card.dataset.stageName
+                            }
+                        };
+                    } else if (card.dataset.locationType === 'reset') {
+                        requestBody = {location: null};
+                    } else {
+                        return;
                     }
 
-                    // Update highlight
-                    stageCards.forEach(c => c.classList.remove('active'));
-                    card.classList.add('active');
+                    try {
+                        card.querySelector('p').textContent = 'Updating...';
 
-                    // Update timestamp
-                    lastUpdatedSpan.textContent = 'Just now';
+                        const response = await fetch('/api/location', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify(requestBody)
+                        });
 
-                    showModal('Success!', 'Location updated successfully! Your photobombers will be notified. 🎉');
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.message || 'Failed to update location');
+                        }
 
-                } catch (err) {
-                    console.error('Update error:', err);
-                    card.textContent = originalContent;
-                    showModal('Error', `Failed to update location: ${err.message}. Please try again.`);
-                } finally {
-                    // card.innerHTML = `<p class="text-sm sm:text-base font-semibold glow">${stage}</p>`;
-                    card.textContent = originalContent;
-                }
+                        // Update highlight
+                        stageCards.forEach(c => c.classList.remove('active'));
+                        customLocationInput.classList.remove('active');
+                        card.classList.add('active');
+
+                        // Clear custom location input
+                        customLocationInput.value = '';
+                        currentCustomLocation = '';
+                        submitCustomLocationBtn.disabled = true;
+
+                        // Update timestamp
+                        lastUpdatedSpan.textContent = 'Just now';
+
+                        showModal('Success!', 'Location updated successfully! Your photobombers will be notified. 🎉');
+
+                    } catch (err) {
+                        console.error('Update error:', err);
+                        showModal('Error', `Failed to update location: ${err.message}. Please try again.`);
+                    } finally {
+                        card.querySelector('p').textContent = originalText;
+                    }
+                });
             });
-        });
+        }
 
         // Modal display function
         function showModal(title, message, buttonText = 'Close') {
