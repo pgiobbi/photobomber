@@ -8,11 +8,13 @@ services:
         APP_NAME: photobomb-backend
     volumes:
       - ./uploads:/var/local/uploads
+      - ./config:/var/local/config
     ports:
       - "127.0.0.1:3002:3002"
     environment:
       - RUST_LOG=debug
       - UPLOAD_DIR=/var/local/uploads
+      - CONFIG_DIR=/var/local/config
       - FPX_JWT_SECRET=${FPX_JWT_SECRET:-your-jwt-secret-here}
       - FPX_ACCESS_TOKEN_DURATION_MINUTES=1440
       - FPX_REFRESH_TOKEN_DURATION_MINUTES=10080

@@ -1,5 +1,5 @@
 use crate::types::auth::LoginRequest;
-use crate::types::location::Stage;
+use crate::types::stages::{Stage, TomorrowlandStage};
 use serde::Serialize;
 use std::env;
 use std::sync::RwLock;
@@ -57,4 +57,6 @@ pub struct AppState {
     pub location_state: RwLock<LocationState>,
     /// Credential state (Admin credentials).
     pub credential_state: CredentialState,
+    /// Tomorrowland stages, from the Tomorrowland API.
+    pub stages: Vec<TomorrowlandStage>,
 }

@@ -6,6 +6,8 @@ use crate::api::extractors::auth_middleware::AuthMiddlewareFactory;
 use crate::api::routes::auth::{get_profile, login, logout};
 use crate::api::routes::images::{get_image, get_upload_count, upload_images};
 use crate::api::routes::location::{get_location, post_location};
+use crate::api::routes::stages::get_stages;
+use crate::types::stages::TomorrowlandStage;
 use crate::types::state::{AppState, CredentialState, LocationState};
 use actix_cors::Cors;
 use actix_multipart::form::tempfile::TempFileConfig;
@@ -17,6 +19,12 @@ use jwt_compact::jwk::KeyType::KeyPair;
 use log::{debug, error, info};
 use serde::{Deserialize, Serialize};
 use std::env;
+use std::env::join_paths;
+use std::error::Error;
+use std::fs::File;
+use std::io::BufReader;
+use std::ops::Index;
+use std::path::Path;
 use std::string::ToString;
 use std::sync::{Arc, RwLock};
 use tokio::sync::Mutex;
@@ -46,11 +54,28 @@ async fn main() -> std::io::Result<()> {
     info!("UPLOAD_DIR    {:>16}: {}", "", &upload_dir);
     info!("MAX_FILE_SIZE {:>16}: {}", "", &max_file_size);
 
+    // Load and parse tomorrowland stages
+
+    let config_dir = env::var("CONFIG_DIR").expect("CONFIG_DIR not set");
+    let stages_path = Path::new(&config_dir).join("stages.json");
+    let stages = {
+        let file = File::open(stages_path)?;
+        let reader = BufReader::new(file);
+
+        serde_json::from_value(
+            serde_json::from_reader::<_, serde_json::Value>(reader)?
+                .get("stages")
+                .unwrap()
+                .clone(),
+        )?
+    };
+
     let app_state = web::Data::new(AppState {
         upload_dir: upload_dir.clone(),
         max_file_size,
         location_state: RwLock::new(LocationState::default()),
         credential_state: CredentialState::from_env(),
+        stages,
     });
 
     HttpServer::new(move || {
@@ -112,6 +137,11 @@ async fn main() -> std::io::Result<()> {
                     .wrap(AuthMiddlewareFactory)
                     .service(get_location)
                     .service(post_location),
+            )
+            .service(
+                web::scope("/api/stages")
+                    .wrap(AuthMiddlewareFactory)
+                    .service(get_stages),
             )
     })
     .bind(("0.0.0.0", 3002))

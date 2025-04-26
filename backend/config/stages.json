@@ -1,0 +1,128 @@
+{
+  "stages": [
+    {
+      "id": "1784481711",
+      "name": "MAINSTAGE",
+      "hosts": []
+    },
+    {
+      "id": "1784481821",
+      "name": "FREEDOM BY BUD",
+      "hosts": []
+    },
+    {
+      "id": "1784481872",
+      "name": "THE ROSE GARDEN",
+      "hosts": {
+        "2025-07-18": "ANDROMEDIK INVITES",
+        "2025-07-19": "BONZAI",
+        "2025-07-20": "TWEEKAMANIA",
+        "2025-07-25": "RAMPAGE",
+        "2025-07-26": "TRIBUTE TO BELGIUM: ILLUSION",
+        "2025-07-27": "SUB ZERO PROJECT & FRIENDS"
+      }
+    },
+    {
+      "id": "1784481918",
+      "name": "ELIXIR",
+      "hosts": {
+        "2025-07-18": "FLAVÃSOUL",
+        "2025-07-19": "TEAM DAMP",
+        "2025-07-20": "RADS",
+        "2025-07-25": "MANGROVE",
+        "2025-07-26": "VUNZIGE DEUNTJES",
+        "2025-07-27": "LEMONADE"
+      }
+    },
+    {
+      "id": "1784481973",
+      "name": "CAGE",
+      "hosts": {
+        "2025-07-18": "FOOTWORXX",
+        "2025-07-25": "FOOTWORXX",
+        "2025-07-26": "He.She.They"
+      }
+    },
+    {
+      "id": "1784482029",
+      "name": "THE RAVE CAVE",
+      "hosts": {
+        "2025-07-19": "CRYSTAL",
+        "2025-07-20": "RAVE ALERT",
+        "2025-07-27": "WE ARE ONE WORLD"
+      }
+    },
+    {
+      "id": "1784482074",
+      "name": "PLANAXIS",
+      "hosts": {
+        "2025-07-19": "MONSTERCAT",
+        "2025-07-20": "2010 - 2012 & Super You &Me present",
+        "2025-07-26": "PSYGATHERING",
+        "2025-07-27": "2010 - 2012"
+      }
+    },
+    {
+      "id": "1784482114",
+      "name": "RISE BY COKE STUDIO",
+      "hosts": {
+        "2025-07-18": "CAFEÍNA",
+        "2025-07-19": "BRESH",
+        "2025-07-20": "PSYGATHERING",
+        "2025-07-26": "YVES V PRESENTS V SESSIONS"
+      }
+    },
+    {
+      "id": "1784482154",
+      "name": "ATMOSPHERE",
+      "hosts": {
+        "2025-07-18": "TELETECH",
+        "2025-07-19": "ARTCORE",
+        "2025-07-20": "EXHALE",
+        "2025-07-27": "AMBER BROOS"
+      }
+    },
+    {
+      "id": "1784482189",
+      "name": "CORE",
+      "hosts": {
+        "2025-07-19": "CURATED BY MIND AGAINST",
+        "2025-07-20": "COLOUR CLUB",
+        "2025-07-25": "DIXON"
+      }
+    },
+    {
+      "id": "1784482230",
+      "name": "CRYSTAL GARDEN",
+      "hosts": {
+        "2025-07-20": "MAGNIFIK",
+        "2025-07-26": "CATCH & RELEASE"
+      }
+    },
+    {
+      "id": "1784482266",
+      "name": "THE LIBRARY",
+      "hosts": {
+        "2025-07-19": "LOST FREQUENCIES & FRIENDS",
+        "2025-07-20": "SMASH THE HOUSE",
+        "2025-07-26": "LOST FREQUENCIES & FRIENDS",
+        "2025-07-27": "SMASH THE HOUSE"
+      }
+    },
+    {
+      "id": "1784482305",
+      "name": "MELODIA BY CORONA",
+      "hosts": {
+        "2025-07-19": "CHITCHAT",
+        "2025-07-20": "CUCKOO'S NEST",
+        "2025-07-25": "DISCO ZONDERDAG",
+        "2025-07-27": "WITH LOVE FROM IBIZA"
+      }
+    },
+    {
+      "id": "1784481754",
+      "name": "HOUSE OF FORTUNE BY JBL",
+      "hosts": []
+    }
+  ]
+}
