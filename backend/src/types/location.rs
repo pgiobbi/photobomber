@@ -1,12 +1,11 @@
-use crate::types::stages::Stage;
-use crate::types::state::LocationState;
+use crate::types::state::{LocationState, LocationVariant};
 use chrono::{TimeZone, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GetLocationResponse {
-    pub location: Option<Stage>,
+    pub location: Option<LocationVariant>,
     pub updated_at: Option<i64>,
     pub updated_ago: Option<i64>,
 }
@@ -26,5 +25,5 @@ impl From<&LocationState> for GetLocationResponse {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PostLocationRequest {
-    pub location: Option<Stage>,
+    pub location: Option<LocationVariant>,
 }

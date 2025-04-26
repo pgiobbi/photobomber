@@ -1,6 +1,6 @@
 use crate::types::auth::LoginRequest;
-use crate::types::stages::{Stage, TomorrowlandStage};
-use serde::Serialize;
+use crate::types::stages::TomorrowlandStage;
+use serde::{Deserialize, Serialize};
 use std::env;
 use std::sync::RwLock;
 use std::thread::sleep;
@@ -42,9 +42,16 @@ impl CredentialState {
     }
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub enum LocationVariant {
+    Tomorrowland(TomorrowlandStage),
+    Custom(String),
+}
+
 #[derive(Default, Serialize)]
 pub struct LocationState {
-    pub location: Option<Stage>,
+    pub location: Option<LocationVariant>,
     pub updated_at: Option<i64>,
 }
 

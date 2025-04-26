@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Struct for stages retrieved from the Tomorrowland API.
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct TomorrowlandStage {
     /// Stage id.
     pub id: String,
