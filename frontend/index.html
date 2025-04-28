@@ -173,7 +173,7 @@
                 transform: scale(1.02);
             }
         }
-        
+
         .high-contrast-mode .text-white {
             color: #ffffff !important;
             text-shadow: 0 0 3px #000000;
@@ -183,15 +183,16 @@
         .step-indicator {
             display: flex;
             justify-content: center;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .step {
-            width: 10px;
-            height: 10px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
-            margin: 0 4px;
+            margin: 0 6px;
             background-color: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
         }
 
         .step.active {
@@ -199,30 +200,58 @@
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
         }
 
-        /* Gallery of example photos */
-        .example-gallery {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding: 8px 0;
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
+        /* Gallery popup */
+        .gallery-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
         }
 
-        .example-photo {
-            width: 80px;
-            height: 80px;
-            border-radius: 8px;
+        .gallery-popup.active {
+            display: flex;
+        }
+
+        .gallery-container {
+            width: 90%;
+            max-width: 800px;
+            height: 70%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .gallery-image {
+            width: 150px;
+            height: 150px;
             object-fit: cover;
-            flex-shrink: 0;
-            scroll-snap-align: start;
+            border-radius: 10px;
             border: 2px solid rgba(255, 255, 255, 0.3);
             transition: all 0.2s ease;
         }
 
-        .example-photo:hover {
+        .gallery-image:hover {
             transform: scale(1.05);
             border-color: #ffffff;
+        }
+
+        .close-gallery {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
         }
 
         /* Power saving mode toggle */
@@ -274,29 +303,20 @@
         }
 
         /* Badge styles */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.75rem;
-            border-radius: 999px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin: 0.25rem;
-            background: rgba(255, 255, 255, 0.1);
+        .badge-overlay {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, rgba(255, 0, 255, 0.8), rgba(65, 176, 232, 0.8));
+            color: white;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
             backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        @keyframes markerPulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.7);
-            }
-            70% {
-                box-shadow: 0 0 0 12px rgba(255, 68, 68, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(255, 68, 68, 0);
-            }
+            z-index: 10;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
 
         /* Preview screen */
@@ -306,12 +326,14 @@
             max-width: 320px;
             height: 320px;
             margin: 0 auto;
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
             background-color: rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
 
-        #previewImage {
+        #previewImage, #finalImage {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -321,13 +343,13 @@
         .social-share {
             display: flex;
             justify-content: center;
-            gap: 12px;
-            margin-top: 1rem;
+            gap: 15px;
+            margin-top: 1.5rem;
         }
 
         .social-btn {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -335,15 +357,79 @@
             color: white;
             font-size: 1.2rem;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .social-btn:hover {
-            transform: translateY(-3px);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
         .twitter {
             background-color: black;
+        }
+
+        .location-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 15px;
+            margin: 15px 0;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .location-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .gallery-trigger {
+            color: #41B0E8;
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .gallery-trigger:hover {
+            color: #ff00ff;
+        }
+
+        .legal-text {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            max-width: 90%;
+            margin: 0 auto;
+        }
+
+        .btn {
+            transition: all 0.3s ease;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+
+        footer {
+            margin-top: 2rem;
         }
     </style>
 </head>
@@ -378,44 +464,57 @@
     <div class="particle w-1 h-1 top-3/4 left-1/2" style="animation-delay: 4s;"></div>
 </div>
 
+<!-- Gallery popup -->
+<div class="gallery-popup" id="galleryPopup">
+    <div class="close-gallery" id="closeGallery">×</div>
+    <h2 class="text-2xl font-bold mb-4 title-glow">AWESOME PHOTOBOMBS</h2>
+    <div class="gallery-container">
+        <img src="/assets/placeholders/example-1.webp" alt="Example photobomb 1" class="gallery-image">
+        <img src="/assets/placeholders/example-2.webp" alt="Example photobomb 2" class="gallery-image">
+        <img src="/assets/placeholders/example-3.webp" alt="Example photobomb 3" class="gallery-image">
+        <img src="/assets/placeholders/example-4.webp" alt="Example photobomb 4" class="gallery-image">
+        <!-- More images can be added here -->
+    </div>
+</div>
+
 <!-- Main flex container -->
-<div class="flex flex-col min-h-dvh w-full">
+<div class="flex flex-col min-h-dvh w-full max-w-xl mx-auto">
     <!-- Header -->
-    <header class="pt-4 px-4 sm:px-5 flex-shrink-0">
+    <header class="pt-8 px-4 sm:px-5 flex-shrink-0">
         <div class="text-center">
-            <div class="flex items-center justify-center space-x-3 mb-2">
-                <span class="text-2xl bounce" id="cameraEmoji">📸</span>
-                <h1 class="text-3xl sm:text-2xl font-bold festival-text title-glow"
+            <div class="flex items-center justify-center space-x-4 mb-3">
+                <span class="text-3xl bounce" id="cameraEmoji">📸</span>
+                <h1 class="text-4xl sm:text-3xl font-bold festival-text title-glow"
                     style="text-shadow: 2px 2px 8px #ff00ff, -2px -2px 8px #d7ef00;">
                     PHOTOBOMB US!
                 </h1>
-                <span class="text-2xl shake" id="bombEmoji">💣</span>
+                <span class="text-3xl shake" id="bombEmoji">💣</span>
             </div>
-            <div class="h-2 w-48 mx-auto bg-gradient-to-r from-pink-500 via-blue-500 to-purple-500 rounded-full mt-2 mb-4"></div>
-            <p class="text-lg sm:text-xl festival-text glow">
-                Join <span id="bomber-count" class="text-3xl count-glow">...</span> Photo Bombers!
+            <div class="h-2 w-64 mx-auto bg-gradient-to-r from-pink-500 via-blue-500 to-purple-500 rounded-full mt-2 mb-4"></div>
+            <p class="text-xl sm:text-2xl festival-text glow">
+                Join <span id="bomber-count" class="text-4xl count-glow">...</span> Photo Bombers!
             </p>
         </div>
     </header>
 
     <!-- Main content -->
-    <main class="flex-grow flex items-center justify-center p-2 sm:p-4 flex-shrink">
-        <div class="space-y-5 max-w-md w-full" id="mainContent">
+    <main class="flex-grow flex items-center justify-center p-5 sm:p-6 flex-shrink">
+        <div class="space-y-6 max-w-md w-full" id="mainContent">
             <!-- Step 1: Initial Screen -->
             <div id="step1" class="text-center">
-                <div class="step-indicator sm:mb-2">
+                <div class="step-indicator mb-4">
                     <div class="step active"></div>
                     <div class="step"></div>
                     <div class="step"></div>
                 </div>
 
-                <p class="text-xl sm:text-2xl sm:mb-4 leading-relaxed">
+                <p class="text-xl sm:text-2xl sm:mb-6 leading-relaxed">
                     We're at <span class="font-extrabold text-blue-300 glow">Tomorrowland!</span><br>
                     Snap a selfie with us! 🤳
                 </p>
 
-                <div class="bg-white bg-opacity-10 backdrop-filter backdrop-blur-sm text-white rounded-xl p-2 sm:p-5 shadow-lg border border-white border-opacity-20">
-                    <p class="text-sm sm:text-lg font-semibold mb-2">
+                <div class="location-card">
+                    <p class="text-base sm:text-lg font-semibold mb-3">
                         Find us: Two friends in neon gear, dancing like nobody's watching! 🕺💃
                     </p>
 
@@ -429,24 +528,21 @@
                     </p>
                 </div>
 
-                <!-- Example photobombs -->
-                <p class="text-sm mt-2">See some awesome photobombs:</p>
-                <div class="example-gallery flex flex-row justify-center px-1">
-                    <img src="/assets/placeholders/example-1.webp" alt="Example photobomb 1" class="example-photo">
-                    <img src="/assets/placeholders/example-2.webp" alt="Example photobomb 2" class="example-photo">
-                    <img src="/assets/placeholders/example-3.webp" alt="Example photobomb 3" class="example-photo">
-                    <img src="/assets/placeholders/example-4.webp" alt="Example photobomb 4" class="example-photo">
-                </div>
+                <!-- Gallery trigger instead of horizontal scrolling -->
+                <p class="text-base mt-4 mb-3">
+                    <span class="gallery-trigger" id="galleryTrigger">
+                        See awesome photobombs from others! 🔍
+                    </span>
+                </p>
 
-                <div class="pt-2">
-                    <p class="text-xs sm:text-sm text-center mb-2 glow">
-                        Ready to photobomb? 📸 You're saying you're 18+, got everyone's OK in the pic, and are cool with
-                        our
+                <div class="pt-3">
+                    <p class="text-xs sm:text-sm text-center mb-4 legal-text">
+                        By taking a photo, you confirm you're 18+, have everyone's permission, and accept our
                         <a href="privacy-policy.html" class="text-blue-300 hover:underline">Privacy Policy</a> &
-                        <a href="terms-of-use.html" class="text-blue-300 hover:underline">Terms of Use</a>! 😎
+                        <a href="terms-of-use.html" class="text-blue-300 hover:underline">Terms of Use</a>
                     </p>
                     <label for="cameraInput"
-                           class="block mx-auto gradient-animate text-white font-bold py-3 sm:py-5 px-8 rounded-xl text-xl sm:text-2xl transition shadow-lg relative overflow-hidden cursor-pointer cta-pulse">
+                           class="block mx-auto gradient-animate text-white font-bold py-4 sm:py-5 px-8 rounded-xl text-xl sm:text-2xl transition shadow-lg relative overflow-hidden cursor-pointer cta-pulse">
                         TAKE THE SHOT! 📸
                         <span class="absolute inset-0 bg-white opacity-10"></span>
                     </label>
@@ -456,25 +552,25 @@
 
             <!-- Step 2: Preview Screen (hidden by default) -->
             <div id="step2" class="text-center hidden">
-                <div class="step-indicator mb-2">
+                <div class="step-indicator mb-4">
                     <div class="step"></div>
                     <div class="step active"></div>
                     <div class="step"></div>
                 </div>
 
-                <h2 class="text-xl sm:text-2xl font-bold sm:mb-3 glow">Preview Your Photobomb!</h2>
+                <h2 class="text-2xl sm:text-3xl font-bold mb-4 glow">Preview Your Photobomb!</h2>
 
-                <div class="preview-container mb-4">
+                <div class="preview-container mb-6">
                     <img id="previewImage" src="" alt="Preview">
                 </div>
 
-                <div class="flex justify-center space-x-4 mt-4">
+                <div class="flex justify-center space-x-6 mt-6">
                     <button id="retakeBtn"
-                            class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white py-3 px-6 rounded-lg transition">
+                            class="btn btn-secondary">
                         Retake 📸
                     </button>
                     <button id="uploadBtn"
-                            class="gradient-animate text-white font-bold py-3 px-6 rounded-lg transition">
+                            class="gradient-animate btn text-white font-bold">
                         Upload! 🚀
                     </button>
                 </div>
@@ -482,33 +578,31 @@
 
             <!-- Step 3: Success Screen (hidden by default) -->
             <div id="step3" class="text-center hidden">
-                <div class="step-indicator mb-2">
+                <div class="step-indicator mb-4">
                     <div class="step"></div>
                     <div class="step"></div>
                     <div class="step active"></div>
                 </div>
 
-                <h2 class="text-2xl font-bold mb-2 title-glow">AWESOME SHOT! 🎉</h2>
+                <h2 class="text-2xl sm:text-3xl font-bold mb-4 title-glow">AWESOME SHOT! 🎉</h2>
 
-                <div class="preview-container mb-3">
+                <div class="preview-container mb-6">
                     <img id="finalImage" src="" alt="Your photobomb">
+                    <div class="badge-overlay badge"></div>
                 </div>
 
-                <div class="mb-4">
-                    <p class="mb-2">You earned a badge!</p>
-                    <div class="badge bg-gradient-to-r from-purple-600 to-blue-500 py-2 px-4">
-                        🌟 PHOTOBOMB HERO 🌟
-                    </div>
-                </div>
+                <!--                <div class="my-4">-->
+                <!--                    <div class="badge bg-gradient-to-r from-purple-600 to-blue-500 py-2 px-4"></div>-->
+                <!--                </div>-->
 
-                <div class="social-share mb-4">
-                    <div class="social-btn p-2 twitter" id="shareTwitter">
-                        <img src="/assets/logos/X_logo_2023.svg" alt="">
-                    </div>
-                </div>
+                <!--                <div class="social-share mb-6">-->
+                <!--                    <div class="social-btn twitter" id="shareTwitter">-->
+                <!--                        <img src="/assets/logos/X_logo_2023.svg" alt="Share on X">-->
+                <!--                    </div>-->
+                <!--                </div>-->
 
                 <button id="newPhotoBtn"
-                        class="gradient-animate text-white font-bold py-3 px-6 rounded-lg transition mb-2">
+                        class="gradient-animate btn text-white font-bold">
                     Take Another Shot! 🤳
                 </button>
             </div>
@@ -516,12 +610,12 @@
     </main>
 
     <!-- Footer -->
-    <footer class="w-full pb-2 sm:pb-8 px-4 sm:px-5 flex-shrink-0">
-        <p class="text-center text-base sm:text-lg mt-1 glow">
+    <footer class="w-full pb-6 sm:pb-8 px-4 sm:px-5 flex-shrink-0">
+        <p class="text-center text-base sm:text-lg mb-2 glow">
             <a href="privacy-policy.html" class="text-blue-300 hover:underline font-bold">Privacy Policy</a> |
             <a href="terms-of-use.html" class="text-blue-300 hover:underline font-bold">Terms of Use</a>
         </p>
-        <p class="text-center text-sm sm:text-base mt-2">
+        <p class="text-center text-sm sm:text-base opacity-70">
             Impressum: Tomorrowland Photobomb Crew, Italy, <a href="mailto:contact@yourdomain.com"
                                                               class="text-blue-300 hover:underline">contact@yourdomain.com</a>
         </p>
@@ -549,7 +643,24 @@
         const bombEmoji = document.getElementById('bombEmoji');
         const locationElement = document.getElementById('currentLocation');
         const lastUpdatedSpan = document.getElementById('lastUpdated');
+        const galleryTrigger = document.getElementById('galleryTrigger');
+        const galleryPopup = document.getElementById('galleryPopup');
+        const closeGallery = document.getElementById('closeGallery');
 
+        // Gallery popup functionality
+        galleryTrigger.addEventListener('click', () => {
+            galleryPopup.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        closeGallery.addEventListener('click', () => {
+            galleryPopup.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+        bomberCount.addEventListener('click', () => {
+            window.location.reload();
+        });
 
         // Fetch and display current location
         async function fetchCurrentLocation() {
@@ -827,28 +938,6 @@
             modal.appendChild(modalContent);
 
             document.body.appendChild(modal);
-        }
-
-        // Periodically update the badge text to show current stats
-        function updateBadgeStats() {
-            const stats = [
-                "🌟 PHOTOBOMB HERO 🌟",
-                "🔥 TOP BOMBER 🔥",
-                "💯 FESTIVAL PRO 💯",
-                "🎪 STAGE CRUSHER 🎪"
-            ];
-
-            const randomStat = stats[Math.floor(Math.random() * stats.length)];
-            const badges = document.querySelectorAll('.badge');
-
-            badges.forEach(badge => {
-                if (badge.textContent.includes('PHOTOBOMB') ||
-                    badge.textContent.includes('BOMBER') ||
-                    badge.textContent.includes('FESTIVAL') ||
-                    badge.textContent.includes('STAGE')) {
-                    badge.textContent = randomStat;
-                }
-            });
         }
     });
 </script>
