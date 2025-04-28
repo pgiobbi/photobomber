@@ -431,6 +431,67 @@
         footer {
             margin-top: 2rem;
         }
+
+        /* Strobe light effect */
+        .strobe-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0;
+        }
+
+        .strobe-active {
+            animation: strobeFlash 0.8s ease-in-out 4;
+        }
+
+        @keyframes strobeFlash {
+            0%, 100% {
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.5;
+                background: #ff00ff;
+            }
+            20% {
+                opacity: 0.4;
+                background: #d7ef00;
+            }
+            30% {
+                opacity: 0.5;
+                background: #ff4444;
+            }
+            40% {
+                opacity: 0.4;
+                background: #41B0E8;
+            }
+        }
+
+        /* Confetti effect */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(45deg, #ff00ff, #d7ef00);
+            opacity: 0.8;
+            animation: confettiFall 3s ease-out forwards;
+            transform: rotate(45deg);
+            z-index: 60;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body class="flex min-h-dvh h-dvh flex-col items-center justify-between text-white">
@@ -463,6 +524,9 @@
     <div class="particle w-2 h-2 top-2/3 left-1/4" style="animation-delay: 3s;"></div>
     <div class="particle w-1 h-1 top-3/4 left-1/2" style="animation-delay: 4s;"></div>
 </div>
+
+<!-- Strobe overlay for success screen -->
+<div class="strobe-overlay" id="strobeOverlay"></div>
 
 <!-- Gallery popup -->
 <div class="gallery-popup" id="galleryPopup">
@@ -591,16 +655,6 @@
                     <div class="badge-overlay badge"></div>
                 </div>
 
-                <!--                <div class="my-4">-->
-                <!--                    <div class="badge bg-gradient-to-r from-purple-600 to-blue-500 py-2 px-4"></div>-->
-                <!--                </div>-->
-
-                <!--                <div class="social-share mb-6">-->
-                <!--                    <div class="social-btn twitter" id="shareTwitter">-->
-                <!--                        <img src="/assets/logos/X_logo_2023.svg" alt="Share on X">-->
-                <!--                    </div>-->
-                <!--                </div>-->
-
                 <button id="newPhotoBtn"
                         class="gradient-animate btn text-white font-bold">
                     Take Another Shot! 🤳
@@ -646,6 +700,7 @@
         const galleryTrigger = document.getElementById('galleryTrigger');
         const galleryPopup = document.getElementById('galleryPopup');
         const closeGallery = document.getElementById('closeGallery');
+        const strobeOverlay = document.getElementById('strobeOverlay');
 
         // Gallery popup functionality
         galleryTrigger.addEventListener('click', () => {
@@ -717,8 +772,9 @@
                 cameraEmoji.classList.remove('bounce');
                 bombEmoji.classList.remove('shake');
                 // Remove other animations
-                document.querySelectorAll('.count-glow, .pulse, .cta-pulse').forEach(el => {
+                document.querySelectorAll('.count-glow, .pulse, .cta-pulse, .strobe-active, .confetti').forEach(el => {
                     el.style.animation = 'none';
+                    if (el.classList.contains('confetti')) el.remove();
                 });
             } else {
                 // Re-enable animations
@@ -797,6 +853,33 @@
             cameraInput.value = ''; // Reset input
         });
 
+        // Function to trigger success animations
+        function triggerSuccessAnimations() {
+            if (powerSaveToggle.checked) return; // Skip animations in power-saving mode
+
+            // Trigger strobe effect
+            strobeOverlay.classList.add('strobe-active');
+            setTimeout(() => {
+                strobeOverlay.classList.remove('strobe-active');
+            }, 4800); // Matches 6 cycles of 0.8s animation
+
+            // Create confetti particles
+            const colors = [
+                'linear-gradient(45deg, #ff00ff, #d7ef00)',
+                'linear-gradient(45deg, #ff4444, #41B0E8)',
+                'linear-gradient(45deg, #d7ef00, #ff00ff)'
+            ];
+            for (let i = 0; i < 30; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = `${Math.random() * 1}s`;
+                document.body.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 3800); // Remove after animation
+            }
+        }
+
         // Upload button
         uploadBtn.addEventListener('click', async () => {
             // Create FormData and append files
@@ -844,10 +927,29 @@
                     "🌟 PHOTOBOMB HERO 🌟",
                     "🔥 TOP BOMBER 🔥",
                     "💯 FESTIVAL PRO 💯",
-                    "🎪 STAGE CRUSHER 🎪"
+                    "🎪 STAGE CRUSHER 🎪",
+                    "🌌 COSMIC PHOTOBOMBER 🌌",
+                    "⚡️ ELECTRIC VIBE IGNITER ⚡️",
+                    "🎇 FESTIVAL FUSE BLAZER 🎇",
+                    "🌈 RAVE LEGEND UNLEASHED 🌈",
+                    "🔥 PULSE POUNDING MAVERICK 🔥",
+                    "✨ STARDUST SCENE STEALER ✨",
+                    "🎉 BASSLINE TRAILBLAZER 🎉",
+                    "💥 BOOMDROP RENEGADE 💥",
+                    "🪐 ORBITAL RHYTHM RIDER 🪐",
+                    "🌠 METEORIC MOMENT MAKER 🌠",
+                    "🎶 SONIC WAVE WARRIOR 🎶",
+                    "⚡ VOLT-CHARGED VISIONARY ⚡",
+                    "🌀 NEON SPIRAL SORCERER 🌀",
+                    "🎡 RAVE RINGMASTER 🎡",
+                    "💫 GALACTIC GROOVE GURU 💫",
+                    "🔊 BEAT QUAKE CREATOR 🔊"
                 ];
                 const badge = document.querySelector('.badge');
                 badge.textContent = stats[Math.floor(Math.random() * stats.length)];
+
+                // Trigger success animations
+                triggerSuccessAnimations();
 
                 // Restore the upload status button for future use
                 uploadBtn.textContent = "Upload! 🚀";
@@ -875,7 +977,7 @@
             shareToSocial('twitter');
         });
 
-        //// Social sharing function
+        // Social sharing function
         async function shareToSocial(platform) {
             const text = "Just photobombed my friends at Tomorrowland!";
             const url = window.location.href;
