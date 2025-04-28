@@ -463,19 +463,6 @@
                     <p class="text-sm mt-1">
                         Last Updated: <span id="lastUpdated">Not set</span>
                     </p>
-
-                    <!-- Simple map -->
-                    <!--                    <div class="map-container bg-blue-900 bg-opacity-30">-->
-                    <!--                        <img src="/api/placeholder/400/120" alt="Festival map"-->
-                    <!--                             class="w-full h-full object-cover opacity-50">-->
-                    <!--                        <div class="map-marker"></div>-->
-                    <!--                    </div>-->
-
-                    <!--                    <div class="mt-3 flex flex-wrap justify-center gap-1">-->
-                    <!--                        <span class="badge">🎵 Main Stage</span>-->
-                    <!--                        <span class="badge">🌴 Near Palm Trees</span>-->
-                    <!--                        <span class="badge">⚡ By LED Wall</span>-->
-                    <!--                    </div>-->
                 </div>
 
                 <!-- Example photobombs -->
@@ -609,7 +596,7 @@
         // Fetch and display current location
         async function fetchCurrentLocation() {
             try {
-                const response = await fetch('/api/location', {
+                const response = await fetch('/api/public/location', {
                     method: 'GET',
                     headers: {'Content-Type': 'application/json'}
                 });
@@ -685,7 +672,7 @@
         // Fetch photo bomber count
         async function fetchBomberCount() {
             try {
-                const response = await fetch('/api/images/count');
+                const response = await fetch('/api/public/images/count');
                 if (!response.ok) throw new Error('API request failed');
                 const data = await response.json();
                 bomberCount.textContent = data.count.toLocaleString();
@@ -766,7 +753,7 @@
 
                 formData.append('images', compressedBlob);
 
-                const response = await fetch('/api/images/upload', {
+                const response = await fetch('/api/public/images/upload', {
                     method: 'POST',
                     body: formData,
                 });

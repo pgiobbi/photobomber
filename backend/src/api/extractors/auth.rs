@@ -9,11 +9,16 @@ use actix_web::{
 };
 
 /// Generates access/refresh tokens and sets them in an empty response.
-pub(crate) fn generate_and_set_auth_cookies(user_id: i64) -> Result<HttpResponseBuilder, ()> {
+pub(crate) fn generate_and_set_auth_cookies(
+    user_id: i64,
+    is_admin: bool,
+) -> Result<HttpResponseBuilder, ()> {
     let mut res = HttpResponse::Ok();
     let (access_tk, refresh_tk) = generate_tokens(user_id).unwrap();
 
-    if let Ok((access_cookie, refresh_cookie)) = build_auth_cookies(&access_tk, &refresh_tk) {
+    if let Ok((access_cookie, refresh_cookie)) =
+        build_auth_cookies(&access_tk, &refresh_tk, is_admin)
+    {
         res.cookie(access_cookie);
         res.cookie(refresh_cookie);
     } else {
@@ -25,11 +30,8 @@ pub(crate) fn generate_and_set_auth_cookies(user_id: i64) -> Result<HttpResponse
 /// Resets the access/refresh cookies and sets them in an empty response.
 pub(crate) fn generate_and_set_auth_removal_cookies() -> Result<HttpResponseBuilder, ()> {
     let mut res = HttpResponse::Ok();
-    if let Ok((access_cookie, refresh_cookie)) = build_auth_removal_cookies() {
-        res.cookie(access_cookie);
-        res.cookie(refresh_cookie);
-    } else {
-        return Err(());
+    for cookie in build_auth_removal_cookies() {
+        res.cookie(cookie);
     }
     Ok(res)
 }
@@ -58,8 +60,9 @@ pub(crate) fn set_auth_cookies<B>(
     res: &mut HttpResponse<B>,
     access_token: &str,
     refresh_token: &str,
+    is_admin: bool,
 ) -> Result<(), ()> {
-    match build_auth_cookies(access_token, refresh_token) {
+    match build_auth_cookies(access_token, refresh_token, is_admin) {
         Ok((access_cookie, refresh_cookie)) => {
             if let Err(_) = res.add_cookie(&access_cookie) {
                 return Err(());
@@ -77,9 +80,16 @@ pub(crate) fn set_auth_cookies<B>(
 pub(crate) fn build_auth_cookies<'a>(
     access_token: &'a str,
     refresh_token: &'a str,
+    is_admin: bool,
 ) -> Result<(Cookie<'a>, Cookie<'a>), HttpError> {
+    let cookie_path = if is_admin {
+        "/api/admin"
+    } else {
+        "/api/public"
+    };
+
     let access_cookie = Cookie::build("access_token", access_token.to_owned())
-        .path("/")
+        .path(cookie_path)
         .secure(true)
         .http_only(true)
         .max_age(CookieDuration::minutes(
@@ -88,7 +98,7 @@ pub(crate) fn build_auth_cookies<'a>(
         .finish();
 
     let refresh_cookie = Cookie::build("refresh_token", refresh_token.to_owned())
-        .path("/")
+        .path(cookie_path)
         .secure(true)
         .http_only(true)
         .max_age(CookieDuration::minutes(
@@ -100,22 +110,24 @@ pub(crate) fn build_auth_cookies<'a>(
 }
 
 /// Builds the auth removal cookies. These can be set in a response.
-pub(crate) fn build_auth_removal_cookies<'a>() -> Result<(Cookie<'a>, Cookie<'a>), HttpError> {
-    let mut access_cookie = Cookie::build("access_token", "")
-        .path("/")
-        .secure(true)
-        .http_only(true)
-        .max_age(CookieDuration::minutes(0))
-        .finish();
-    access_cookie.make_removal();
+pub(crate) fn build_auth_removal_cookies<'a>() -> Vec<Cookie<'a>> {
+    let cookie_params: [(&str, &str); 4] = [
+        ("access_token", "/api/admin"),
+        ("refresh_token", "/api/admin"),
+        ("access_token", "/api/public"),
+        ("refresh_token", "/api/public"),
+    ];
 
-    let mut refresh_cookie = Cookie::build("refresh_token", "")
-        .path("/")
-        .secure(true)
-        .http_only(true)
-        .max_age(CookieDuration::minutes(0))
-        .finish();
-    refresh_cookie.make_removal();
-
-    Ok((access_cookie, refresh_cookie))
+    cookie_params
+        .iter()
+        .map(|(cookie_name, cookie_path)| {
+            let mut cookie = Cookie::build(*cookie_name, "")
+                .path(*cookie_path)
+                .secure(true)
+                .http_only(true)
+                .finish();
+            cookie.make_removal();
+            cookie
+        })
+        .collect()
 }

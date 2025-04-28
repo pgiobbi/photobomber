@@ -105,7 +105,13 @@ where
 
             if let Some(token) = token_opt {
                 let (req, mut res) = res.into_parts();
-                let _ = set_auth_cookies(&mut res, &token.access_token, &token.refresh_token);
+                let is_admin = req.path().starts_with("/api/admin");
+                let _ = set_auth_cookies(
+                    &mut res,
+                    &token.access_token,
+                    &token.refresh_token,
+                    is_admin,
+                );
                 Ok(ServiceResponse::new(req, res))
             } else {
                 Ok(res)

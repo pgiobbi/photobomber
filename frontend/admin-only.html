@@ -282,13 +282,13 @@
         const customLocationInput = document.getElementById('customLocation');
         const submitCustomLocationBtn = document.getElementById('submitCustomLocation');
 
-        let stages = []; // Store stages from /api/stages
+        let stages = []; // Store stages from /api/admin/stages
         let currentCustomLocation = ''; // Track current custom location
 
         // Check authentication status on page load
         async function checkAuth() {
             try {
-                const response = await fetch('/api/auth/profile', {
+                const response = await fetch('/api/admin/profile', {
                     method: 'GET',
                     headers: {'Content-Type': 'application/json'}
                 });
@@ -308,10 +308,10 @@
             }
         }
 
-        // Fetch available stages from /api/stages
+        // Fetch available stages from /api/admin/stages
         async function fetchStages() {
             try {
-                const response = await fetch('/api/stages', {
+                const response = await fetch('/api/admin/stages', {
                     method: 'GET',
                     headers: {'Content-Type': 'application/json'}
                 });
@@ -355,7 +355,7 @@
         // Fetch and highlight current location, update timestamp
         async function fetchCurrentLocation() {
             try {
-                const response = await fetch('/api/location', {
+                const response = await fetch('/api/admin/location', {
                     method: 'GET',
                     headers: {'Content-Type': 'application/json'}
                 });
@@ -514,7 +514,7 @@
                 submitCustomLocationBtn.textContent = 'Setting...';
                 submitCustomLocationBtn.disabled = true;
 
-                const response = await fetch('/api/location', {
+                const response = await fetch('/api/admin/location', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
@@ -586,7 +586,7 @@
                     try {
                         card.querySelector('p').textContent = 'Updating...';
 
-                        const response = await fetch('/api/location', {
+                        const response = await fetch('/api/admin/location', {
                             method: 'POST',
                             headers: {'Content-Type': 'application/json'},
                             body: JSON.stringify(requestBody)

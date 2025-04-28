@@ -3,7 +3,7 @@ mod types;
 
 use crate::api::constants::DEFAULT_MAX_FILE_SIZE;
 use crate::api::extractors::auth_middleware::AuthMiddlewareFactory;
-use crate::api::routes::auth::{get_profile, login, logout};
+use crate::api::routes::auth::{get_profile, post_login, post_logout};
 use crate::api::routes::images::{get_image, get_upload_count, upload_images};
 use crate::api::routes::location::{get_location, post_location};
 use crate::api::routes::stages::get_stages;
@@ -116,32 +116,36 @@ async fn main() -> std::io::Result<()> {
             )
             .wrap(NormalizePath::trim())
             .service(
+                // Public (w/o auth) endpoints. For both admin and public users
                 web::scope("/api/auth")
-                    .service(web::resource("login").route(web::post().to(login)))
-                    .service(web::resource("logout").route(web::post().to(logout)))
+                    .service(web::scope("login").service(post_login))
+                    .service(web::scope("logout").service(post_logout)),
+            )
+            .service(
+                // Public (w/ auth) endpoints. Scoping is required to avoid cookie conflicts, since
+                // public cookies are generated with `Path=/api/public`
+                web::scope("/api/public")
+                    .wrap(AuthMiddlewareFactory)
                     .service(
-                        web::resource("profile")
-                            .wrap(AuthMiddlewareFactory)
-                            .route(web::get().to(get_profile)),
-                    ),
+                        web::scope("images")
+                            .service(get_upload_count)
+                            .service(upload_images)
+                            .service(get_image),
+                    )
+                    .service(web::scope("location").service(get_location)),
             )
             .service(
-                web::scope("/api/images")
+                // Admin (w/ auth) endpoints. Scoping is required to avoid cookie conflicts, since
+                // admin cookies are generated with `Path=/api/admin`
+                web::scope("/api/admin")
                     .wrap(AuthMiddlewareFactory)
-                    .service(get_upload_count)
-                    .service(upload_images)
-                    .service(get_image),
-            )
-            .service(
-                web::scope("/api/location")
-                    .wrap(AuthMiddlewareFactory)
-                    .service(get_location)
-                    .service(post_location),
-            )
-            .service(
-                web::scope("/api/stages")
-                    .wrap(AuthMiddlewareFactory)
-                    .service(get_stages),
+                    .service(web::scope("stages").service(get_stages))
+                    .service(
+                        web::scope("location")
+                            .service(post_location)
+                            .service(get_location),
+                    )
+                    .service(web::scope("profile").service(get_profile)),
             )
     })
     .bind(("0.0.0.0", 3002))
