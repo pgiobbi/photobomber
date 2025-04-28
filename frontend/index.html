@@ -173,12 +173,7 @@
                 transform: scale(1.02);
             }
         }
-
-        /* New styles for high contrast mode */
-        .high-contrast-mode {
-            background-image: linear-gradient(135deg, rgba(5, 10, 20, 0.95), rgba(15, 25, 40, 0.9)), url('/assets/orbyz-notext.webp');
-        }
-
+        
         .high-contrast-mode .text-white {
             color: #ffffff !important;
             text-shadow: 0 0 3px #000000;
@@ -292,29 +287,6 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        /* Map marker positioning */
-        .map-container {
-            position: relative;
-            width: 100%;
-            height: 120px;
-            border-radius: 8px;
-            overflow: hidden;
-            margin: 1rem 0;
-        }
-
-        .map-marker {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: #ff4444;
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 0 4px rgba(255, 68, 68, 0.4);
-            animation: markerPulse 1.5s infinite;
-        }
-
         @keyframes markerPulse {
             0% {
                 box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.7);
@@ -370,16 +342,8 @@
             transform: translateY(-3px);
         }
 
-        .instagram {
-            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
-        }
-
         .twitter {
-            background-color: #1DA1F2;
-        }
-
-        .tiktok {
-            background: linear-gradient(45deg, #000000, #25F4EE, #FE2C55, #000000);
+            background-color: black;
         }
     </style>
 </head>
@@ -458,7 +422,7 @@
                     <!-- Current location information -->
                     <p class="text-sm">
                         <span class="inline-block animate-pulse">📍</span> We are at: <span id="currentLocation"
-                                                                                              class="font-bold text-blue-300">Loading...</span>
+                                                                                           class="font-bold text-blue-300">Loading...</span>
                     </p>
                     <p class="text-sm mt-1">
                         Last Updated: <span id="lastUpdated">Not set</span>
@@ -537,16 +501,9 @@
                     </div>
                 </div>
 
-                <p class="mb-3">Share with #TomorrowlandPhotobomb:</p>
                 <div class="social-share mb-4">
-                    <div class="social-btn instagram" id="shareInstagram">
-                        <span>📱</span>
-                    </div>
-                    <div class="social-btn twitter" id="shareTwitter">
-                        <span>🐦</span>
-                    </div>
-                    <div class="social-btn tiktok" id="shareTiktok">
-                        <span>🎵</span>
+                    <div class="social-btn p-2 twitter" id="shareTwitter">
+                        <img src="/assets/logos/X_logo_2023.svg" alt="">
                     </div>
                 </div>
 
@@ -592,6 +549,7 @@
         const bombEmoji = document.getElementById('bombEmoji');
         const locationElement = document.getElementById('currentLocation');
         const lastUpdatedSpan = document.getElementById('lastUpdated');
+
 
         // Fetch and display current location
         async function fetchCurrentLocation() {
@@ -771,12 +729,18 @@
                 step2.classList.add('hidden');
                 step3.classList.remove('hidden');
 
+                const stats = [
+                    "🌟 PHOTOBOMB HERO 🌟",
+                    "🔥 TOP BOMBER 🔥",
+                    "💯 FESTIVAL PRO 💯",
+                    "🎪 STAGE CRUSHER 🎪"
+                ];
+                const badge = document.querySelector('.badge');
+                badge.textContent = stats[Math.floor(Math.random() * stats.length)];
+
+                // Restore the upload status button for future use
                 uploadBtn.textContent = "Upload! 🚀";
                 uploadBtn.disabled = false;
-
-                // Confetti effect
-                createConfetti();
-
             } catch (err) {
                 console.error('Upload error:', err);
                 showModal(
@@ -796,111 +760,27 @@
             cameraInput.value = ''; // Reset input
         });
 
-        // Social share buttons
-        document.getElementById('shareInstagram').addEventListener('click', () => {
-            shareToSocial('instagram');
-        });
-
         document.getElementById('shareTwitter').addEventListener('click', () => {
             shareToSocial('twitter');
         });
 
-        document.getElementById('shareTiktok').addEventListener('click', () => {
-            shareToSocial('tiktok');
-        });
-
         //// Social sharing function
-        function shareToSocial(platform) {
-            const text = "Just photobombed my friends at Tomorrowland! #TomorrowlandPhotobomb";
+        async function shareToSocial(platform) {
+            const text = "Just photobombed my friends at Tomorrowland!";
             const url = window.location.href;
 
             let shareUrl = '';
 
             switch (platform) {
-                case 'instagram':
-                    // Instagram doesn't support direct sharing, show instructions
-                    showModal(
-                        'Share to Instagram',
-                        'Save this photo to your device, then open Instagram and create a new post with #TomorrowlandPhotobomb!',
-                        'Got it!'
-                    );
-                    return;
                 case 'twitter':
                     shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
                     break;
-                case 'tiktok':
-                    showModal(
-                        'Share to TikTok',
-                        'Save this photo to your device, then open TikTok and create a new post with #TomorrowlandPhotobomb!',
-                        'Got it!'
-                    );
-                    return;
             }
 
             if (shareUrl) {
                 window.open(shareUrl, '_blank');
             }
         }
-
-        // Create confetti effect for celebration
-        function createConfetti() {
-            const confettiCount = 100;
-            const container = document.body;
-
-            for (let i = 0; i < confettiCount; i++) {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti';
-
-                // Random colors
-                const colors = ['#ff00ff', '#d7ef00', '#ff4444', '#41B0E8', '#FFC0CB'];
-                const color = colors[Math.floor(Math.random() * colors.length)];
-
-                // Random size
-                const size = Math.random() * 10 + 5;
-
-                // Random position
-                const posX = Math.random() * window.innerWidth;
-                const posY = -20; // Start above the screen
-
-                // Apply styles
-                confetti.style.backgroundColor = color;
-                confetti.style.width = `${size}px`;
-                confetti.style.height = `${size}px`;
-                confetti.style.position = 'fixed';
-                confetti.style.left = `${posX}px`;
-                confetti.style.top = `${posY}px`;
-                confetti.style.borderRadius = '50%';
-                confetti.style.zIndex = '9999';
-
-                // Animation
-                const duration = Math.random() * 3 + 2; // 2-5 seconds
-                const delay = Math.random() * 3; // 0-3 seconds
-
-                confetti.style.animation = `confettiFall ${duration}s ease-in ${delay}s 1 forwards`;
-
-                container.appendChild(confetti);
-
-                // Remove after animation
-                setTimeout(() => {
-                    container.removeChild(confetti);
-                }, (duration + delay) * 1000);
-            }
-        }
-
-        // Add confetti animation
-        const styleSheet = document.styleSheets[0];
-        styleSheet.insertRule(`
-                @keyframes confettiFall {
-                    0% {
-                        transform: translateY(0) rotate(0deg);
-                        opacity: 1;
-                    }
-                    100% {
-                        transform: translateY(${window.innerHeight}px) rotate(720deg);
-                        opacity: 0;
-                    }
-                }
-            `, styleSheet.cssRules.length);
 
         // Modal display function with image previews
         function showModal(title, message, buttonText = 'Keep Dancing! 🕺', imageUrls = []) {
@@ -970,100 +850,6 @@
                 }
             });
         }
-
-        // Simulate festival crowd energy
-        let festivalEnergy = 80; // 0-100 scale
-        function simulateFestivalEnergy() {
-            const energyChange = Math.random() * 10 - 5; // -5 to +5
-            festivalEnergy += energyChange;
-
-            // Keep in range
-            festivalEnergy = Math.max(50, Math.min(100, festivalEnergy));
-
-            // Visually reflect energy
-            const intensity = festivalEnergy / 100;
-            document.documentElement.style.setProperty('--festival-intensity', intensity.toString());
-
-            // If energy is really high, add additional visual effects
-            if (festivalEnergy > 90 && !powerSaveToggle.checked) {
-                createBurstEffect();
-            }
-        }
-
-        function createBurstEffect() {
-            const burst = document.createElement('div');
-            burst.className = 'energy-burst';
-            burst.style.position = 'fixed';
-            burst.style.width = '300px';
-            burst.style.height = '300px';
-            burst.style.borderRadius = '50%';
-            burst.style.background = 'radial-gradient(circle, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 70%)';
-            burst.style.left = `${Math.random() * window.innerWidth}px`;
-            burst.style.top = `${Math.random() * window.innerHeight}px`;
-            burst.style.transform = 'scale(0)';
-            burst.style.transition = 'transform 0.5s ease-out, opacity 0.5s ease-out';
-            burst.style.opacity = '0.7';
-            burst.style.zIndex = '1';
-
-            document.body.appendChild(burst);
-
-            // Animate burst
-            setTimeout(() => {
-                burst.style.transform = 'scale(1)';
-                burst.style.opacity = '0';
-            }, 10);
-
-            // Remove after animation
-            setTimeout(() => {
-                document.body.removeChild(burst);
-            }, 600);
-        }
-
-        // Only run energy simulation occasionally to save battery
-        setInterval(simulateFestivalEnergy, 5_000); // Every 10 seconds
-
-        // Apply time-of-day optimizations
-        function applyTimeBasedOptimizations() {
-            const hour = new Date().getHours();
-            const isDaytime = hour >= 7 && hour < 19;
-
-            // Automatically enable high contrast mode during daytime
-            if (isDaytime && !contrastToggle.checked) {
-                contrastToggle.checked = true;
-                document.body.classList.add('high-contrast-mode');
-            }
-
-            // Automatically enable power saving mode during late night
-            if ((hour >= 2 && hour < 7) && !powerSaveToggle.checked) {
-                powerSaveToggle.checked = true;
-                document.body.classList.add('power-save');
-                particlesContainer.style.display = 'none';
-            }
-        }
-
-        // Run once on load
-        applyTimeBasedOptimizations();
-
-        // Track usage time to intelligently conserve battery
-        let sessionStartTime = Date.now();
-        let batteryWarningShown = false;
-
-        function checkSessionDuration() {
-            const sessionDuration = (Date.now() - sessionStartTime) / 1000 / 60; // minutes
-
-            // If using the app for more than 15 minutes and not in power save mode, suggest it
-            if (sessionDuration > 15 && !powerSaveToggle.checked && !batteryWarningShown) {
-                showModal(
-                    'Battery Tip 🔋',
-                    'Want to save battery for more festival fun? Try enabling power saving mode!',
-                    'Good idea!'
-                );
-                batteryWarningShown = true;
-            }
-        }
-
-        // Check session duration every 5 minutes
-        setInterval(checkSessionDuration, 300000);
     });
 </script>
 
