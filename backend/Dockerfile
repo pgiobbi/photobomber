@@ -1,12 +1,11 @@
 # syntax=docker/dockerfile:1
 
-ARG RUST_VERSION=1.85.1
+ARG RUST_VERSION=1.86.0
 ARG APP_NAME=photobomb-backend
 
 ################################################################################
-# Create a stage for building the application.
-FROM --platform=linux/arm64 rust:${RUST_VERSION}-bullseye AS build
-ARG APP_NAME
+# Create a stage for building dependencies.
+FROM --platform=linux/arm64 rust:${RUST_VERSION}-bullseye AS deps
 WORKDIR /app
 
 # Install build dependencies.
@@ -18,9 +17,25 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy source code and build the application.
+# Copy dependency files.
 COPY Cargo.toml Cargo.lock ./
+
+# Create a dummy main.rs to build dependencies.
+RUN mkdir src && \
+    echo "fn main() {}" > src/main.rs && \
+    cargo build --locked --release --target aarch64-unknown-linux-gnu && \
+    rm -rf src
+
+################################################################################
+# Create a stage for building the application.
+FROM deps AS build
+ARG APP_NAME
+WORKDIR /app
+
+# Copy source code.
 COPY src ./src
+
+# Build the application, reusing cached dependencies.
 RUN cargo build --locked --release --target aarch64-unknown-linux-gnu
 RUN cp ./target/aarch64-unknown-linux-gnu/release/${APP_NAME} /bin/server
 
