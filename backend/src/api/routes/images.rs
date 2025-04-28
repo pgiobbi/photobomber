@@ -8,6 +8,8 @@ use actix_web::{Error, HttpResponse, Responder, get, post, web};
 use log::{error, info, warn};
 use mime::IMAGE;
 use sanitize_filename::sanitize;
+use std::fs::{File, Permissions};
+use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
 use tokio::fs;
 use uuid::Uuid;
@@ -55,13 +57,13 @@ pub async fn upload_images(
         // Validate content type
         let content_type = file.content_type.unwrap_or(mime::APPLICATION_OCTET_STREAM);
         if !content_type.type_().eq(&IMAGE) {
-            warn!("{}", format!("Invalid content type: {}", content_type));
+            warn!("Invalid content type: {}", content_type);
             return Ok(HttpResponse::BadRequest().json("Only image files are allowed"));
         }
 
         // Validate file size
         if file.size > app_state.max_file_size as usize {
-            warn!("{}", format!("File size {} exceeds 1MB limit", file.size));
+            warn!("File size {} exceeds 1MB limit", file.size);
             return Ok(HttpResponse::BadRequest().json("File size exceeds 1MB limit"));
         }
 
@@ -84,16 +86,33 @@ pub async fn upload_images(
         // Persist the file
         match file.file.persist(&file_path) {
             Ok(_) => {
-                info!(
-                    "{}",
-                    format!("Successfully saved file: {}", file_name_with_ext)
-                );
+                info!("Successfully saved file: {}", file_name_with_ext);
+
+                // Set file permissions to rw-r--r-- (644)
+                let file = File::open(&file_path).map_err(|e| {
+                    error!(
+                        "Failed to open file {} to set permissions: {}",
+                        file_name_with_ext, e
+                    );
+                    actix_web::error::ErrorInternalServerError(format!(
+                        "Failed to set permissions: {}",
+                        e
+                    ))
+                })?;
+                file.set_permissions(Permissions::from_mode(0o644))
+                    .map_err(|e| {
+                        error!(
+                            "Failed to set permissions for {}: {}",
+                            file_name_with_ext, e
+                        );
+                        actix_web::error::ErrorInternalServerError(format!(
+                            "Failed to set permissions: {}",
+                            e
+                        ))
+                    })?;
             }
             Err(e) => {
-                error!(
-                    "{}",
-                    format!("Failed to save file {}: {}", file_name_with_ext, e)
-                );
+                error!("Failed to save file {}: {}", file_name_with_ext, e);
                 return Err(actix_web::error::ErrorInternalServerError(format!(
                     "Failed to save file: {}",
                     e
@@ -112,10 +131,7 @@ pub async fn upload_images(
         return Ok(HttpResponse::BadRequest().json("No valid images uploaded"));
     }
 
-    info!(
-        "{}",
-        format!("Successfully uploaded {} images", responses.len())
-    );
+    info!("Successfully uploaded {} images", responses.len());
     Ok(HttpResponse::Ok().json(responses))
 }
 
