@@ -9,7 +9,10 @@ html, body {
     font-family: 'Arial', sans-serif;
     overflow: hidden;
     -webkit-tap-highlight-color: transparent;
-    height: 100dvh;
+    color: white;
+    /* Allow the body to be at least 100% of viewport height but grow as needed */
+    min-height: 100vh;
+    min-height: 100dvh; /* For modern browsers */
 }
 
 .glow {
@@ -199,8 +202,8 @@ input[type="file"] {
 .preview-container {
     position: relative;
     width: 100%;
-    max-width: 320px;
-    height: 320px;
+    max-width: 280px;
+    height: 280px;
     margin: 0 auto;
     border-radius: 16px;
     overflow: hidden;
@@ -369,11 +372,8 @@ footer {
     }
 }
 
-/* Custom checkbox styles */
 .leaderboard-checkbox {
     position: relative;
-    cursor: pointer;
-    padding-left: 2.5rem;
     font-size: 1.1rem;
     font-weight: 600;
     color: #fff;
@@ -381,24 +381,16 @@ footer {
     user-select: none;
 }
 
-.leaderboard-checkbox input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-}
-
 .leaderboard-checkbox .checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
+    position: relative;
+    display: inline-block;
     height: 24px;
     width: 24px;
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: 6px;
     border: 2px solid rgba(255, 255, 255, 0.5);
     transition: all 0.3s ease;
+    vertical-align: middle;
 }
 
 .leaderboard-checkbox input:checked ~ .checkmark {
@@ -411,13 +403,6 @@ footer {
     content: "";
     position: absolute;
     display: none;
-}
-
-.leaderboard-checkbox input:checked ~ .checkmark:after {
-    display: block;
-}
-
-.leaderboard-checkbox .checkmark:after {
     left: 8px;
     top: 4px;
     width: 6px;
@@ -425,6 +410,10 @@ footer {
     border: solid white;
     border-width: 0 3px 3px 0;
     transform: rotate(45deg);
+}
+
+.leaderboard-checkbox input:checked ~ .checkmark:after {
+    display: block;
 }
 
 .leaderboard-checkbox:hover .checkmark {

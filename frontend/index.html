@@ -16,7 +16,7 @@
     <link href="https://fonts.cdnfonts.com/css/impact" rel="stylesheet">
     <link href="./styles.css" rel="stylesheet">
 </head>
-<body class="flex min-h-dvh h-dvh flex-col items-center justify-between text-white">
+<body>
 
 <!-- Decorative elements -->
 <div class="halo bg-blue-400 w-64 h-64 top-0 left-0"></div>
@@ -125,23 +125,25 @@
 
                 <h2 class="text-2xl sm:text-3xl font-bold mb-4 glow">Preview Your Photobomb!</h2>
 
-                <div class="preview-container mb-6">
+                <div class="preview-container mb-4">
                     <img id="previewImage" src="" alt="Preview">
                 </div>
 
                 <div class="mb-4 text-center">
-                    <label class="leaderboard-checkbox">
-                        <input type="checkbox" id="isPublic">
-                        <span class="checkmark"></span>
-                        Join the Leaderboard! 🌟 Shine on our main page!
-                    </label>
-                    <p class="text-xs sm:text-sm text-center mt-2 legal-text">
+                    <div class="inline-flex items-center justify-center">
+                        <label class="leaderboard-checkbox inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="isPublic" class="absolute opacity-0 w-0 h-0">
+                            <span class="checkmark mr-2"></span>
+                            <span>Join the Leaderboard! 🌟</span>
+                        </label>
+                    </div>
+                    <p class="text-xs sm:text-sm text-center my-2 legal-text">
                         By joining, you agree we may display your photo on the leaderboard on our main page.
                         See our <a href="privacy-policy.html" class="text-blue-300 hover:underline">Privacy Policy</a>.
                     </p>
                 </div>
 
-                <div class="flex justify-center space-x-6 mt-6">
+                <div class="flex justify-center space-x-6">
                     <button id="retakeBtn"
                             class="btn btn-secondary">
                         Retake 📸
