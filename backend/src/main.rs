@@ -5,7 +5,7 @@ use crate::api::constants::DEFAULT_MAX_FILE_SIZE;
 use crate::api::extractors::auth_middleware::AuthMiddlewareFactory;
 use crate::api::libraries::db::connect_or_initialize_db;
 use crate::api::routes::auth::{get_profile, post_login, post_logout};
-use crate::api::routes::images::{get_image, get_leaderboard, get_upload_count, upload_images};
+use crate::api::routes::images::{get_image, get_leaderboard, get_upload_count, post_image_upvote, upload_images};
 use crate::api::routes::location::{get_location, post_location};
 use crate::api::routes::stages::get_stages;
 use crate::types::stages::TomorrowlandStage;
@@ -133,6 +133,7 @@ async fn main() -> Result<()> {
                             .service(get_upload_count)
                             .service(upload_images)
                             .service(get_leaderboard)
+                            .service(post_image_upvote)
                             .service(get_image), // parametric endpoint, must be last
                     )
                     .service(web::scope("location").service(get_location)),

@@ -2,15 +2,19 @@ use crate::AppState;
 use crate::api::constants::ALLOWED_EXTENSIONS;
 use crate::api::utils::{get_extension_from_filename, get_extension_from_mime};
 use crate::types::db::DbImage;
-use crate::types::images::{GetLeaderboardQueryParams, ImageCountResponse, ImageUploadRequest, ImageUploadResponse, LeaderboardOrder};
+use crate::types::images::{
+    GetLeaderboardQueryParams, ImageCountResponse, ImageUploadRequest, ImageUploadResponse,
+    LeaderboardOrder,
+};
 use actix_multipart::form::MultipartForm;
 use actix_multipart::form::text::Text;
 use actix_web::http::header::{ContentDisposition, DispositionParam, DispositionType};
 use actix_web::{Error, HttpResponse, Responder, get, post, web};
-use log::{error, info, warn};
+use log::{debug, error, info, warn};
 use mime::IMAGE;
 use sanitize_filename::sanitize;
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use sqlx::sqlite::SqliteQueryResult;
 use std::fs::{File, Permissions};
 use std::hash::Hasher;
@@ -182,12 +186,11 @@ pub async fn upload_images(
         }
 
         // Insert metadata into the database
-        let insert_res =
-            sqlx::query("INSERT INTO images (filename, is_public) VALUES ($1, $2)")
-                .bind(&file_name_with_ext)
-                .bind(form.is_public.0)
-                .execute(&app_state.db_pool)
-                .await;
+        let insert_res = sqlx::query("INSERT INTO images (filename, is_public) VALUES ($1, $2)")
+            .bind(&file_name_with_ext)
+            .bind(form.is_public.0)
+            .execute(&app_state.db_pool)
+            .await;
 
         // Delete image if database insert was not successful
         if let Err(e) = insert_res {
@@ -224,7 +227,7 @@ pub async fn get_image(
     app_state: web::Data<AppState>,
 ) -> Result<impl Responder, Error> {
     let filename = path.into_inner();
-    info!("{}", format!("Attempting to retrieve image: {}", filename));
+    debug!("Attempting to retrieve image: {}", filename);
 
     // Sanitize filename to prevent path traversal
     let sanitized_filename = sanitize(&filename);
@@ -232,10 +235,7 @@ pub async fn get_image(
         || sanitized_filename.contains('/')
         || sanitized_filename.contains('\\')
     {
-        warn!(
-            "{}",
-            format!("Invalid filename detected: {}", sanitized_filename)
-        );
+        warn!("Invalid filename detected: {}", sanitized_filename);
         return Ok(HttpResponse::BadRequest().json("Invalid filename"));
     }
 
@@ -251,13 +251,13 @@ pub async fn get_image(
     // Construct and validate file path
     let file_path = format!("{}/{}", app_state.upload_dir, sanitized_filename);
     if !file_path.starts_with(&app_state.upload_dir) {
-        warn!("{}", format!("Invalid file path: {}", file_path));
+        warn!("Invalid file path: {}", file_path);
         return Ok(HttpResponse::BadRequest().json("Invalid file path"));
     }
 
     // Check if file exists
     if fs::metadata(&file_path).await.is_err() {
-        warn!("{}", format!("Image not found: {}", file_path));
+        warn!("Image not found: {}", file_path);
         return Ok(HttpResponse::BadRequest().json("Image not found"));
     }
 
@@ -265,7 +265,7 @@ pub async fn get_image(
     let content = match fs::read(&file_path).await {
         Ok(content) => content,
         Err(e) => {
-            error!("{}", format!("Failed to read file {}: {}", file_path, e));
+            error!("Failed to read file {}: {}", file_path, e);
             return Err(actix_web::error::ErrorInternalServerError(e));
         }
     };
@@ -286,9 +286,31 @@ pub async fn get_image(
         parameters: vec![DispositionParam::Filename(sanitized_filename)],
     };
 
-    info!("{}", format!("Successfully retrieved image: {}", filename));
     Ok(HttpResponse::Ok()
         .content_type(mime)
         .append_header(disposition)
         .body(content))
+}
+
+#[post("/{id}/upvote")]
+pub async fn post_image_upvote(
+    path: web::Path<String>,
+    app_state: web::Data<AppState>,
+) -> Result<impl Responder, Error> {
+    let id = path.into_inner();
+
+    // TODO: validate upvote_cookie, update cacheå
+    debug!("Attempting to upvote image: {}", id);
+    let rows_affected =
+        sqlx::query("UPDATE images SET karma = karma + 1 WHERE id = $1 AND is_public IS TRUE;")
+            .bind(&id)
+            .execute(&app_state.db_pool)
+            .await
+            .map_or_else(|e| 0, |r| r.rows_affected());
+
+    if rows_affected == 0 {
+        return Ok(HttpResponse::Forbidden().json(json!({ "rowsAffected": rows_affected })));
+    };
+
+    Ok(HttpResponse::Ok().json(json!({ "rowsAffected": rows_affected })))
 }
