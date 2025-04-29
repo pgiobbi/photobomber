@@ -141,6 +141,26 @@ pub async fn upload_images(
             }
         }
 
+        // Insert metadata into the database
+        let insert_res =
+            sqlx::query("INSERT INTO images (filename, join_leaderboard) VALUES ($1, $2)")
+                .bind(&file_name_with_ext)
+                .bind(form.join_leaderboard.0)
+                .execute(&app_state.db_pool)
+                .await;
+
+        // Delete image if database insert was not successful
+        if let Err(e) = insert_res {
+            error!("Failed to persist file on DB {}: {}", file_name_with_ext, e);
+            if let Err(e) = fs::remove_file(file_path).await {
+                error!(
+                    "Failed to remove orphaned file {}: {}",
+                    file_name_with_ext, e
+                );
+            }
+            return Ok(HttpResponse::InternalServerError().json("Database error"));
+        };
+
         responses.push(ImageUploadResponse {
             file_id,
             file_name: file_name_with_ext,

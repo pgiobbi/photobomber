@@ -626,17 +626,17 @@
                     <img id="previewImage" src="" alt="Preview">
                 </div>
 
-                <!--                <div class="mb-4 text-center">-->
-                <!--                    <label class="leaderboard-checkbox">-->
-                <!--                        <input type="checkbox" id="joinLeaderboard">-->
-                <!--                        <span class="checkmark"></span>-->
-                <!--                        Join the Leaderboard! 🌟 Shine on our main page!-->
-                <!--                    </label>-->
-                <!--                    <p class="text-xs sm:text-sm text-center mt-2 legal-text">-->
-                <!--                        By joining, you agree we may display your photo on the leaderboard on our main page.-->
-                <!--                        See our <a href="privacy-policy.html" class="text-blue-300 hover:underline">Privacy Policy</a>.-->
-                <!--                    </p>-->
-                <!--                </div>-->
+                <div class="mb-4 text-center">
+                    <label class="leaderboard-checkbox">
+                        <input type="checkbox" id="joinLeaderboard">
+                        <span class="checkmark"></span>
+                        Join the Leaderboard! 🌟 Shine on our main page!
+                    </label>
+                    <p class="text-xs sm:text-sm text-center mt-2 legal-text">
+                        By joining, you agree we may display your photo on the leaderboard on our main page.
+                        See our <a href="privacy-policy.html" class="text-blue-300 hover:underline">Privacy Policy</a>.
+                    </p>
+                </div>
 
                 <div class="flex justify-center space-x-6 mt-6">
                     <button id="retakeBtn"
@@ -826,7 +826,7 @@
             step2.classList.add('hidden');
             step1.classList.remove('hidden');
             cameraInput.value = ''; // Reset input
-            joinLeaderboard.checked = false; // Reset checkbox
+            joinLeaderboard && (joinLeaderboard.checked = false); // Reset checkbox
         });
 
         // Function to trigger success animations
@@ -879,8 +879,7 @@
                 }
 
                 formData.append('images', compressedBlob);
-                formData.append('joinLeaderboard', "false");
-                // formData.append('joinLeaderboard', joinLeaderboard.checked);
+                formData.append('joinLeaderboard', joinLeaderboard && joinLeaderboard?.checked || false);
 
                 const response = await fetch('/api/public/images/upload', {
                     method: 'POST',
@@ -948,7 +947,7 @@
             step3.classList.add('hidden');
             step1.classList.remove('hidden');
             cameraInput.value = ''; // Reset input
-            joinLeaderboard.checked = false; // Reset checkbox
+            joinLeaderboard && (joinLeaderboard.checked = false); // Reset checkbox
         });
 
         document.getElementById('shareTwitter')?.addEventListener('click', () => {
