@@ -343,6 +343,12 @@
                         if (response.ok) {
                             image.karma += 1;
                             karmaBadge.textContent = `${image.karma}`;
+                            let data = await response.json();
+                            if (data.rowsAffected === 1) {
+                                showModal('Success!', 'Image upvoted successfully! 🎉');
+                            } else {
+                                throw new Error("Image could not be upvoted. Please try again!")
+                            }
                         } else {
                             throw new Error("You can only upvote if you photobomb us first! Go take a shot! 📸")
                         }
