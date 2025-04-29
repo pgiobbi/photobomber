@@ -70,8 +70,9 @@ pub async fn get_leaderboard(
     let entries: Vec<DbImage> = sqlx::query_as(
         format!(
             "SELECT * FROM images \
-             WHERE join_leaderboard is TRUE
-             ORDER BY {} {}",
+             WHERE is_public is TRUE
+             ORDER BY {} {}
+             LIMIT 100",
             order_by, order_direction
         )
         .as_str(),
@@ -138,7 +139,7 @@ pub async fn upload_images(
             responses.push(ImageUploadResponse {
                 file_id: file_id.clone(),
                 file_name: file_name_with_ext,
-                join_leaderboard: form.join_leaderboard.0,
+                is_public: form.is_public.0,
             });
             continue;
         }
@@ -182,9 +183,9 @@ pub async fn upload_images(
 
         // Insert metadata into the database
         let insert_res =
-            sqlx::query("INSERT INTO images (filename, join_leaderboard) VALUES ($1, $2)")
+            sqlx::query("INSERT INTO images (filename, is_public) VALUES ($1, $2)")
                 .bind(&file_name_with_ext)
-                .bind(form.join_leaderboard.0)
+                .bind(form.is_public.0)
                 .execute(&app_state.db_pool)
                 .await;
 
@@ -203,7 +204,7 @@ pub async fn upload_images(
         responses.push(ImageUploadResponse {
             file_id,
             file_name: file_name_with_ext,
-            join_leaderboard: form.join_leaderboard.0,
+            is_public: form.is_public.0,
         });
     }
 
@@ -237,6 +238,8 @@ pub async fn get_image(
         );
         return Ok(HttpResponse::BadRequest().json("Invalid filename"));
     }
+
+    // TODO: query the DB, only return if found and is_public is TRUE (public images)
 
     // Check if extension is allowed
     let ext = Path::new(&sanitized_filename)

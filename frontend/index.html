@@ -36,7 +36,7 @@
 <!-- Gallery popup -->
 <div class="gallery-popup" id="galleryPopup">
     <div class="close-gallery" id="closeGallery">×</div>
-    <h2 class="text-2xl font-bold mb-4 title-glow">AWESOME PHOTOBOMBS</h2>
+    <h2 class="text-2xl font-bold mb-4 title-glow text-center">AWESOME PHOTOBOMBS</h2>
     <div class="gallery-container" id="galleryContainer">
         <!-- Images will be dynamically inserted here -->
     </div>
@@ -131,7 +131,7 @@
 
                 <div class="mb-4 text-center">
                     <label class="leaderboard-checkbox">
-                        <input type="checkbox" id="joinLeaderboard">
+                        <input type="checkbox" id="isPublic">
                         <span class="checkmark"></span>
                         Join the Leaderboard! 🌟 Shine on our main page!
                     </label>
@@ -210,7 +210,7 @@
         const closeGallery = document.getElementById('closeGallery');
         const galleryContainer = document.getElementById('galleryContainer');
         const strobeOverlay = document.getElementById('strobeOverlay');
-        const joinLeaderboard = document.getElementById('joinLeaderboard');
+        const isPublic = document.getElementById('isPublic');
 
         // Fetch and display current location
         async function fetchCurrentLocation() {
@@ -331,6 +331,27 @@
                 img.dataset.id = image.id;
                 img.dataset.karma = image.karma;
 
+                // Add karma badge
+                const karmaBadge = document.createElement('div');
+                karmaBadge.className = 'karma-badge';
+                karmaBadge.textContent = `${image.karma}`; // Only the number, arrow is in CSS
+                container.appendChild(karmaBadge);
+
+                karmaBadge.addEventListener('click', async () => {
+                    try {
+                        const response = await fetch(`/api/public/images/${image.id}/upvote`, {method: 'POST'});
+                        if (response.ok) {
+                            image.karma += 1;
+                            karmaBadge.textContent = `${image.karma}`;
+                        } else {
+                            throw new Error("You can only upvote if you photobomb us first! Go take a shot! 📸")
+                        }
+                    } catch (err) {
+                        console.error('Upvote failed:', err);
+                        showModal('Oops!', `Upvote failed! ${err.message}`, 'Close');
+                    }
+                });
+
                 const spinner = document.createElement('div');
                 spinner.className = 'spinner';
 
@@ -413,7 +434,7 @@
             step2.classList.add('hidden');
             step1.classList.remove('hidden');
             cameraInput.value = ''; // Reset input
-            joinLeaderboard && (joinLeaderboard.checked = false); // Reset checkbox
+            isPublic && (isPublic.checked = false); // Reset checkbox
         });
 
         // Function to trigger success animations
@@ -466,7 +487,7 @@
                 }
 
                 formData.append('images', compressedBlob);
-                formData.append('joinLeaderboard', joinLeaderboard && joinLeaderboard?.checked || false);
+                formData.append('isPublic', isPublic && isPublic?.checked || false);
 
                 const response = await fetch('/api/public/images/upload', {
                     method: 'POST',
@@ -533,7 +554,7 @@
             step3.classList.add('hidden');
             step1.classList.remove('hidden');
             cameraInput.value = ''; // Reset input
-            joinLeaderboard && (joinLeaderboard.checked = false); // Reset checkbox
+            isPublic && (isPublic.checked = false); // Reset checkbox
         });
 
         document.getElementById('shareTwitter')?.addEventListener('click', () => {

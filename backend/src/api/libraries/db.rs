@@ -31,11 +31,11 @@ pub async fn connect_or_initialize_db(db_path: PathBuf) -> Result<Pool<Sqlite>> 
             CREATE TABLE images (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 filename TEXT NOT NULL,
-                join_leaderboard BOOLEAN NOT NULL DEFAULT FALSE,
+                is_public BOOLEAN NOT NULL DEFAULT FALSE,
                 karma INTEGER DEFAULT 0,
                 created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
-            CREATE INDEX idx_join_leaderboard ON images(join_leaderboard);
+            CREATE INDEX idx_is_public ON images(is_public);
             CREATE INDEX idx_karma ON images(karma);
             "#,
         )

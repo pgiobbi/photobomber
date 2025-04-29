@@ -8,8 +8,8 @@ use serde::{Deserialize, Serialize};
 pub struct ImageUploadRequest {
     #[multipart(rename = "images", limit = "1MB")]
     pub images: Vec<TempFile>,
-    #[multipart(rename = "joinLeaderboard")]
-    pub join_leaderboard: Text<bool>,
+    #[multipart(rename = "isPublic")]
+    pub is_public: Text<bool>,
 }
 
 // Structure for the response
@@ -18,7 +18,7 @@ pub struct ImageUploadRequest {
 pub struct ImageUploadResponse {
     pub file_id: String,
     pub file_name: String,
-    pub join_leaderboard: bool,
+    pub is_public: bool,
 }
 
 // Structure for the count response

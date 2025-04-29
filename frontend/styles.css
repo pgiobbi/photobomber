@@ -186,7 +186,7 @@ input[type="file"] {
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.9);
-    z-index: 100;
+    z-index: 40;
     display: none;
     justify-content: center;
     align-items: center;
@@ -201,12 +201,29 @@ input[type="file"] {
     width: 90%;
     max-width: 800px;
     height: 70%;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 15px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
     overflow-y: auto;
-    padding: 20px;
+    padding: 15px;
+}
+
+/* Single image per row for very small screens (<320px) */
+@media (max-width: 319px) {
+    .gallery-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Flex layout for larger screens (≥640px) */
+@media (min-width: 640px) {
+    .gallery-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+        padding: 20px;
+    }
 }
 
 .gallery-image {
@@ -493,8 +510,8 @@ footer {
 
 .image-container {
     position: relative;
-    width: 150px;
-    height: 150px;
+    width: 100%;
+    aspect-ratio: 1/1; /* Ensure square images */
 }
 
 .gallery-image {
@@ -537,4 +554,38 @@ footer {
     100% {
         transform: translate(-50%, -50%) rotate(360deg);
     }
+}
+
+.karma-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: linear-gradient(45deg, #ff00ff, #d7ef00);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 800;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    border: 2px solid #fff;
+    opacity: 0.9;
+    transition: transform 0.2s ease;
+    z-index: 10;
+}
+
+.karma-badge:hover {
+    transform: scale(1.05);
+    opacity: 1;
+    cursor: pointer;
+}
+
+.karma-badge::before {
+    content: '↑';
+    font-size: 14px;
+    font-weight: bold;
+    margin-right: 4px;
+    color: #41B0E8;
 }
