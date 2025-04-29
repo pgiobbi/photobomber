@@ -3,6 +3,7 @@ use crate::api::constants::ALLOWED_EXTENSIONS;
 use crate::api::utils::{get_extension_from_filename, get_extension_from_mime};
 use crate::types::images::{ImageCountResponse, ImageUploadRequest, ImageUploadResponse};
 use actix_multipart::form::MultipartForm;
+use actix_multipart::form::text::Text;
 use actix_web::http::header::{ContentDisposition, DispositionParam, DispositionType};
 use actix_web::{Error, HttpResponse, Responder, get, post, web};
 use log::{error, info, warn};
@@ -98,6 +99,7 @@ pub async fn upload_images(
             responses.push(ImageUploadResponse {
                 file_id: file_id.clone(),
                 file_name: file_name_with_ext,
+                join_leaderboard: form.join_leaderboard.0,
             });
             continue;
         }
@@ -142,6 +144,7 @@ pub async fn upload_images(
         responses.push(ImageUploadResponse {
             file_id,
             file_name: file_name_with_ext,
+            join_leaderboard: form.join_leaderboard.0,
         });
     }
 
