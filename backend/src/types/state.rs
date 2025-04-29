@@ -5,6 +5,7 @@ use std::env;
 use std::sync::RwLock;
 use std::thread::sleep;
 use std::time::Duration;
+use sqlx::{Pool, Sqlite};
 
 type Bytes = u64;
 
@@ -66,4 +67,6 @@ pub struct AppState {
     pub credential_state: CredentialState,
     /// Tomorrowland stages, from the Tomorrowland API.
     pub stages: Vec<TomorrowlandStage>,
+    /// Database connection pool.
+    pub db_pool: Pool<Sqlite>,
 }

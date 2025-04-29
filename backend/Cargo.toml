@@ -23,3 +23,5 @@ jsonwebtoken = "9.3.1"
 futures-util = "0.3.31"
 strum = { version = "0.27.1", features = ["derive"] }
 twox-hash = "2.1.0"
+sqlx = { version = "0.8.5", features = ["runtime-tokio", "sqlite"] }
+anyhow = "1.0.98"

@@ -3,6 +3,7 @@ mod types;
 
 use crate::api::constants::DEFAULT_MAX_FILE_SIZE;
 use crate::api::extractors::auth_middleware::AuthMiddlewareFactory;
+use crate::api::libraries::db::connect_or_initialize_db;
 use crate::api::routes::auth::{get_profile, post_login, post_logout};
 use crate::api::routes::images::{get_image, get_upload_count, upload_images};
 use crate::api::routes::location::{get_location, post_location};
@@ -13,14 +14,15 @@ use actix_cors::Cors;
 use actix_multipart::form::tempfile::TempFileConfig;
 use actix_web::middleware::NormalizePath;
 use actix_web::{App, HttpServer, http, web};
+use anyhow::{Context, Error, Result};
 use env_logger::Env;
 use jwt_compact::alg::{Ed25519, Hs256Key};
 use jwt_compact::jwk::KeyType::KeyPair;
 use log::{debug, error, info};
 use serde::{Deserialize, Serialize};
+use sqlx::sqlite::SqlitePoolOptions;
 use std::env;
 use std::env::join_paths;
-use std::error::Error;
 use std::fs::File;
 use std::io::BufReader;
 use std::ops::Index;
@@ -30,7 +32,7 @@ use std::sync::{Arc, RwLock};
 use tokio::sync::Mutex;
 
 #[actix_web::main]
-async fn main() -> std::io::Result<()> {
+async fn main() -> Result<()> {
     // Initialize logger
     env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
@@ -38,13 +40,7 @@ async fn main() -> std::io::Result<()> {
 
     // Create upload directory
     let upload_dir = env::var("UPLOAD_DIR").unwrap_or("./uploads".to_string());
-    match std::fs::create_dir_all(upload_dir.clone()) {
-        Ok(_) => {}
-        Err(e) => {
-            error!("{}", format!("Failed to create upload directory: {}", e));
-            return Err(e);
-        }
-    }
+    std::fs::create_dir_all(upload_dir.clone()).context("UPLOAD_DIR could not be created")?;
 
     let max_file_size = env::var("MAX_FILE_SIZE")
         .unwrap_or(DEFAULT_MAX_FILE_SIZE.to_string())
@@ -55,7 +51,6 @@ async fn main() -> std::io::Result<()> {
     info!("MAX_FILE_SIZE {:>16}: {}", "", &max_file_size);
 
     // Load and parse tomorrowland stages
-
     let config_dir = env::var("CONFIG_DIR").expect("CONFIG_DIR not set");
     let stages_path = Path::new(&config_dir).join("stages.json");
     let stages = {
@@ -70,12 +65,19 @@ async fn main() -> std::io::Result<()> {
         )?
     };
 
+    // Initialize db connection
+    let db_path = Path::new(&config_dir).join("photobomb.sqlite");
+    let pool = connect_or_initialize_db(db_path)
+        .await
+        .expect("Failed to initialize database");
+
     let app_state = web::Data::new(AppState {
         upload_dir: upload_dir.clone(),
         max_file_size,
         location_state: RwLock::new(LocationState::default()),
         credential_state: CredentialState::from_env(),
         stages,
+        db_pool: pool,
     });
 
     HttpServer::new(move || {
@@ -158,5 +160,7 @@ async fn main() -> std::io::Result<()> {
         e
     })?
     .run()
-    .await
+    .await?;
+
+    Ok(())
 }
