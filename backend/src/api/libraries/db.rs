@@ -33,7 +33,7 @@ pub async fn connect_or_initialize_db(db_path: PathBuf) -> Result<Pool<Sqlite>> 
                 filename TEXT NOT NULL,
                 join_leaderboard BOOLEAN NOT NULL DEFAULT FALSE,
                 karma INTEGER DEFAULT 0,
-                uploaded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
             CREATE INDEX idx_join_leaderboard ON images(join_leaderboard);
             CREATE INDEX idx_karma ON images(karma);

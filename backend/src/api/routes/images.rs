@@ -1,7 +1,8 @@
 use crate::AppState;
 use crate::api::constants::ALLOWED_EXTENSIONS;
 use crate::api::utils::{get_extension_from_filename, get_extension_from_mime};
-use crate::types::images::{ImageCountResponse, ImageUploadRequest, ImageUploadResponse};
+use crate::types::db::DbImage;
+use crate::types::images::{GetLeaderboardQueryParams, ImageCountResponse, ImageUploadRequest, ImageUploadResponse, LeaderboardOrder};
 use actix_multipart::form::MultipartForm;
 use actix_multipart::form::text::Text;
 use actix_web::http::header::{ContentDisposition, DispositionParam, DispositionType};
@@ -9,6 +10,8 @@ use actix_web::{Error, HttpResponse, Responder, get, post, web};
 use log::{error, info, warn};
 use mime::IMAGE;
 use sanitize_filename::sanitize;
+use serde::{Deserialize, Serialize};
+use sqlx::sqlite::SqliteQueryResult;
 use std::fs::{File, Permissions};
 use std::hash::Hasher;
 use std::io::Read;
@@ -45,6 +48,42 @@ pub async fn get_upload_count(app_state: web::Data<AppState>) -> Result<impl Res
 
     info!("{}", format!("Retrieved upload count: {}", count));
     Ok(HttpResponse::Ok().json(ImageCountResponse { count }))
+}
+
+#[get("leaderboard")]
+pub async fn get_leaderboard(
+    query: web::Query<GetLeaderboardQueryParams>,
+    app_state: web::Data<AppState>,
+) -> Result<impl Responder, Error> {
+    info!("{:?}", query);
+
+    let order_by = match query.order_by {
+        None | Some(LeaderboardOrder::Time) => "created_at",
+        Some(LeaderboardOrder::Karma) => "karma",
+    };
+    let order_direction = match query.ascending {
+        None | Some(false) => "DESC",
+        Some(true) => "ASC",
+    };
+
+    // Execute the query and fetch rows
+    let entries: Vec<DbImage> = sqlx::query_as(
+        format!(
+            "SELECT * FROM images \
+             WHERE join_leaderboard is TRUE
+             ORDER BY {} {}",
+            order_by, order_direction
+        )
+        .as_str(),
+    )
+    .fetch_all(&app_state.db_pool)
+    .await
+    .map_err(|e| {
+        error!("Database error: {:?}", e);
+        actix_web::error::ErrorInternalServerError("Failed to fetch images")
+    })?;
+
+    Ok(HttpResponse::Ok().json(entries))
 }
 
 // Image upload endpoint
