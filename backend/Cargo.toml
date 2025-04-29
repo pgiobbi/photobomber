@@ -22,3 +22,4 @@ chrono = "0.4.40"
 jsonwebtoken = "9.3.1"
 futures-util = "0.3.31"
 strum = { version = "0.27.1", features = ["derive"] }
+twox-hash = "2.1.0"

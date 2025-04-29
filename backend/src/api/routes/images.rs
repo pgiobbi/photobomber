@@ -9,9 +9,12 @@ use log::{error, info, warn};
 use mime::IMAGE;
 use sanitize_filename::sanitize;
 use std::fs::{File, Permissions};
+use std::hash::Hasher;
+use std::io::Read;
 use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
 use tokio::fs;
+use twox_hash::XxHash64;
 use uuid::Uuid;
 
 // Count endpoint
@@ -53,7 +56,7 @@ pub async fn upload_images(
 
     let mut responses = Vec::new();
 
-    for file in form.images {
+    for mut file in form.images {
         // Validate content type
         let content_type = file.content_type.unwrap_or(mime::APPLICATION_OCTET_STREAM);
         if !content_type.type_().eq(&IMAGE) {
@@ -67,21 +70,37 @@ pub async fn upload_images(
             return Ok(HttpResponse::BadRequest().json("File size exceeds 1MB limit"));
         }
 
-        // Get or generate filename
-        let original_file_name = file
-            .file_name
-            .unwrap_or_else(|| format!("image_{}", Uuid::new_v4()));
+        // Get or generate original filename
 
         // Determine file extension
-        let extension = get_extension_from_filename(&original_file_name)
-            .unwrap_or_else(|| get_extension_from_mime(&content_type));
+        let extension = get_extension_from_mime(&content_type);
+        // let original_file_name = file.file_name.unwrap_or_else(|| "image".to_string());
+        // let extension = get_extension_from_filename(&original_file_name)
+        //     .unwrap_or_else(|| get_extension_from_mime(&content_type));
 
-        // Generate unique file ID
-        let file_id = Uuid::new_v4().to_string();
+        // Read file content for hashing
+        let mut content = Vec::new();
+        file.file.read_to_end(&mut content).map_err(|e| {
+            error!("Failed to read file content: {}", e);
+            actix_web::error::ErrorInternalServerError(format!("Failed to read file: {}", e))
+        })?;
 
-        // Create persistent file path with extension
+        // Generate hash-based filename
+        let mut hasher = XxHash64::default();
+        hasher.write(&content);
+        let file_id = format!("{:x}", hasher.finish());
         let file_name_with_ext = format!("{}.{}", file_id, extension);
         let file_path = format!("{}/{}", app_state.upload_dir, file_name_with_ext);
+
+        // Check if file already exists
+        if Path::new(&file_path).exists() {
+            info!("File already exists: {}", file_name_with_ext);
+            responses.push(ImageUploadResponse {
+                file_id: file_id.clone(),
+                file_name: file_name_with_ext,
+            });
+            continue;
+        }
 
         // Persist the file
         match file.file.persist(&file_path) {
