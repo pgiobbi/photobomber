@@ -1,4 +1,4 @@
-async function compressImage(file, maxSizeKB = 300, maxDimension = 1920) {
+export async function compressImage(file, maxSizeKB = 300, maxDimension = 1920) {
     try {
         if (!file.type.startsWith('image/')) {
             throw new Error('Please upload an image file.');
