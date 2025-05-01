@@ -7,3 +7,6 @@ pub const ALLOWED_EXTENSIONS: &[&str] = &["jpg", "jpeg", "png", "gif", "webp"];
 
 pub const ADMIN_ID: i64 = 1;
 pub const PUBLIC_ID: i64 = 0;
+
+/// Number of images that can be upvoted for each uploaded image.
+pub const UPVOTES_PER_UPLOAD: i8 = 3;

@@ -1,14 +1,22 @@
 use crate::AppState;
-use crate::api::constants::ALLOWED_EXTENSIONS;
+use crate::api::constants::{ALLOWED_EXTENSIONS, UPVOTES_PER_UPLOAD};
 use crate::api::utils::{get_extension_from_filename, get_extension_from_mime};
-use crate::types::images::{ImageCountResponse, ImageUploadRequest, ImageUploadResponse};
+use crate::types::db::DbImage;
+use crate::types::images::{
+    GetLeaderboardQueryParams, ImageCountResponse, ImageUploadRequest, ImageUploadResponse,
+    LeaderboardOrder,
+};
 use actix_multipart::form::MultipartForm;
 use actix_multipart::form::text::Text;
+use actix_web::cookie::Cookie;
 use actix_web::http::header::{ContentDisposition, DispositionParam, DispositionType};
-use actix_web::{Error, HttpResponse, Responder, get, post, web};
-use log::{error, info, warn};
+use actix_web::{Error, HttpRequest, HttpResponse, Responder, get, post, web};
+use log::{debug, error, info, warn};
 use mime::IMAGE;
 use sanitize_filename::sanitize;
+use serde::{Deserialize, Serialize};
+use serde_json::{Value, json};
+use sqlx::sqlite::SqliteQueryResult;
 use std::fs::{File, Permissions};
 use std::hash::Hasher;
 use std::io::Read;
@@ -47,6 +55,43 @@ pub async fn get_upload_count(app_state: web::Data<AppState>) -> Result<impl Res
     Ok(HttpResponse::Ok().json(ImageCountResponse { count }))
 }
 
+#[get("leaderboard")]
+pub async fn get_leaderboard(
+    query: web::Query<GetLeaderboardQueryParams>,
+    app_state: web::Data<AppState>,
+) -> Result<impl Responder, Error> {
+    info!("{:?}", query);
+
+    let order_by = match query.order_by {
+        None | Some(LeaderboardOrder::Time) => "created_at",
+        Some(LeaderboardOrder::Karma) => "karma",
+    };
+    let order_direction = match query.ascending {
+        None | Some(false) => "DESC",
+        Some(true) => "ASC",
+    };
+
+    // Execute the query and fetch rows
+    let entries: Vec<DbImage> = sqlx::query_as(
+        format!(
+            "SELECT * FROM images \
+             WHERE is_public is TRUE
+             ORDER BY {} {}
+             LIMIT 100",
+            order_by, order_direction
+        )
+        .as_str(),
+    )
+    .fetch_all(&app_state.db_pool)
+    .await
+    .map_err(|e| {
+        error!("Database error: {:?}", e);
+        actix_web::error::ErrorInternalServerError("Failed to fetch images")
+    })?;
+
+    Ok(HttpResponse::Ok().json(entries))
+}
+
 // Image upload endpoint
 #[post("/upload")]
 pub async fn upload_images(
@@ -57,6 +102,7 @@ pub async fn upload_images(
 
     let mut responses = Vec::new();
 
+    let mut num_non_duplicates = 0;
     for mut file in form.images {
         // Validate content type
         let content_type = file.content_type.unwrap_or(mime::APPLICATION_OCTET_STREAM);
@@ -95,12 +141,14 @@ pub async fn upload_images(
 
         // Check if file already exists
         if Path::new(&file_path).exists() {
-            info!("File already exists: {}", file_name_with_ext);
+            warn!("File already exists: {}", file_name_with_ext);
             responses.push(ImageUploadResponse {
                 file_id: file_id.clone(),
                 file_name: file_name_with_ext,
-                join_leaderboard: form.join_leaderboard.0,
+                is_public: form.is_public.0,
+                _is_new: false,
             });
+            num_non_duplicates += 1;
             continue;
         }
 
@@ -141,10 +189,30 @@ pub async fn upload_images(
             }
         }
 
+        // Insert metadata into the database
+        let insert_res = sqlx::query("INSERT INTO images (filename, is_public) VALUES ($1, $2)")
+            .bind(&file_name_with_ext)
+            .bind(form.is_public.0)
+            .execute(&app_state.db_pool)
+            .await;
+
+        // Delete image if database insert was not successful
+        if let Err(e) = insert_res {
+            error!("Failed to persist file on DB {}: {}", file_name_with_ext, e);
+            if let Err(e) = fs::remove_file(file_path).await {
+                error!(
+                    "Failed to remove orphaned file {}: {}",
+                    file_name_with_ext, e
+                );
+            }
+            return Ok(HttpResponse::InternalServerError().json("Database error"));
+        };
+
         responses.push(ImageUploadResponse {
             file_id,
             file_name: file_name_with_ext,
-            join_leaderboard: form.join_leaderboard.0,
+            is_public: form.is_public.0,
+            _is_new: true,
         });
     }
 
@@ -153,8 +221,31 @@ pub async fn upload_images(
         return Ok(HttpResponse::BadRequest().json("No valid images uploaded"));
     }
 
+    if num_non_duplicates != 0 {
+        debug!(
+            "Found {} duplicates. Upvote token will not be issued",
+            num_non_duplicates
+        );
+        return Ok(HttpResponse::Ok().json(responses));
+    }
+
+    // Generate cookie and/or update cache
+    let upvote_token = Uuid::new_v4();
+    app_state
+        .cache
+        .insert(format!("upvote.{upvote_token}"), UPVOTES_PER_UPLOAD)
+        .await;
+
     info!("Successfully uploaded {} images", responses.len());
-    Ok(HttpResponse::Ok().json(responses))
+    Ok(HttpResponse::Ok()
+        .cookie(
+            Cookie::build("upvote_token", upvote_token.to_string())
+                .path("/api/public")
+                .secure(true)
+                .http_only(true)
+                .finish(),
+        )
+        .json(responses))
 }
 
 // Simplified image retrieval endpoint
@@ -164,7 +255,7 @@ pub async fn get_image(
     app_state: web::Data<AppState>,
 ) -> Result<impl Responder, Error> {
     let filename = path.into_inner();
-    info!("{}", format!("Attempting to retrieve image: {}", filename));
+    debug!("Attempting to retrieve image: {}", filename);
 
     // Sanitize filename to prevent path traversal
     let sanitized_filename = sanitize(&filename);
@@ -172,12 +263,11 @@ pub async fn get_image(
         || sanitized_filename.contains('/')
         || sanitized_filename.contains('\\')
     {
-        warn!(
-            "{}",
-            format!("Invalid filename detected: {}", sanitized_filename)
-        );
+        warn!("Invalid filename detected: {}", sanitized_filename);
         return Ok(HttpResponse::BadRequest().json("Invalid filename"));
     }
+
+    // TODO: query the DB, only return if found and is_public is TRUE (public images)
 
     // Check if extension is allowed
     let ext = Path::new(&sanitized_filename)
@@ -189,13 +279,13 @@ pub async fn get_image(
     // Construct and validate file path
     let file_path = format!("{}/{}", app_state.upload_dir, sanitized_filename);
     if !file_path.starts_with(&app_state.upload_dir) {
-        warn!("{}", format!("Invalid file path: {}", file_path));
+        warn!("Invalid file path: {}", file_path);
         return Ok(HttpResponse::BadRequest().json("Invalid file path"));
     }
 
     // Check if file exists
     if fs::metadata(&file_path).await.is_err() {
-        warn!("{}", format!("Image not found: {}", file_path));
+        warn!("Image not found: {}", file_path);
         return Ok(HttpResponse::BadRequest().json("Image not found"));
     }
 
@@ -203,7 +293,7 @@ pub async fn get_image(
     let content = match fs::read(&file_path).await {
         Ok(content) => content,
         Err(e) => {
-            error!("{}", format!("Failed to read file {}: {}", file_path, e));
+            error!("Failed to read file {}: {}", file_path, e);
             return Err(actix_web::error::ErrorInternalServerError(e));
         }
     };
@@ -224,9 +314,65 @@ pub async fn get_image(
         parameters: vec![DispositionParam::Filename(sanitized_filename)],
     };
 
-    info!("{}", format!("Successfully retrieved image: {}", filename));
     Ok(HttpResponse::Ok()
         .content_type(mime)
         .append_header(disposition)
         .body(content))
+}
+
+#[post("/{id}/upvote")]
+pub async fn post_image_upvote(
+    req: HttpRequest,
+    path: web::Path<String>,
+    app_state: web::Data<AppState>,
+) -> Result<impl Responder, Error> {
+    let id = path.into_inner();
+
+    // Parse the upvote cookie and check the remaining number of upvotes for this token from cache
+    let Some(mut upvote_cookie) = req.cookie("upvote_token") else {
+        return Ok(HttpResponse::Forbidden().json(json!("No upvote token")));
+    };
+    let upvote_token_key = format!("upvote.{}", upvote_cookie.value().to_string());
+
+    let remaining_upvotes = app_state.cache.get(&upvote_token_key).await;
+    let mut remaining_upvotes = match remaining_upvotes {
+        None | Some(0) => {
+            // No upvotes left
+            app_state.cache.invalidate(&upvote_token_key).await;
+            upvote_cookie.make_removal();
+            return Ok(HttpResponse::Forbidden().json(json!("No upvote token")));
+        }
+        Some(x) => x,
+    };
+
+    debug!("Attempting to upvote image: {}", id);
+    let rows_affected =
+        sqlx::query("UPDATE images SET karma = karma + 1 WHERE id = $1 AND is_public IS TRUE;")
+            .bind(&id)
+            .execute(&app_state.db_pool)
+            .await
+            .map_or_else(|e| 0, |r| r.rows_affected());
+
+    if rows_affected == 0 {
+        return Ok(HttpResponse::Forbidden().json(json!({ "rowsAffected": rows_affected })));
+    };
+
+    // Decrease the number of remaining upvotes
+    remaining_upvotes -= 1;
+
+    // Remove the cookie if there are no more upvotes left
+    if remaining_upvotes == 0 {
+        app_state.cache.invalidate(&upvote_token_key).await;
+        upvote_cookie.make_removal();
+
+        Ok(HttpResponse::Ok()
+            .cookie(upvote_cookie)
+            .json(json!({ "rowsAffected": rows_affected })))
+    } else {
+        app_state
+            .cache
+            .insert(upvote_token_key.clone(), remaining_upvotes)
+            .await;
+        Ok(HttpResponse::Ok().json(json!({ "rowsAffected": rows_affected })))
+    }
 }
