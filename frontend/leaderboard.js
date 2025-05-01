@@ -52,7 +52,7 @@ async function populateGallery() {
                         throw new Error("Image could not be upvoted. Please try again!");
                     }
                 } else {
-                    throw new Error("You can only upvote if you photobomb us first! Go take a shot! 📸");
+                    throw new Error("Before upvoting you need to photobomb us first! 3 upvotes per photobomb! Go take a shot! 📸");
                 }
             } catch (err) {
                 console.error('Upvote failed:', err);
