@@ -5,6 +5,7 @@ use std::env;
 use std::sync::RwLock;
 use std::thread::sleep;
 use std::time::Duration;
+use moka::future::Cache;
 use sqlx::{Pool, Sqlite};
 
 type Bytes = u64;
@@ -69,4 +70,6 @@ pub struct AppState {
     pub stages: Vec<TomorrowlandStage>,
     /// Database connection pool.
     pub db_pool: Pool<Sqlite>,
+    /// Cache<token, num_remaining_upvotes>.
+    pub cache: Cache<String, i8>,
 }

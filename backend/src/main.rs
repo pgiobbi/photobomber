@@ -29,6 +29,7 @@ use std::ops::Index;
 use std::path::Path;
 use std::string::ToString;
 use std::sync::{Arc, RwLock};
+use moka::future::Cache;
 use tokio::sync::Mutex;
 
 #[actix_web::main]
@@ -71,6 +72,9 @@ async fn main() -> Result<()> {
         .await
         .expect("Failed to initialize database");
 
+    // Initialize in-memory cache
+    let cache = Cache::new(10_000);
+
     let app_state = web::Data::new(AppState {
         upload_dir: upload_dir.clone(),
         max_file_size,
@@ -78,6 +82,7 @@ async fn main() -> Result<()> {
         credential_state: CredentialState::from_env(),
         stages,
         db_pool: pool,
+        cache,
     });
 
     HttpServer::new(move || {

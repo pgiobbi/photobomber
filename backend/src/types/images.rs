@@ -19,6 +19,9 @@ pub struct ImageUploadResponse {
     pub file_id: String,
     pub file_name: String,
     pub is_public: bool,
+    /// Internal parameter to track whether the image was already present in the system.
+    #[serde(skip_serializing)]
+    pub _is_new: bool,
 }
 
 // Structure for the count response

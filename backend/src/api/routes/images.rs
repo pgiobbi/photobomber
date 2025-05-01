@@ -1,5 +1,5 @@
 use crate::AppState;
-use crate::api::constants::ALLOWED_EXTENSIONS;
+use crate::api::constants::{ALLOWED_EXTENSIONS, UPVOTES_PER_UPLOAD};
 use crate::api::utils::{get_extension_from_filename, get_extension_from_mime};
 use crate::types::db::DbImage;
 use crate::types::images::{
@@ -8,13 +8,14 @@ use crate::types::images::{
 };
 use actix_multipart::form::MultipartForm;
 use actix_multipart::form::text::Text;
+use actix_web::cookie::Cookie;
 use actix_web::http::header::{ContentDisposition, DispositionParam, DispositionType};
-use actix_web::{Error, HttpResponse, Responder, get, post, web};
+use actix_web::{Error, HttpRequest, HttpResponse, Responder, get, post, web};
 use log::{debug, error, info, warn};
 use mime::IMAGE;
 use sanitize_filename::sanitize;
 use serde::{Deserialize, Serialize};
-use serde_json::json;
+use serde_json::{Value, json};
 use sqlx::sqlite::SqliteQueryResult;
 use std::fs::{File, Permissions};
 use std::hash::Hasher;
@@ -101,6 +102,7 @@ pub async fn upload_images(
 
     let mut responses = Vec::new();
 
+    let mut num_non_duplicates = 0;
     for mut file in form.images {
         // Validate content type
         let content_type = file.content_type.unwrap_or(mime::APPLICATION_OCTET_STREAM);
@@ -139,12 +141,14 @@ pub async fn upload_images(
 
         // Check if file already exists
         if Path::new(&file_path).exists() {
-            info!("File already exists: {}", file_name_with_ext);
+            warn!("File already exists: {}", file_name_with_ext);
             responses.push(ImageUploadResponse {
                 file_id: file_id.clone(),
                 file_name: file_name_with_ext,
                 is_public: form.is_public.0,
+                _is_new: false,
             });
+            num_non_duplicates += 1;
             continue;
         }
 
@@ -208,6 +212,7 @@ pub async fn upload_images(
             file_id,
             file_name: file_name_with_ext,
             is_public: form.is_public.0,
+            _is_new: true,
         });
     }
 
@@ -216,8 +221,31 @@ pub async fn upload_images(
         return Ok(HttpResponse::BadRequest().json("No valid images uploaded"));
     }
 
+    if num_non_duplicates != 0 {
+        debug!(
+            "Found {} duplicates. Upvote token will not be issued",
+            num_non_duplicates
+        );
+        return Ok(HttpResponse::Ok().json(responses));
+    }
+
+    // Generate cookie and/or update cache
+    let upvote_token = Uuid::new_v4();
+    app_state
+        .cache
+        .insert(format!("upvote.{upvote_token}"), UPVOTES_PER_UPLOAD)
+        .await;
+
     info!("Successfully uploaded {} images", responses.len());
-    Ok(HttpResponse::Ok().json(responses))
+    Ok(HttpResponse::Ok()
+        .cookie(
+            Cookie::build("upvote_token", upvote_token.to_string())
+                .path("/api/public")
+                .secure(true)
+                .http_only(true)
+                .finish(),
+        )
+        .json(responses))
 }
 
 // Simplified image retrieval endpoint
@@ -294,12 +322,29 @@ pub async fn get_image(
 
 #[post("/{id}/upvote")]
 pub async fn post_image_upvote(
+    req: HttpRequest,
     path: web::Path<String>,
     app_state: web::Data<AppState>,
 ) -> Result<impl Responder, Error> {
     let id = path.into_inner();
 
-    // TODO: validate upvote_cookie, update cacheå
+    // Parse the upvote cookie and check the remaining number of upvotes for this token from cache
+    let Some(mut upvote_cookie) = req.cookie("upvote_token") else {
+        return Ok(HttpResponse::Forbidden().json(json!("No upvote token")));
+    };
+    let upvote_token_key = format!("upvote.{}", upvote_cookie.value().to_string());
+
+    let remaining_upvotes = app_state.cache.get(&upvote_token_key).await;
+    let mut remaining_upvotes = match remaining_upvotes {
+        None | Some(0) => {
+            // No upvotes left
+            app_state.cache.invalidate(&upvote_token_key).await;
+            upvote_cookie.make_removal();
+            return Ok(HttpResponse::Forbidden().json(json!("No upvote token")));
+        }
+        Some(x) => x,
+    };
+
     debug!("Attempting to upvote image: {}", id);
     let rows_affected =
         sqlx::query("UPDATE images SET karma = karma + 1 WHERE id = $1 AND is_public IS TRUE;")
@@ -312,5 +357,22 @@ pub async fn post_image_upvote(
         return Ok(HttpResponse::Forbidden().json(json!({ "rowsAffected": rows_affected })));
     };
 
-    Ok(HttpResponse::Ok().json(json!({ "rowsAffected": rows_affected })))
+    // Decrease the number of remaining upvotes
+    remaining_upvotes -= 1;
+
+    // Remove the cookie if there are no more upvotes left
+    if remaining_upvotes == 0 {
+        app_state.cache.invalidate(&upvote_token_key).await;
+        upvote_cookie.make_removal();
+
+        Ok(HttpResponse::Ok()
+            .cookie(upvote_cookie)
+            .json(json!({ "rowsAffected": rows_affected })))
+    } else {
+        app_state
+            .cache
+            .insert(upvote_token_key.clone(), remaining_upvotes)
+            .await;
+        Ok(HttpResponse::Ok().json(json!({ "rowsAffected": rows_affected })))
+    }
 }
