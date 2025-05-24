@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentLocation = data.location;
             const updatedAgo = data.updatedAgo;
             locationElement.textContent = currentLocation?.name || 'Not set';
-            if (currentLocation?.name) locationElement.classList.add('text-yellow-300');
+            // if (currentLocation?.name) locationElement.classList.add('text-yellow-300');
             lastUpdatedSpan.textContent = updatedAgo !== null && updatedAgo !== undefined
                 ? secondsToHumanReadable(Math.floor(updatedAgo / 1000))
                 : 'Not set';

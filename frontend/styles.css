@@ -1,18 +1,27 @@
 html, body {
     margin: 0;
     padding: 0;
-    background-color: rgba(14, 27, 43, 0.1);
-    background-image: linear-gradient(135deg, rgba(14, 27, 43, 0.85), rgba(25, 40, 65, 0.7)), url('/assets/orbyz-notext.webp');
+    /*background-color: rgba(14, 27, 43, 0.1);*/
+    background-color: white;
+    /*background-image: linear-gradient(135deg, rgba(14, 27, 43, 0.85), rgba(25, 40, 65, 0.7)), url('/assets/orbyz-notext.webp');*/
     background-size: cover;
     background-position: center;
     background-blend-mode: overlay;
     font-family: 'Arial', sans-serif;
     overflow: hidden;
     -webkit-tap-highlight-color: transparent;
-    color: white;
+    color: black;
     /* Allow the body to be at least 100% of viewport height but grow as needed */
     min-height: 100vh;
     min-height: 100dvh; /* For modern browsers */
+}
+
+.yellow-curve {
+    clip-path: url(#yellow-curve-clip);
+}
+
+.green-curve {
+    clip-path: url(#green-curve-clip);
 }
 
 .glow {
@@ -136,9 +145,15 @@ input[type="file"] {
 }
 
 .festival-text {
-    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-    font-weight: 800;
+    font-family: 'Anton', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
     letter-spacing: 2px;
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+.location-text {
+    font-family: 'Anton', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    letter-spacing: 0px;
     text-transform: uppercase;
     line-height: 1;
 }
@@ -299,7 +314,7 @@ input[type="file"] {
 
 .btn-secondary {
     background-color: rgba(255, 255, 255, 0.15);
-    color: white;
+    color: black;
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
@@ -376,7 +391,7 @@ footer {
     position: relative;
     font-size: 1.1rem;
     font-weight: 600;
-    color: #fff;
+    color: black;
     text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
     user-select: none;
 }
@@ -598,4 +613,98 @@ footer {
     100% {
         transform: scale(1.15) rotate(0deg);
     }
+}
+
+.green-section {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
+    background: linear-gradient(135deg, #8bc34a, #689f38);
+    clip-path: url(#green-curve-clip);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    user-select: none;
+}
+
+.green-section:hover {
+    background: linear-gradient(135deg, #9ccc65, #7cb342);
+    transform: scale(1.02);
+}
+
+.green-section:active {
+    transform: scale(0.98);
+}
+
+.shutter-button {
+    width: 80px;
+    height: 80px;
+    border: 4px solid white;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.shutter-button::before {
+    content: '';
+    width: 50px;
+    height: 50px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.8;
+}
+
+.green-section:hover .shutter-button {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.green-section:active .shutter-button {
+    transform: scale(0.9);
+}
+
+.camera-text {
+    font-size: 30px;
+    font-weight: bold;
+    font-family: 'Anton', sans-serif;
+    /*text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);*/
+    margin: 0;
+}
+
+.camera-emoji {
+    font-size: 32px;
+    margin-left: 10px;
+}
+
+.hidden-input {
+    display: none;
+}
+
+/* Pulse animation */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 20px rgba(255, 255, 255, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+    }
+}
+
+.shutter-button {
+    animation: pulse 2s infinite;
 }

@@ -19,6 +19,24 @@
 </head>
 <body>
 
+<!-- SVG Definitions for Curves -->
+<svg class="absolute" width="0" height="0">
+    <defs>
+        <!-- Yellow Section Bottom Curve -->
+        <clipPath id="yellow-curve-clip" clipPathUnits="objectBoundingBox">
+            <path d="M0,0 H1 V0.9 Q0.5,1 0,0.9 V0 Z"/>
+        </clipPath>
+        <!-- Cream Section Bottom Curve -->
+        <clipPath id="cream-curve-clip" clipPathUnits="objectBoundingBox">
+            <path d="M0,0 H1 V0.85 Q0.5,1 0,0.85 V0 Z"/>
+        </clipPath>
+        <!-- Green Section Top Curve - Gaussian Hill Shape -->
+        <clipPath id="green-curve-clip" clipPathUnits="objectBoundingBox">
+            <path d="M0,0.3 C0.15,0.1 0.3,0 0.5,0 C0.7,0 0.85,0.1 1,0.3 V1 H0 V0.3 Z"/>
+        </clipPath>
+    </defs>
+</svg>
+
 <!-- Decorative elements -->
 <div class="halo bg-blue-400 w-64 h-64 top-0 left-0"></div>
 <div class="halo bg-purple-500 w-48 h-48 bottom-0 right-0"></div>
@@ -44,86 +62,110 @@
 </div>
 
 <!-- Main flex container -->
-<div class="flex flex-col min-h-dvh w-full max-w-xl mx-auto">
+<div class="flex flex-col min-h-dvh w-full max-w-xl mx-auto relative">
     <!-- Header -->
-    <header class="pt-8 px-4 sm:px-5 flex-shrink-0">
-        <div class="text-center">
-            <div class="flex items-center justify-center space-x-4 mb-3">
-                <span class="text-3xl bounce" id="cameraEmoji">📸</span>
-                <h1 class="text-4xl sm:text-3xl font-bold festival-text title-glow"
-                    style="text-shadow: 2px 2px 8px #ff00ff, -2px -2px 8px #d7ef00;">
-                    PHOTOBOMB US!
-                </h1>
-                <span class="text-3xl shake" id="bombEmoji">💣</span>
-            </div>
-            <div class="h-2 w-64 mx-auto bg-gradient-to-r from-pink-500 via-blue-500 to-purple-500 rounded-full mt-2 mb-4"></div>
-            <p class="text-xl sm:text-2xl festival-text glow">
-                Join <span id="bomber-count" class="text-4xl count-glow">...</span> Photo Bombers!
+    <header class="yellow-curve text-center pt-1 pb-12 relative z-30 flex-shrink-0"
+            style="background-color: #fade00; clip-path: url(#yellow-curve-clip);">
+        <div class="flex flex-col items-center justify-center gap-2">
+            <img id="bomb-logo" src="/assets/logos/bomb_opt.svg" alt="Bomb logo" class="w-14">
+            <h1 class="text-6xl sm:text-5xl font-extrabold festival-text tracking-tight">PHOTOBOMB US</h1>
+            <p class="text-2xl sm:text-xl festival-text">
+                Join <span id="bomber-count" class="text-3xl">...</span> Photo Bombers!
             </p>
         </div>
     </header>
 
-    <!-- Main content -->
-    <main class="flex-grow flex items-center justify-center p-5 sm:p-6 flex-shrink">
-        <div class="space-y-6 max-w-md w-full" id="mainContent">
-            <!-- Step 1: Initial Screen -->
-            <div id="step1" class="text-center">
-                <div class="step-indicator mb-4">
-                    <div class="step active"></div>
-                    <div class="step"></div>
-                    <div class="step"></div>
-                </div>
+    <!-- Middle cream section with illustration -->
+    <div class="absolute top-0 left-0 right-0 z-15"
+         style="background-color: #feefc2; clip-path: url(#cream-curve-clip); height: 90dvh;">
+        <div class="flex items-center justify-center h-full">
+            <!-- Image placeholder for your illustration -->
+            <div class="w-2/3 rounded-md max-h-48 overflow-hidden">
+                <img src="/assets/down-photobombers.jpg" alt="Photobombers example" class="rounded-md">
+            </div>
 
-                <p class="text-xl sm:text-2xl sm:mb-6 leading-relaxed">
-                    We're at <span class="font-extrabold text-blue-300 glow">Tomorrowland!</span><br>
-                    Snap a selfie with us! 🤳
-                </p>
+            <!-- Location info section -->
+            <div class="absolute z-25 left-0 right-0" style="top: 55dvh;">
+                <div class="rounded-lg py-6 max-w-md mx-auto relative">
+                    <!-- Top Icon -->
+                    <div class="flex justify-center mb-2">
+                        <div class="w-8 h-8 bg-black rounded-full flex items-center justify-center">
+                            <div class="w-4 h-4 bg-white rounded-full relative">
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <div class="w-2 h-2 bg-black rounded-full"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                <div class="location-card">
-                    <p class="text-base sm:text-lg font-semibold mb-3">
-                        Find us: Two friends in neon gear, dancing like nobody's watching! 🕺💃
-                    </p>
+                    <!-- Now @ Text -->
+                    <div class="text-center text-black text-sm mb-1">
+                        now @
+                    </div>
 
-                    <!-- Current location information -->
-                    <p class="text-sm">
-                        <span class="inline-block animate-pulse">📍</span> We are at: <span id="currentLocation"
-                                                                                           class="font-bold text-blue-300">Loading...</span>
-                    </p>
-                    <p class="text-sm mt-1">
+                    <!-- Main Title -->
+                    <div class="text-center text-2xl font-bold mb-2" style="color: #33925f; transform: scaleY(1.25)">
+                        <span id="currentLocation" class="location-text">Not set</span>
+                    </div>
+
+                    <!-- Last Updated -->
+                    <div class="text-center text-black text-xs mb-4">
                         Last Updated: <span id="lastUpdated">Not set</span>
-                    </p>
-                </div>
+                    </div>
 
-                <!-- Gallery trigger -->
-                <p class="text-base mt-2">
+                    <!-- Decorative Lines -->
+                    <div class="absolute left-0 top-1/2 transform -translate-y-1/2">
+                        <div class="w-20 h-0.5" style="background-color: #8bc34a"></div>
+                    </div>
+                    <div class="absolute right-0 top-1/2 transform -translate-y-1/2">
+                        <div class="w-20 h-0.5" style="background-color: #8bc34a"></div>
+                    </div>
+
+                    <p class="text-base mt-2 hidden">
                     <span class="gallery-trigger" id="galleryTrigger">
                         See the photobomb leaderboard! 🔍
                     </span>
-                </p>
-
-                <div class="">
-                    <p class="py-3 text-xs sm:text-sm text-center legal-text">
-                        By taking a photo, you confirm you're 18+, have everyone's permission, and accept our
-                        <a href="privacy-policy.html" class="text-blue-300 hover:underline">Privacy Policy</a> &
-                        <a href="terms-of-use.html" class="text-blue-300 hover:underline">Terms of Use</a>
                     </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--    <div class="w-full absolute bottom-0 left-0">-->
+    <!--        <label for="cameraInput" class="green-section">-->
+    <!--            <div class="shutter-button"></div>-->
+    <!--            <div class="festival-text text-3xl">TAKE A SHOT</div>-->
+    <!--        </label>-->
+    <!--        <input type="file" id="cameraInput" accept="image/*" capture="user">-->
+    <!--    </div>-->
+
+
+    <!-- Main content (other steps) -->
+    <main class="flex-grow flex items-center justify-center flex-shrink relative">
+        <div class="space-y-6 max-w-md w-full" id="mainContent">
+            <!-- Step 1: Initial Screen -->
+            <div id="step1" class="text-center">
+                <!--                <div class="step-indicator mb-4">-->
+                <!--                    <div class="step active"></div>-->
+                <!--                    <div class="step"></div>-->
+                <!--                    <div class="step"></div>-->
+                <!--                </div>-->
+                <!-- Green camera section -->
+                <div class="absolute bottom-0 left-0 right-0 z-20"
+                     style="background: linear-gradient(135deg, #8bc34a, #689f38); clip-path: url(#green-curve-clip); height: 200px;">
                     <label for="cameraInput"
-                           class="block mx-auto gradient-animate text-white font-bold py-4 sm:py-5 px-8 rounded-xl text-xl sm:text-2xl transition shadow-lg relative overflow-hidden cursor-pointer cta-pulse">
-                        TAKE THE SHOT! 📸
-                        <span class="absolute inset-0 bg-white opacity-10"></span>
+                           class="w-full h-full flex flex-col items-center justify-center cursor-pointer text-white">
+                        <!-- Shutter button -->
+                        <div class="shutter-button"></div>
+                        <div class="festival-text text-2xl font-bold">TAKE A SHOT</div>
                     </label>
                     <input type="file" id="cameraInput" accept="image/*" capture="user">
                 </div>
+
             </div>
 
             <!-- Step 2: Preview Screen (hidden by default) -->
             <div id="step2" class="text-center hidden">
-                <div class="step-indicator mb-4">
-                    <div class="step"></div>
-                    <div class="step active"></div>
-                    <div class="step"></div>
-                </div>
-
                 <h2 class="text-2xl sm:text-3xl font-bold mb-4 glow">Preview Your Photobomb!</h2>
 
                 <div class="preview-container mb-4">
@@ -145,12 +187,10 @@
                 </div>
 
                 <div class="flex justify-center space-x-6">
-                    <button id="retakeBtn"
-                            class="btn btn-secondary">
+                    <button id="retakeBtn" class="btn btn-secondary">
                         Retake 📸
                     </button>
-                    <button id="uploadBtn"
-                            class="gradient-animate btn text-white font-bold">
+                    <button id="uploadBtn" class="gradient-animate btn text-white font-bold">
                         Upload! 🚀
                     </button>
                 </div>
@@ -158,11 +198,11 @@
 
             <!-- Step 3: Success Screen (hidden by default) -->
             <div id="step3" class="text-center hidden">
-                <div class="step-indicator mb-4">
-                    <div class="step"></div>
-                    <div class="step"></div>
-                    <div class="step active"></div>
-                </div>
+                <!--                <div class="step-indicator mb-4">-->
+                <!--                    <div class="step"></div>-->
+                <!--                    <div class="step"></div>-->
+                <!--                    <div class="step active"></div>-->
+                <!--                </div>-->
 
                 <h2 class="text-2xl sm:text-3xl font-bold mb-4 title-glow">AWESOME SHOT! 🎉</h2>
 
@@ -171,25 +211,12 @@
                     <div class="badge-overlay badge"></div>
                 </div>
 
-                <button id="newPhotoBtn"
-                        class="gradient-animate btn text-white font-bold">
+                <button id="newPhotoBtn" class="gradient-animate btn text-white font-bold">
                     Take Another Shot! 🤳
                 </button>
             </div>
         </div>
     </main>
-
-    <!-- Footer -->
-    <footer class="w-full pb-6 sm:pb-8 px-4 sm:px-5 flex-shrink-0">
-        <p class="text-center text-base sm:text-lg mb-2 glow">
-            <a href="privacy-policy.html" class="text-blue-300 hover:underline font-bold">Privacy Policy</a> |
-            <a href="terms-of-use.html" class="text-blue-300 hover:underline font-bold">Terms of Use</a>
-        </p>
-        <p class="text-center text-sm sm:text-base opacity-70">
-            Impressum: Tomorrowland Photobomb Crew, Italy, <a href="mailto:support@photobomber.xyz"
-                                                              class="text-blue-300 hover:underline">support@photobomber.xyz</a>
-        </p>
-    </footer>
 </div>
 
 <canvas id="canvasElement"></canvas>
