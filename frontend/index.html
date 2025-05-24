@@ -16,6 +16,7 @@
     <link href="https://fonts.cdnfonts.com/css/impact" rel="stylesheet">
     <link href="./styles.css" rel="stylesheet" crossorigin="use-credentials">
     <link rel="preload" href="./leaderboard.js" as="script" crossorigin="use-credentials">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
 
@@ -33,6 +34,17 @@
 
 <!-- Strobe overlay for success screen -->
 <div class="strobe-overlay" id="strobeOverlay"></div>
+
+<!-- Turnstile overlay -->
+<div id="turnstileOverlay">
+    <div class="flex flex-row items-center justify-center">
+        <div
+                class="cf-turnstile"
+                data-sitekey="1x00000000000000000000AA"
+                data-callback="javascriptCallback"
+        ></div>
+    </div>
+</div>
 
 <!-- Gallery popup -->
 <div class="gallery-popup" id="galleryPopup">
@@ -144,6 +156,7 @@
                     </p>
                 </div>
 
+                <div id="turnstile-container" class="hidden"></div>
                 <div class="flex justify-center space-x-6">
                     <button id="retakeBtn"
                             class="btn btn-secondary">

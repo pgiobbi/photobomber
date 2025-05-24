@@ -17,6 +17,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const galleryTrigger = document.getElementById('galleryTrigger');
     const strobeOverlay = document.getElementById('strobeOverlay');
     const isPublic = document.getElementById('isPublic');
+    const turnstileOverlay = document.getElementById('turnstileOverlay');
+
+    // Cloudflare Turnstile widget ID
+    const turnstileSiteKey = '1x00000000000000000000AA';
+
+    // Monitor Turnstile widget visibility
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.addedNodes.length) {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.classList && node.classList.contains('cf-turnstile')) {
+                        turnstileOverlay.appendChild(node);
+                        turnstileOverlay.classList.add('active');
+                    }
+                });
+            }
+            if (mutation.removedNodes.length) {
+                mutation.removedNodes.forEach((node) => {
+                    if (node.classList && node.classList.contains('cf-turnstile')) {
+                        turnstileOverlay.classList.remove('active');
+                    }
+                });
+            }
+        });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
 
     // Fetch and display current location
     async function fetchCurrentLocation() {
@@ -101,6 +127,10 @@ document.addEventListener('DOMContentLoaded', () => {
         previewImage.src = fileURL;
         step1.classList.add('hidden');
         step2.classList.remove('hidden');
+        // Reset Turnstile widget when entering step 2
+        if (window.turnstile) {
+            window.turnstile.reset();
+        }
     });
 
     // Retake button
@@ -109,6 +139,10 @@ document.addEventListener('DOMContentLoaded', () => {
         step1.classList.remove('hidden');
         cameraInput.value = '';
         if (isPublic) isPublic.checked = false;
+        // Reset Turnstile widget
+        if (window.turnstile) {
+            window.turnstile.reset();
+        }
     });
 
     // Trigger success animations
@@ -136,6 +170,11 @@ document.addEventListener('DOMContentLoaded', () => {
     uploadBtn.addEventListener('click', async () => {
         const files = cameraInput.files;
         if (!files.length) return;
+        const turnstileResponse = document.querySelector('[name="cf-turnstile-response"]');
+        if (!turnstileResponse || !turnstileResponse.value) {
+            showModal('Verification Required', 'Please complete the verification to upload your photo.');
+            return;
+        }
         const formData = new FormData();
         try {
             uploadBtn.textContent = "Uploading...";
@@ -151,6 +190,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             formData.append('images', compressedBlob);
             formData.append('isPublic', isPublic?.checked || false);
+            formData.append('cf-turnstile-response', turnstileResponse.value);
+
             const response = await fetch('/api/public/images/upload', {
                 method: 'POST',
                 body: formData,
@@ -190,6 +231,11 @@ document.addEventListener('DOMContentLoaded', () => {
             triggerSuccessAnimations();
             uploadBtn.textContent = "Upload! 🚀";
             uploadBtn.disabled = false;
+
+            // Reset Turnstile widget
+            if (window.turnstile) {
+                window.turnstile.reset();
+            }
         } catch (err) {
             console.error('Upload error:', err);
             showModal('Oops! 😅', `Failed to upload: ${err.message}. Try again!`, 'Retry');
@@ -204,5 +250,9 @@ document.addEventListener('DOMContentLoaded', () => {
         step1.classList.remove('hidden');
         cameraInput.value = '';
         if (isPublic) isPublic.checked = false;
+        // Reset Turnstile widget
+        if (window.turnstile) {
+            window.turnstile.reset();
+        }
     });
 });
