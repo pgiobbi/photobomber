@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 
 #[derive(Serialize, FromRow)]
@@ -9,4 +9,13 @@ pub struct DbImage {
     pub is_public: bool,
     pub karma: i32,
     pub created_at: String,
+}
+
+#[derive(Serialize, Deserialize, FromRow)]
+#[serde(rename_all = "camelCase")]
+pub struct DbParam {
+    pub key: String,
+    pub value: String,
+    pub description: Option<String>,
+    pub updated_at: Option<String>,
 }

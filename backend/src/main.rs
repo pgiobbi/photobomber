@@ -5,8 +5,11 @@ use crate::api::constants::DEFAULT_MAX_FILE_SIZE;
 use crate::api::extractors::auth_middleware::AuthMiddlewareFactory;
 use crate::api::libraries::db::connect_or_initialize_db;
 use crate::api::routes::auth::{get_profile, post_login, post_logout};
-use crate::api::routes::images::{get_image, get_leaderboard, get_upload_count, post_image_upvote, upload_images};
+use crate::api::routes::images::{
+    get_image, get_leaderboard, get_upload_count, post_image_upvote, upload_images,
+};
 use crate::api::routes::location::{get_location, post_location};
+use crate::api::routes::params::{get_params, upsert_param};
 use crate::api::routes::stages::get_stages;
 use crate::types::stages::TomorrowlandStage;
 use crate::types::state::{AppState, CredentialState, LocationState};
@@ -19,6 +22,7 @@ use env_logger::Env;
 use jwt_compact::alg::{Ed25519, Hs256Key};
 use jwt_compact::jwk::KeyType::KeyPair;
 use log::{debug, error, info};
+use moka::future::Cache;
 use serde::{Deserialize, Serialize};
 use sqlx::sqlite::SqlitePoolOptions;
 use std::env;
@@ -29,7 +33,6 @@ use std::ops::Index;
 use std::path::Path;
 use std::string::ToString;
 use std::sync::{Arc, RwLock};
-use moka::future::Cache;
 use tokio::sync::Mutex;
 
 #[actix_web::main]
@@ -155,7 +158,12 @@ async fn main() -> Result<()> {
                             .service(post_location)
                             .service(get_location),
                     )
-                    .service(web::scope("profile").service(get_profile)),
+                    .service(web::scope("profile").service(get_profile))
+                    .service(
+                        web::scope("params")
+                            .service(get_params)
+                            .service(upsert_param),
+                    ),
             )
     })
     .bind(("0.0.0.0", 3002))
