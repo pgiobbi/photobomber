@@ -145,6 +145,40 @@
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.5);
         }
 
+        /* Parameter item styles */
+        .param-item {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .param-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .param-item.editing {
+            background-color: rgba(255, 215, 0, 0.1);
+            border-color: #FFD700;
+        }
+
+        .param-key {
+            font-family: monospace;
+            font-weight: bold;
+            color: #41B0E8;
+        }
+
+        .param-value {
+            font-family: monospace;
+            color: #FFD700;
+        }
+
+        .param-updated {
+            color: #9CA3AF;
+            font-size: 0.75rem;
+        }
+
         /* Modal styles */
         .modal {
             position: fixed;
@@ -257,6 +291,49 @@
                     </div>
                 </div>
 
+                <!-- Parameters Management Section -->
+                <div class="mt-8">
+                    <h2 class="text-xl sm:text-2xl font-bold festival-text glow mb-4 text-center">
+                        System Parameters 🔧
+                    </h2>
+
+                    <!-- Add New Parameter -->
+                    <div class="bg-black/20 p-4 rounded-lg border border-white/20 mb-4">
+                        <h3 class="text-lg font-semibold glow mb-3">Add/Update Parameter</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                            <div>
+                                <label for="paramKey" class="block text-sm font-semibold mb-1 glow">
+                                    Key
+                                </label>
+                                <input type="text" id="paramKey" placeholder="parameter_key" class="backdrop-blur-sm">
+                            </div>
+                            <div>
+                                <label for="paramValue" class="block text-sm font-semibold mb-1 glow">
+                                    Value
+                                </label>
+                                <input type="text" id="paramValue" placeholder="parameter_value"
+                                       class="backdrop-blur-sm">
+                            </div>
+                        </div>
+                        <button id="submitParam"
+                                class="gradient-animate text-white font-bold py-2 px-4 rounded-lg transition" disabled>
+                            Save Parameter
+                        </button>
+                    </div>
+
+                    <!-- Parameters List -->
+                    <div class="bg-black/20 p-4 rounded-lg border border-white/20">
+                        <h3 class="text-lg font-semibold glow mb-3">Current Parameters</h3>
+                        <div id="paramsList" class="space-y-2">
+                            <p class="text-center text-white/70">Loading parameters...</p>
+                        </div>
+                        <button id="refreshParams"
+                                class="mt-3 bg-blue-500/40 hover:bg-blue-500/60 text-white py-2 px-4 rounded-lg transition">
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+
                 <div class="w-full text-center mt-4">
                     <button id="logoutBtn"
                             class="bg-red-400/40 hover:bg-opacity-50 text-white py-3 px-6 rounded-lg transition">
@@ -281,9 +358,15 @@
         const lastUpdatedSpan = document.getElementById('lastUpdated');
         const customLocationInput = document.getElementById('customLocation');
         const submitCustomLocationBtn = document.getElementById('submitCustomLocation');
+        const paramKeyInput = document.getElementById('paramKey');
+        const paramValueInput = document.getElementById('paramValue');
+        const submitParamBtn = document.getElementById('submitParam');
+        const paramsListContainer = document.getElementById('paramsList');
+        const refreshParamsBtn = document.getElementById('refreshParams');
 
         let stages = []; // Store stages from /api/admin/stages
         let currentCustomLocation = ''; // Track current custom location
+        let parameters = []; // Store current parameters
 
         // Check authentication status on page load
         async function checkAuth() {
@@ -297,13 +380,13 @@
                 if (response.ok && data.user_id === 1) {
                     // Authenticated, show main content and load stages and current location
                     mainContent.classList.remove('hidden');
-                    await Promise.all([fetchStages(), fetchCurrentLocation()]);
+                    await Promise.all([fetchStages(), fetchCurrentLocation(), fetchParameters()]);
                 } else {
                     throw new Error('Not authenticated');
                 }
             } catch (err) {
                 console.error('Auth check failed:', err);
-                showModal('Error', 'Failed to check authentication status. Please try again later.');
+                showModal('Error', 'Failed to check authentication status. Please try again.');
                 loginScreen.classList.remove('hidden');
             }
         }
@@ -332,10 +415,10 @@
         function renderStageCards() {
             // Clear existing stage cards except the reset card
             stageCardsContainer.innerHTML = `
-                <div class="stage-card" data-location-type="reset">
-                    <p class="text-sm sm:text-base font-semibold glow">No Location</p>
-                </div>
-            `;
+            <div class="stage-card" data-location-type="reset">
+                <p class="text-sm sm:text-base font-semibold glow">No Location</p>
+            </div>
+        `;
 
             // Add stage cards
             stages.forEach(stage => {
@@ -406,6 +489,130 @@
             }
         }
 
+        // Fetch parameters from /api/admin/params
+        async function fetchParameters() {
+            try {
+                const response = await fetch('/api/admin/params', {
+                    method: 'GET',
+                    headers: {'Content-Type': 'application/json'}
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch parameters');
+                }
+
+                parameters = await response.json();
+                renderParameters();
+            } catch (err) {
+                console.error('Failed to fetch parameters:', err);
+                paramsListContainer.innerHTML = '<p class="text-center text-red-400">Failed to load parameters</p>';
+            }
+        }
+
+        // Render parameters list
+        function renderParameters() {
+            if (parameters.length === 0) {
+                paramsListContainer.innerHTML = '<p class="text-center text-white/70">No parameters found</p>';
+                return;
+            }
+
+            paramsListContainer.innerHTML = parameters.map(param => `
+            <div class="param-item" data-key="${param.key}">
+                <div class="flex justify-between items-start mb-2">
+                    <div class="flex-1 min-w-0">
+                        <div class="param-key text-sm">${param.key}</div>
+                        <div class="param-value text-lg break-all">${param.value}</div>
+                        <div class="param-updated mt-1">Updated: ${formatDateTime(param.updatedAt)}</div>
+                    </div>
+                    <div class="flex gap-2 ml-2">
+                        <button class="edit-param bg-yellow-500/40 hover:bg-yellow-500/60 text-white px-2 py-1 rounded text-xs transition"
+                                data-key="${param.key}" data-value="${param.value}">
+                            Edit
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+            // Attach edit listeners
+            document.querySelectorAll('.edit-param').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const key = e.target.dataset.key;
+                    const value = e.target.dataset.value;
+                    paramKeyInput.value = key;
+                    paramValueInput.value = value;
+                    updateSubmitParamButton();
+
+                    // Highlight the parameter being edited
+                    document.querySelectorAll('.param-item').forEach(item => item.classList.remove('editing'));
+                    document.querySelector(`[data-key="${key}"]`).classList.add('editing');
+
+                    // Scroll to form
+                    paramKeyInput.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    paramKeyInput.focus();
+                });
+            });
+        }
+
+        // Format datetime string
+        function formatDateTime(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString();
+        }
+
+        // Update parameter via POST /api/admin/params
+        async function updateParameter() {
+            const key = paramKeyInput.value.trim();
+            const value = paramValueInput.value.trim();
+
+            if (!key) {
+                showModal('Error', 'Please enter a parameter key.');
+                return;
+            }
+
+            try {
+                submitParamBtn.textContent = 'Saving...';
+                submitParamBtn.disabled = true;
+
+                const response = await fetch('/api/admin/params', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({key, value})
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to update parameter');
+                }
+
+                // Clear form
+                paramKeyInput.value = '';
+                paramValueInput.value = '';
+                updateSubmitParamButton();
+
+                // Remove editing highlight
+                document.querySelectorAll('.param-item').forEach(item => item.classList.remove('editing'));
+
+                // Refresh parameters
+                await fetchParameters();
+
+                showModal('Success!', 'Parameter updated successfully! 🎉');
+
+            } catch (err) {
+                console.error('Parameter update error:', err);
+                showModal('Error', `Failed to update parameter: ${err.message}. Please try again.`);
+            } finally {
+                submitParamBtn.textContent = 'Save Parameter';
+                submitParamBtn.disabled = false;
+            }
+        }
+
+        // Update submit button state for parameters
+        function updateSubmitParamButton() {
+            const key = paramKeyInput.value.trim();
+            submitParamBtn.disabled = !key;
+        }
+
         // Convert seconds to human-readable format
         function secondsToHumanReadable(seconds) {
             if (seconds < 60) return `${seconds} seconds ago`;
@@ -447,7 +654,7 @@
                 mainContent.classList.remove('hidden');
                 usernameInput.value = '';
                 passwordInput.value = '';
-                await Promise.all([fetchStages(), fetchCurrentLocation()]);
+                await Promise.all([fetchStages(), fetchCurrentLocation(), fetchParameters()]);
 
             } catch (err) {
                 console.error('Login error:', err);
@@ -561,6 +768,39 @@
             }
         });
 
+        // Parameter form event listeners
+        paramKeyInput.addEventListener('input', updateSubmitParamButton);
+        paramValueInput.addEventListener('input', updateSubmitParamButton);
+
+        submitParamBtn.addEventListener('click', updateParameter);
+
+        // Handle Enter key for parameter form
+        paramKeyInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !submitParamBtn.disabled) {
+                updateParameter();
+            }
+        });
+        paramValueInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !submitParamBtn.disabled) {
+                updateParameter();
+            }
+        });
+
+        // Refresh parameters button
+        refreshParamsBtn.addEventListener('click', async () => {
+            const originalText = refreshParamsBtn.textContent;
+            try {
+                refreshParamsBtn.textContent = 'Refreshing...';
+                refreshParamsBtn.disabled = true;
+                await fetchParameters();
+            } catch (err) {
+                console.error('Failed to refresh parameters:', err);
+            } finally {
+                refreshParamsBtn.textContent = originalText;
+                refreshParamsBtn.disabled = false;
+            }
+        });
+
         // Attach listeners to stage cards
         function attachCardListeners() {
             const stageCards = stageCardsContainer.querySelectorAll('.stage-card');
@@ -598,7 +838,8 @@
                         }
 
                         // Update highlight
-                        stageCards.forEach(c => c.classList.remove('active'));
+                        const allStageCards = stageCardsContainer.querySelectorAll('.stage-card');
+                        allStageCards.forEach(c => c.classList.remove('active'));
                         customLocationInput.classList.remove('active');
                         card.classList.add('active');
 
