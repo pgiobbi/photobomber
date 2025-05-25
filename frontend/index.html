@@ -86,25 +86,38 @@
     <main class="flex-grow flex items-center justify-center flex-shrink relative">
         <div class="space-y-6 max-w-md w-full" id="mainContent">
             <!-- Step 1: Initial Screen -->
-            <div id="step1" class="flex items-center justify-center h-full">
-                <!-- Image placeholder for your illustration -->
-                <div class="absolute top-0 w-2/3 rounded-md max-h-48 overflow-hidden">
-                    <img src="/assets/down-photobombers.jpg" alt="Photobombers example" class="rounded-md">
+            <div id="step1" class="flex flex-col items-center justify-center h-full">
+                <!-- Left Raver -->
+                <div class="absolute top-12 left-0 w-2/5 rounded-md overflow-hidden animate-bounce">
+                    <img src="/assets/ravers-pixelated-nobg-128.png" alt="Ravers" class="rounded-md w-full">
                 </div>
+
+                <!-- Center Photobomber with Left-to-Right Animation -->
+                <div class="absolute top-12 w-1/2 rounded-md overflow-hidden animate-slide-left-to-right">
+                    <img src="/assets/photobomber-pixelated-nobg-128.png" alt="Photobomber" class="rounded-md w-full">
+                </div>
+
+                <!-- Right Raver -->
+                <div class="absolute top-12 right-0 w-2/5 rounded-md overflow-hidden animate-bounce">
+                    <img src="/assets/ravers-pixelated-nobg-128.png" alt="Ravers"
+                         class="rounded-md w-full -scale-x-100">
+                </div>
+
+                <p class="location-text text-3xl p-2 mt-8 z-20 w-full text-center" style="background-color: #feefc2">Snap a selfie with us!</p>
 
                 <!-- Location info section -->
                 <div class="w-full z-25 top-0 left-0 right-0 mt-8" style="">
                     <div class="w-full rounded-lg py-6 max-w-md mx-auto relative">
-                        <!-- Top Icon -->
-                        <div class="flex justify-center mb-2">
-                            <div class="w-8 h-8 bg-black rounded-full flex items-center justify-center">
-                                <div class="w-4 h-4 bg-white rounded-full relative">
-                                    <div class="absolute inset-0 flex items-center justify-center">
-                                        <div class="w-2 h-2 bg-black rounded-full"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <!--                        &lt;!&ndash; Top Icon &ndash;&gt;-->
+                        <!--                        <div class="flex justify-center mb-2">-->
+                        <!--                            <div class="w-8 h-8 bg-black rounded-full flex items-center justify-center">-->
+                        <!--                                <div class="w-4 h-4 bg-white rounded-full relative">-->
+                        <!--                                    <div class="absolute inset-0 flex items-center justify-center">-->
+                        <!--                                        <div class="w-2 h-2 bg-black rounded-full"></div>-->
+                        <!--                                    </div>-->
+                        <!--                                </div>-->
+                        <!--                            </div>-->
+                        <!--                        </div>-->
 
                         <div class="relative w-full">
                             <!-- Now @ Text -->

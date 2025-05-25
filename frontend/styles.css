@@ -714,3 +714,22 @@ footer {
 .shutter-button {
     animation: pulse 2s infinite;
 }
+
+@keyframes slide-left-to-right {
+    0% {
+        transform: translateX(-100vw); /* Start off-screen to the left */
+    }
+    45% {
+        transform: translateX(0); /* Stop at center */
+    }
+    55% {
+        transform: translateX(0); /* Pause at center */
+    }
+    100% {
+        transform: translateX(100vw); /* Move off-screen to the right */
+    }
+}
+
+.animate-slide-left-to-right {
+    animation: slide-left-to-right 4s infinite ease-in-out; /* 4s duration, infinite loop, ease-in-out */
+}
