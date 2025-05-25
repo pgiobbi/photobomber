@@ -733,3 +733,50 @@ footer {
 .animate-slide-left-to-right {
     animation: slide-left-to-right 4s infinite ease-in-out; /* 4s duration, infinite loop, ease-in-out */
 }
+
+
+.text-snap-selfie {
+    animation: strobeFlash2 1s linear infinite;
+}
+
+@keyframes strobeFlash2 {
+    0%, 100% {
+        color: black;
+    }
+    50% {
+        color: #ff7500;
+    }
+}
+
+/* Blinking animation for the emoji */
+@keyframes blink {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+}
+
+/* Flash effect for brightness */
+@keyframes flash {
+    0%, 44%, 56%, 100% {
+        filter: brightness(100%); /* Normal brightness outside center */
+    }
+    45% {
+        filter: brightness(100%); /* Start of flash */
+    }
+    48% {
+        filter: brightness(250%); /* Peak brightness */
+    }
+    52% {
+        filter: brightness(250%); /* Hold peak */
+    }
+    55% {
+        filter: brightness(100%); /* Fade back */
+    }
+}
+
+.flash-effect {
+    animation: flash 4s infinite ease-in-out; /* Sync with slide animation */
+}
