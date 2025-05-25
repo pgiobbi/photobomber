@@ -104,6 +104,7 @@ async fn main() -> Result<()> {
                             || origin_str.starts_with("http://127.0.0.1")
                             || origin_str.starts_with("http://[::1]")
                             || origin_str == "https://photobomber.servebeer.com"
+                            || origin_str == "https://photobomber.xyz"
                             || cors_allow_all;
 
                         debug!(
