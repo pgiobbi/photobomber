@@ -156,8 +156,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: formData,
             });
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Upload failed');
+                const errorData = await response.text();
+                throw new Error(errorData || 'Upload failed');
             }
             await fetchBomberCount();
             finalImage.src = previewImage.src;

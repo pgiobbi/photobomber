@@ -1,5 +1,6 @@
 use crate::AppState;
 use crate::api::constants::{ALLOWED_EXTENSIONS, UPVOTES_PER_UPLOAD};
+use crate::api::libraries::db::get_upload_allowed;
 use crate::api::utils::{get_extension_from_filename, get_extension_from_mime};
 use crate::types::db::DbImage;
 use crate::types::images::{
@@ -99,6 +100,12 @@ pub async fn upload_images(
     app_state: web::Data<AppState>,
 ) -> Result<impl Responder, Error> {
     info!("Starting image upload processing");
+
+    // Check if image upload is allowed
+    if !get_upload_allowed(&app_state.db_pool).await.unwrap_or(false) {
+        warn!("Image upload not allowed");
+        return Ok(HttpResponse::Forbidden().json("Image upload is not allowed"));
+    }
 
     let mut responses = Vec::new();
 
