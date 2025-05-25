@@ -151,6 +151,12 @@ input[type="file"] {
     line-height: 1;
 }
 
+.festival-caption {
+    font-family: 'Anton', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    letter-spacing: 2px;
+    line-height: 1;
+}
+
 .location-text {
     font-family: 'Anton', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
     letter-spacing: 0px;
