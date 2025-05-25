@@ -315,7 +315,7 @@ input[type="file"] {
 .btn-secondary {
     background-color: rgba(255, 255, 255, 0.15);
     color: black;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid black;
 }
 
 .btn-secondary:hover {

@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#0e1b2b">
-    <meta name="description" content="Photobomb us at Tomorrowland 2025! Snap a selfie and join the fun!">
-    <title>Photobomb Us at Tomorrowland!</title>
+    <meta name="description" content="Photobomb us! Snap a selfie and join the fun!">
+    <title>Photobomb Us!</title>
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96"/>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <link rel="shortcut icon" href="/favicon.ico"/>
@@ -78,81 +78,83 @@
     <!-- Middle cream section with illustration -->
     <div class="absolute top-0 left-0 right-0 z-15"
          style="background-color: #feefc2; clip-path: url(#cream-curve-clip); height: 90dvh;">
-        <div class="flex items-center justify-center h-full">
-            <!-- Image placeholder for your illustration -->
-            <div class="w-2/3 rounded-md max-h-48 overflow-hidden">
-                <img src="/assets/down-photobombers.jpg" alt="Photobombers example" class="rounded-md">
-            </div>
-
-            <!-- Location info section -->
-            <div class="absolute z-25 left-0 right-0" style="top: 55dvh;">
-                <div class="rounded-lg py-6 max-w-md mx-auto relative">
-                    <!-- Top Icon -->
-                    <div class="flex justify-center mb-2">
-                        <div class="w-8 h-8 bg-black rounded-full flex items-center justify-center">
-                            <div class="w-4 h-4 bg-white rounded-full relative">
-                                <div class="absolute inset-0 flex items-center justify-center">
-                                    <div class="w-2 h-2 bg-black rounded-full"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Now @ Text -->
-                    <div class="text-center text-black text-sm mb-1">
-                        now @
-                    </div>
-
-                    <!-- Main Title -->
-                    <div class="text-center text-2xl font-bold mb-2" style="color: #33925f; transform: scaleY(1.25)">
-                        <span id="currentLocation" class="location-text">Not set</span>
-                    </div>
-
-                    <!-- Last Updated -->
-                    <div class="text-center text-black text-xs mb-4">
-                        Last Updated: <span id="lastUpdated">Not set</span>
-                    </div>
-
-                    <!-- Decorative Lines -->
-                    <div class="absolute left-0 top-1/2 transform -translate-y-1/2">
-                        <div class="w-20 h-0.5" style="background-color: #8bc34a"></div>
-                    </div>
-                    <div class="absolute right-0 top-1/2 transform -translate-y-1/2">
-                        <div class="w-20 h-0.5" style="background-color: #8bc34a"></div>
-                    </div>
-
-                    <p class="text-base mt-2 hidden">
-                    <span class="gallery-trigger" id="galleryTrigger">
-                        See the photobomb leaderboard! 🔍
-                    </span>
-                    </p>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Main content (other steps) -->
     <main class="flex-grow flex items-center justify-center flex-shrink relative">
         <div class="space-y-6 max-w-md w-full" id="mainContent">
             <!-- Step 1: Initial Screen -->
-            <div id="step1" class="text-center">
+            <div id="step1" class="flex items-center justify-center h-full">
+                <!-- Image placeholder for your illustration -->
+                <div class="absolute top-0 w-2/3 rounded-md max-h-48 overflow-hidden">
+                    <img src="/assets/down-photobombers.jpg" alt="Photobombers example" class="rounded-md">
+                </div>
+
+                <!-- Location info section -->
+                <div class="w-full z-25 top-0 left-0 right-0" style="">
+                    <div class="w-full rounded-lg py-6 max-w-md mx-auto relative">
+                        <!-- Top Icon -->
+                        <div class="flex justify-center mb-2">
+                            <div class="w-8 h-8 bg-black rounded-full flex items-center justify-center">
+                                <div class="w-4 h-4 bg-white rounded-full relative">
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <div class="w-2 h-2 bg-black rounded-full"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="relative w-full">
+                            <!-- Now @ Text -->
+                            <div class="text-center text-black text-base mb-1">
+                                now @
+                            </div>
+
+                            <!-- Main Title -->
+                            <div class="text-center text-3xl font-bold mb-2"
+                                 style="color: #33925f; transform: scaleY(1.25)">
+                                <span id="currentLocation" class="location-text">Not set</span>
+                            </div>
+
+                            <!-- Last Updated -->
+                            <div class="text-center text-black text-sm mb-4">
+                                Last Updated: <span id="lastUpdated">Not set</span>
+                            </div>
+
+                            <!-- Decorative Lines -->
+                            <div class="absolute left-0 top-1/2 transform -translate-y-1/2">
+                                <div class="w-20 h-1" style="background-color: #8bc34a"></div>
+                            </div>
+                            <div class="absolute right-0 top-1/2 transform -translate-y-1/2">
+                                <div class="w-20 h-1" style="background-color: #8bc34a"></div>
+                            </div>
+                        </div>
+
+
+                        <p class="text-base mt-2 hidden">
+                                <span class="gallery-trigger" id="galleryTrigger">
+                                    See the photobomb leaderboard! 🔍
+                                </span>
+                        </p>
+                    </div>
+                </div>
+
                 <!-- Green camera section -->
-                <div class="absolute bottom-0 left-0 right-0 z-20 h-48"
+                <div class="absolute bottom-0 left-0 right-0 z-20 h-1/3"
                      style="background: linear-gradient(135deg, #8bc34a, #689f38); clip-path: url(#green-curve-clip)">
                     <label for="cameraInput"
                            class="w-full h-full flex flex-col items-center justify-center cursor-pointer text-white">
                         <!-- Shutter button -->
                         <div class="shutter-button"></div>
-                        <div class="festival-text text-2xl font-bold">TAKE A SHOT</div>
+                        <div class="festival-text text-3xl font-bold">TAKE A SHOT</div>
                     </label>
                     <input type="file" id="cameraInput" accept="image/*" capture="user">
                 </div>
-
             </div>
 
             <!-- Step 2: Preview Screen (hidden by default) -->
             <div id="step2" class="text-center hidden">
-                <h2 class="text-2xl sm:text-3xl font-bold mb-4 glow">Preview Your Photobomb!</h2>
+                <h2 class="text-2xl sm:text-3xl font-bold mb-4 festival-text">Preview Your Photobomb!</h2>
 
                 <div class="preview-container mb-4">
                     <img id="previewImage" src="" alt="Preview">
@@ -168,7 +170,11 @@
                     </div>
                     <p class="text-xs sm:text-sm text-center my-2 legal-text">
                         By joining, you agree we may display your photo on the leaderboard on our main page.
-                        See our <a href="privacy-policy.html" class="text-blue-300 hover:underline">Privacy Policy</a>.
+                        See our
+                        <a href="privacy-policy.html" class="text-blue-300 hover:underline">Privacy Policy</a>
+                        and
+                        <a href="terms-of-use.html" class="text-blue-300 hover:underline">Terms of Use</a>
+                        .
                     </p>
                 </div>
 
@@ -184,7 +190,7 @@
 
             <!-- Step 3: Success Screen (hidden by default) -->
             <div id="step3" class="text-center hidden">
-                <h2 class="text-2xl sm:text-3xl font-bold mb-4 title-glow">AWESOME SHOT! 🎉</h2>
+                <h2 class="text-4xl sm:text-5sxl font-bold mb-4 festival-text">AWESOME SHOT! 🎉</h2>
 
                 <div class="preview-container mb-6">
                     <img id="finalImage" src="" alt="Your photobomb">
