@@ -66,10 +66,10 @@
 <!-- Main flex container -->
 <div class="flex flex-col min-h-dvh w-full max-w-xl mx-auto relative">
     <!-- Header -->
-    <header class="yellow-curve text-center pt-1 pb-12 relative z-30 flex-shrink-0"
-            style="background-color: #fade00; clip-path: url(#yellow-curve-clip);">
-        <div class="flex flex-col items-center justify-center gap-2">
-            <img id="bomb-logo" src="/assets/logos/bomb_opt.svg" alt="Bomb logo" class="w-10">
+    <header class="yellow-curve text-center pt-1 pb-12 relative z-30 flex-shrink-0 bg-gradient-to-r from-[#80ADD4] via-[#F98EAC] to-[#FEA336]"
+            style="clip-path: url(#yellow-curve-clip);">
+        <div class="flex flex-col items-center justify-center gap-2 text-white">
+            <img id="bomb-logo" src="/assets/logos/bomb_opt.svg" alt="Bomb logo" class="w-10 invert">
             <h1 class="text-5xl sm:text-4xl font-extrabold festival-text tracking-tight">PHOTOBOMB US</h1>
             <p class="text-2xl sm:text-xl festival-caption font-base">
                 Join <span id="bomber-count" class="text-3xl">...</span> Photo Bombers!
@@ -79,7 +79,7 @@
 
     <!-- Middle cream section with illustration -->
     <div class="absolute top-0 left-0 right-0 z-15"
-         style="background-color: #feefc2; clip-path: url(#cream-curve-clip); height: 90dvh;">
+         style="background-color: #d6e0f1; clip-path: url(#cream-curve-clip); height: 90dvh;">
     </div>
 
     <!-- Main content (other steps) -->
@@ -119,7 +119,7 @@
                         <!--                            </div>-->
                         <!--                        </div>-->
 
-                        <div class="relative w-full pt-2 bg-[#feefc2]">
+                        <div class="relative w-full pt-2" style="background: #d6e0f1">
                             <!-- Now @ Text -->
                             <div class="text-center text-black text-base mb-1">
                                 now @
@@ -127,7 +127,7 @@
 
                             <!-- Main Title -->
                             <div class="text-center text-3xl font-bold mb-2"
-                                 style="color: #33925f; transform: scaleY(1.25)">
+                                 style="color: #5eabed; transform: scaleY(1.25)">
                                 <span id="currentLocation" class="location-text">Not set</span>
                             </div>
 
@@ -138,10 +138,10 @@
 
                             <!-- Decorative Lines -->
                             <div class="absolute left-0 top-1/2 transform -translate-y-1/2">
-                                <div class="w-20 h-1" style="background-color: #8bc34a"></div>
+                                <div class="w-20 h-1" style="background-color: #6ea5df"></div>
                             </div>
                             <div class="absolute right-0 top-1/2 transform -translate-y-1/2">
-                                <div class="w-20 h-1" style="background-color: #8bc34a"></div>
+                                <div class="w-20 h-1" style="background-color: #6ea5df"></div>
                             </div>
                         </div>
 
@@ -156,7 +156,7 @@
 
                 <!-- Green camera section -->
                 <div class="absolute bottom-0 left-0 right-0 z-20 h-1/3"
-                     style="background: linear-gradient(135deg, #8bc34a, #689f38); clip-path: url(#green-curve-clip)">
+                     style="background: #fea336; clip-path: url(#green-curve-clip)">
                     <label for="cameraInput"
                            class="w-full h-full flex flex-col items-center justify-center cursor-pointer text-white">
                         <!-- Shutter button -->
