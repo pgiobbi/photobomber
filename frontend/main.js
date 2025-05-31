@@ -196,8 +196,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const file = files[0];
         const fileURL = URL.createObjectURL(file);
         previewImage.src = fileURL;
-        step1.classList.add('hidden');
-        step2.classList.remove('hidden');
+        //step1.classList.add('hidden');
+        //step2.classList.remove('hidden');
         onUploadClicked();
     });
 
