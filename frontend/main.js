@@ -115,9 +115,8 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => confetti.remove(), 4000);
         }
     }
-
-    // Upload button
-    uploadBtn.addEventListener('click', async () => {
+    
+    async function onUploadClicked() {
         const files = cameraInput.files;
         if (!files.length) return;
         const formData = new FormData();
@@ -180,7 +179,10 @@ document.addEventListener('DOMContentLoaded', () => {
             uploadBtn.textContent = "Upload! 🚀";
             uploadBtn.disabled = false;
         }
-    });
+    }
+
+    // Upload button
+    uploadBtn.addEventListener('click', async () => await onUploadClicked());
     
     // Handle file input change
     cameraInput.addEventListener('change', async (event) => {
@@ -196,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
         previewImage.src = fileURL;
         step1.classList.add('hidden');
         step2.classList.remove('hidden');
-        uploadBtn.click();
+        onUploadClicked();
     });
 
     // New photo button
