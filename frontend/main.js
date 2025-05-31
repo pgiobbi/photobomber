@@ -87,22 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Handle file input change
-    cameraInput.addEventListener('change', async (event) => {
-        const files = event.target.files;
-        if (files.length !== 1) return;
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        if (!allowedTypes.includes(files[0].type)) {
-            showModal('Invalid File', 'Please upload only JPG, PNG, GIF, HEIC, HEIF, or WebP images.');
-            return;
-        }
-        const file = files[0];
-        const fileURL = URL.createObjectURL(file);
-        previewImage.src = fileURL;
-        step1.classList.add('hidden');
-        step2.classList.remove('hidden');
-    });
-
     // Retake button
     retakeBtn.addEventListener('click', () => {
         step2.classList.add('hidden');
@@ -196,6 +180,23 @@ document.addEventListener('DOMContentLoaded', () => {
             uploadBtn.textContent = "Upload! 🚀";
             uploadBtn.disabled = false;
         }
+    });
+    
+    // Handle file input change
+    cameraInput.addEventListener('change', async (event) => {
+        const files = event.target.files;
+        if (files.length !== 1) return;
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        if (!allowedTypes.includes(files[0].type)) {
+            showModal('Invalid File', 'Please upload only JPG, PNG, GIF, HEIC, HEIF, or WebP images.');
+            return;
+        }
+        const file = files[0];
+        const fileURL = URL.createObjectURL(file);
+        previewImage.src = fileURL;
+        step1.classList.add('hidden');
+        step2.classList.remove('hidden');
+        uploadBtn.click();
     });
 
     // New photo button
