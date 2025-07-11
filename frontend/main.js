@@ -18,6 +18,68 @@ document.addEventListener('DOMContentLoaded', () => {
     const strobeOverlay = document.getElementById('strobeOverlay');
     const isPublic = document.getElementById('isPublic');
 
+    //Create the Festival logo spinner
+    function createSpinner() {
+        const spinner = document.createElement('div');
+        spinner.id = 'uploadSpinner';
+        spinner.className = 'upload-spinner';
+        spinner.innerHTML = `
+            <div class="logo-container">
+                <div class="logo-glow"></div>
+                <svg class="tomorrowland-logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="rainbow-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#ff6b35;stop-opacity:1" />
+                            <stop offset="16.66%" style="stop-color:#f7931e;stop-opacity:1" />
+                            <stop offset="33.33%" style="stop-color:#ffcc02;stop-opacity:1" />
+                            <stop offset="50%" style="stop-color:#37b24d;stop-opacity:1" />
+                            <stop offset="66.66%" style="stop-color:#1c7ed6;stop-opacity:1" />
+                            <stop offset="83.33%" style="stop-color:#9c36b5;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#ff6b35;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <path class="logo-fill" d="M100,20 L100,180 M60,20 L140,20 M100,60 L130,90 L100,120 L70,90 Z M100,120 L120,140 L100,160 L80,140 Z"/>
+                    <path class="logo-path" d="M100,20 L100,180 M60,20 L140,20 M100,60 L130,90 L100,120 L70,90 Z M100,120 L120,140 L100,160 L80,140 Z"/>
+                    <circle class="logo-fill" cx="100" cy="40" r="8"/>
+                    <circle class="logo-path" cx="100" cy="40" r="8"/>
+                    <circle class="logo-fill" cx="85" cy="75" r="4"/>
+                    <circle class="logo-path" cx="85" cy="75" r="4"/>
+                    <circle class="logo-fill" cx="115" cy="75" r="4"/>
+                    <circle class="logo-path" cx="115" cy="75" r="4"/>
+                    <circle class="logo-fill" cx="100" cy="180" r="6"/>
+                    <circle class="logo-path" cx="100" cy="180" r="6"/>
+                </svg>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+            </div>
+            <div class="loading-text">Uploading</div>
+            <div class="loading-subtext">Feel the magic happening...</div>
+            <div class="progress-container">
+                <div class="progress-bar"></div>
+            </div>
+        `;
+        document.body.appendChild(spinner);
+        setTimeout(() => {
+            spinner.classList.add('active');
+        }, 10)
+
+    }
+
+    // Remove the spinner
+    function removeSpinner() {
+        const spinner = document.getElementById('uploadSpinner');
+        if (spinner) {
+            spinner.classList.remove('active');
+            setTimeout(() => {
+                spinner.remove();
+            }, 300);
+        }
+    }
+
     // Fetch and display current location
     async function fetchCurrentLocation() {
         try {
@@ -121,7 +183,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!files.length) return;
         const formData = new FormData();
         try {
-            uploadBtn.textContent = "Uploading...";
+            createSpinner();
+            uploadBtn.textContent = 'Uploading...';
             uploadBtn.disabled = true;
             const file = files[0];
             const res = await compressImage(file);
@@ -130,6 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 showModal('File Too Large', 'Images must be under 1MB. Try a smaller file!');
                 uploadBtn.textContent = "Upload! 🚀";
                 uploadBtn.disabled = false;
+                removeSpinner();
                 return;
             }
             formData.append('images', compressedBlob);
@@ -173,11 +237,13 @@ document.addEventListener('DOMContentLoaded', () => {
             triggerSuccessAnimations();
             uploadBtn.textContent = "Upload! 🚀";
             uploadBtn.disabled = false;
+            removeSpinner();
         } catch (err) {
             console.error('Upload error:', err);
             showModal('Oops! 😅', `Failed to upload: ${err.message}. Try again!`, 'Retry');
             uploadBtn.textContent = "Upload! 🚀";
             uploadBtn.disabled = false;
+            removeSpinner();
         }
     }
 
@@ -197,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const fileURL = URL.createObjectURL(file);
         previewImage.src = fileURL;
         step1.classList.add('hidden');
-        //step2.classList.remove('hidden');
+        // step2.classList.remove('hidden');
         onUploadClicked();
     });
 

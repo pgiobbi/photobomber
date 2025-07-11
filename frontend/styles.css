@@ -1,9 +1,7 @@
 html, body {
     margin: 0;
     padding: 0;
-    /*background-color: rgba(14, 27, 43, 0.1);*/
     background-color: white;
-    /*background-image: linear-gradient(135deg, rgba(14, 27, 43, 0.85), rgba(25, 40, 65, 0.7)), url('/assets/orbyz-notext.webp');*/
     background-size: cover;
     background-position: center;
     background-blend-mode: overlay;
@@ -206,7 +204,8 @@ input[type="file"] {
 .badge-overlay {
     position: absolute;
     top: 10px;
-    right: 10px;
+    left: 50%;
+    transform: translateX(-50%);
     padding: 0.5rem 1rem;
     border-radius: 12px;
     font-size: 0.9rem;
@@ -216,6 +215,10 @@ input[type="file"] {
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(5px);
     z-index: 10;
+    white-space: nowrap;
+    max-width: 98%;
+    text-align: center;
+    display: inline-block;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
@@ -554,8 +557,8 @@ footer {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 40px;
-    height: 40px;
+    width: 80px;
+    height: 80px;
     border: 4px solid rgba(255, 255, 255, 0.3);
     border-top: 4px solid #ff00ff;
     border-right: 4px solid #d7ef00;
@@ -717,23 +720,22 @@ footer {
 
 @keyframes slide-left-to-right {
     0% {
-        transform: translateX(-100vw); /* Start off-screen to the left */
+        transform: translateX(-100vw);
     }
     45% {
-        transform: translateX(0); /* Stop at center */
+        transform: translateX(0);
     }
     55% {
-        transform: translateX(0); /* Pause at center */
+        transform: translateX(0);
     }
     100% {
-        transform: translateX(100vw); /* Move off-screen to the right */
+        transform: translateX(100vw);
     }
 }
 
 .animate-slide-left-to-right {
-    animation: slide-left-to-right 4s infinite ease-in-out; /* 4s duration, infinite loop, ease-in-out */
+    animation: slide-left-to-right 4s infinite ease-in-out;
 }
-
 
 .text-snap-selfie {
     animation: strobeFlash2 1s linear infinite;
@@ -761,22 +763,254 @@ footer {
 /* Flash effect for brightness */
 @keyframes flash {
     0%, 44%, 56%, 100% {
-        filter: brightness(100%); /* Normal brightness outside center */
+        filter: brightness(100%);
     }
     45% {
-        filter: brightness(100%); /* Start of flash */
+        filter: brightness(100%);
     }
     48% {
-        filter: brightness(250%); /* Peak brightness */
+        filter: brightness(250%);
     }
     52% {
-        filter: brightness(250%); /* Hold peak */
+        filter: brightness(250%);
     }
     55% {
-        filter: brightness(100%); /* Fade back */
+        filter: brightness(100%);
     }
 }
 
 .flash-effect {
-    animation: flash 4s infinite ease-in-out; /* Sync with slide animation */
+    animation: flash 4s infinite ease-in-out;
+}
+
+.upload-spinner {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /*background: linear-gradient(135deg, rgba(88, 171, 239, 0.2), rgba(234, 132, 193, 0.2), rgba(245, 156, 60, 0.2));*/
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(7.6px);
+    border-radius: 12px;
+    padding: 1rem;
+    opacity: 0;
+    transform: scale(1.2);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.upload-spinner.active {
+    opacity: 1;
+    transform: scale(1.5);
+}
+
+.upload-spinner .logo-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin-bottom: 1rem;
+}
+
+.upload-spinner .tomorrowland-logo {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 10px rgba(255, 107, 53, 0.3));
+}
+
+.upload-spinner .logo-path {
+    fill: none;
+    stroke: #333;
+    stroke-width: 3;
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: drawPath 4s ease-in-out infinite;
+}
+
+.upload-spinner .logo-fill {
+    fill: url(#rainbow-gradient);
+    opacity: 0;
+    animation: fillLogo 4s ease-in-out infinite;
+}
+
+.upload-spinner .logo-glow {
+    position: absolute;
+    inset: -10px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 107, 53, 0.3) 0%, transparent 70%);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.upload-spinner .particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #ff6b35;
+    border-radius: 50%;
+    animation: floatSpinner 3s ease-in-out infinite;
+    box-shadow: 0 0 6px currentColor;
+}
+
+.upload-spinner .particle:nth-child(3) {
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+    background: #ff6b35;
+}
+
+.upload-spinner .particle:nth-child(4) {
+    top: 30%;
+    right: 15%;
+    animation-delay: 0.5s;
+    background: #f7931e;
+}
+
+.upload-spinner .particle:nth-child(5) {
+    bottom: 25%;
+    left: 20%;
+    animation-delay: 1s;
+    background: #ffcc02;
+}
+
+.upload-spinner .particle:nth-child(6) {
+    bottom: 35%;
+    right: 10%;
+    animation-delay: 1.5s;
+    background: #37b24d;
+}
+
+.upload-spinner .particle:nth-child(7) {
+    top: 50%;
+    left: 5%;
+    animation-delay: 2s;
+    background: #1c7ed6;
+}
+
+.upload-spinner .particle:nth-child(8) {
+    top: 60%;
+    right: 5%;
+    animation-delay: 2.5s;
+    background: #9c36b5;
+}
+
+.upload-spinner .loading-text {
+    color: white;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: linear-gradient(45deg, #ff6b35, #f7931e, #ffcc02, #37b24d, #1c7ed6, #9c36b5);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientText 3s ease-in-out infinite;
+    font-family: 'Anton', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+
+.upload-spinner .loading-subtext {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.75rem;
+    text-align: center;
+    animation: fadeInOut 2s ease-in-out infinite 0.5s;
+    font-family: 'Anton', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+
+.upload-spinner .progress-container {
+    width: 150px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 1rem;
+}
+
+.upload-spinner .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #ff6b35, #f7931e, #ffcc02, #37b24d, #1c7ed6, #9c36b5);
+    background-size: 200% 100%;
+    border-radius: 2px;
+    animation: progressMove 4s ease-in-out infinite, gradientShift 2s linear infinite;
+    width: 0%;
+}
+
+@media (max-width: 768px) {
+    .upload-spinner .logo-container {
+        width: 80px;
+        height: 80px;
+    }
+
+    .upload-spinner .loading-text {
+        font-size: 0.875rem;
+    }
+
+    .upload-spinner .progress-container {
+        width: 120px;
+    }
+}
+
+@keyframes drawPath {
+    0% {
+        stroke-dashoffset: 1000;
+        stroke: #333;
+    }
+    50% {
+        stroke-dashoffset: 0;
+        stroke: #ff6b35;
+    }
+    100% {
+        stroke-dashoffset: -1000;
+        stroke: #9c36b5;
+    }
+}
+
+@keyframes fillLogo {
+    0%, 30% {
+        opacity: 0;
+        fill: url(#rainbow-gradient);
+    }
+    50%, 80% {
+        opacity: 0.8;
+        fill: url(#rainbow-gradient);
+    }
+    100% {
+        opacity: 0;
+        fill: url(#rainbow-gradient);
+    }
+}
+
+@keyframes floatSpinner {
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+        opacity: 0.7;
+    }
+    50% {
+        transform: translateY(-15px) rotate(180deg);
+        opacity: 1;
+    }
+}
+
+@keyframes gradientText {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+}
+
+@keyframes progressMove {
+    0% { width: 0%; }
+    30% { width: 30%; }
+    60% { width: 60%; }
+    90% { width: 90%; }
+    100% { width: 100%; }
+}
+
+@keyframes fadeInOut {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
 }
