@@ -9,9 +9,8 @@ html, body {
     overflow: hidden;
     -webkit-tap-highlight-color: transparent;
     color: black;
-    /* Allow the body to be at least 100% of viewport height but grow as needed */
     min-height: 100vh;
-    min-height: 100dvh; /* For modern browsers */
+    min-height: 100dvh;
 }
 
 .yellow-curve {
@@ -688,7 +687,6 @@ footer {
     font-size: 30px;
     font-weight: bold;
     font-family: 'Anton', sans-serif;
-    /*text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);*/
     margin: 0;
 }
 
