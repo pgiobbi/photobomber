@@ -47,7 +47,7 @@ html, body {
 }
 
 .gradient-animate {
-    background: linear-gradient(60deg, var(--ice-blue), var(--deep-crimson), var(--ice-blue), var(--deep-crimson));
+    background: linear-gradient(60deg, #ff00ff, #d7ef00, #ff4444, #ff00ff);
     background-size: 200% 200%;
     animation: animatedGradient 8s ease-in-out infinite alternate, ctaPulse 1.5s ease-in-out infinite;
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -220,7 +220,7 @@ input[type="file"] {
     border-radius: 12px;
     font-size: 0.9rem;
     font-weight: 700;
-    background: linear-gradient(135deg, var(--deep-crimson), var(--ice-blue));
+    background: linear-gradient(135deg, rgba(255, 0, 255, 0.8), rgba(65, 176, 232, 0.8));
     color: white;
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(5px);
