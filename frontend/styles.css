@@ -25,6 +25,7 @@ html, body {
 
 .yellow-curve {
     clip-path: url(#yellow-curve-clip);
+    background-image: linear-gradient(135deg, rgba(218, 240, 246, 0.0), rgba(37, 60, 120, 0.6)), url('/assets/orbyz-notext.webp');
 }
 
 .green-curve {
@@ -656,11 +657,15 @@ footer {
     justify-content: center;
     color: var(--ice-blue);
     user-select: none;
+    border: 4px solid var(--deep-crimson); /* Added red border */
+    border-bottom: none; /* Remove bottom border to maintain curve */
+    box-shadow: 0 0 15px rgba(190, 29, 30, 0.5); /* Glow effect for border */
 }
 
 .green-section:hover {
     background: linear-gradient(135deg, var(--steel-blue), var(--frost-grey-blue));
     transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(190, 29, 30, 0.7); /* Stronger glow on hover */
 }
 
 .green-section:active {
@@ -672,7 +677,7 @@ footer {
     height: 80px;
     border: 4px solid var(--ice-blue);
     border-radius: 50%;
-    background: rgba(218, 240, 246, 0.2);
+    background: linear-gradient(135deg, #dc143c 0%, #8b0000 50%, #dc143c 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -680,83 +685,6 @@ footer {
     transition: all 0.2s ease;
     position: relative;
     overflow: hidden;
-}
-
-.shutter-button::before {
-    content: '';
-    width: 50px;
-    height: 50px;
-    background: var(--ice-blue);
-    border-radius: 50%;
-    opacity: 0.8;
-}
-
-.green-section:hover .shutter-button {
-    transform: scale(1.1);
-    background: rgba(218, 240, 246, 0.3);
-}
-
-.green-section:active .shutter-button {
-    transform: scale(0.9);
-}
-
-.camera-text {
-    font-size: 30px;
-    font-weight: bold;
-    font-family: 'Anton', sans-serif;
-    margin: 0;
-}
-
-.camera-emoji {
-    font-size: 32px;
-    margin-left: 10px;
-}
-
-.hidden-input {
-    display: none;
-}
-
-/* Pulse animation */
-@keyframes pulse {
-    0% {
-        box-shadow: 0 0 0 0 red;
-    }
-    70% {
-        box-shadow: 0 0 0 20px rgba(218, 240, 246, 0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 red;
-    }
-}
-
-@keyframes crimsonGemGlow {
-    0% {
-        box-shadow:
-                0 0 0 0 rgba(220, 20, 60, 0.8),
-                0 0 20px rgba(220, 20, 60, 0.6),
-                inset 0 0 20px rgba(139, 0, 0, 0.3);
-        transform: scale(1);
-    }
-    50% {
-        box-shadow:
-                0 0 0 25px rgba(220, 20, 60, 0),
-                0 0 35px rgba(220, 20, 60, 0.8),
-                inset 0 0 25px rgba(139, 0, 0, 0.5);
-        transform: scale(1.05);
-    }
-    100% {
-        box-shadow:
-                0 0 0 0 rgba(220, 20, 60, 0),
-                0 0 20px rgba(220, 20, 60, 0.6),
-                inset 0 0 20px rgba(139, 0, 0, 0.3);
-        transform: scale(1);
-    }
-}
-
-.shutter-button {
-    background: linear-gradient(135deg, #dc143c 0%, #8b0000 50%, #dc143c 100%);
-            border: 2px solid rgba(220, 20, 60, 0.8);
-            position: relative;
     animation: crimsonGemGlow 2.5s infinite;
 }
 
@@ -782,6 +710,49 @@ footer {
     background: rgba(255, 255, 255, 0.6);
     border-radius: 50%;
     filter: blur(1px);
+}
+
+.green-section:hover .shutter-button {
+    transform: scale(1.1);
+    background: rgba(218, 240, 246, 0.3);
+}
+
+.green-section:active .shutter-button {
+    transform: scale(0.9);
+}
+
+.camera-text {
+    font-size: 36px; /* Increased font size */
+    font-weight: bold;
+    font-family: 'Anton', sans-serif;
+    margin: 0;
+    color: var(--ice-blue); /* High contrast color */
+    text-shadow: 0 0 10px rgba(218, 240, 246, 0.9), /* Stronger glow */
+                 0 0 15px rgba(194, 149, 63, 0.7),
+                 0 0 20px rgba(127, 29, 36, 0.5);
+    animation: strobeFlash2 1s linear infinite; /* Retain flashing effect */
+}
+
+.camera-emoji {
+    font-size: 32px;
+    margin-left: 10px;
+}
+
+.hidden-input {
+    display: none;
+}
+
+/* Pulse animation */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 red;
+    }
+    70% {
+        box-shadow: 0 0 0 20px rgba(218, 240, 246, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 red;
+    }
 }
 
 @keyframes crimsonGemGlow {
@@ -1054,11 +1025,19 @@ footer {
 @keyframes drawPath {
     0% {
         stroke-dashoffset: 1000;
-        stroke: #333;
+        stroke: var(--deep-crimson);
+    }
+    25% {
+        stroke-dashoffset: 500;
+        stroke: var(--ice-blue);
     }
     50% {
         stroke-dashoffset: 0;
-        stroke: var(--metallic-gold);
+        stroke: var(--deep-crimson);
+    }
+    75% {
+        stroke-dashoffset: -500;
+        stroke: var(--ice-blue);
     }
     100% {
         stroke-dashoffset: -1000;
@@ -1097,30 +1076,6 @@ footer {
     }
 }
 
-@keyframes drawPath {
-    0% {
-        stroke-dashoffset: 1000;
-        stroke: var(--deep-crimson);
-    }
-    25% {
-        stroke-dashoffset: 500;
-        stroke: var(--ice-blue);
-    }
-    50% {
-        stroke-dashoffset: 0;
-        stroke: var(--deep-crimson);
-    }
-    75% {
-        stroke-dashoffset: -500;
-        stroke: var(--ice-blue);
-    }
-    100% {
-        stroke-dashoffset: -1000;
-        stroke: var(--deep-crimson);
-    }
-}
-
-
 @keyframes fillLogo {
     0%, 30% {
         opacity: 0;
@@ -1137,8 +1092,8 @@ footer {
 }
 
 @keyframes logoGlow {
-            0% { filter: drop-shadow(0 0 20px rgba(135, 206, 235, 0.8)); }
-            100% { filter: drop-shadow(0 0 40px rgba(220, 20, 60, 1)); }
+    0% { filter: drop-shadow(0 0 20px rgba(135, 206, 235, 0.8)); }
+    100% { filter: drop-shadow(0 0 40px rgba(220, 20, 60, 1)); }
 }
 
 @keyframes floatSpinner {
@@ -1176,24 +1131,23 @@ footer {
 }
 
 .ice-bg {
-  background-image:
-    url('./assets/ice-bg.jpg'); /* Your custom transparent PNG */
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-  position: relative;
+    /*background-image: url('./assets/ice-bg.jpg');*/
+    background-image: linear-gradient(135deg, rgba(218, 240, 246, 0.0), rgba(37, 60, 120, 0.6)), url('/assets/orbyz-notext.webp');
+
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
 }
 
-/* Overlay layer to focus on shutter-button */
 .ice-bg::after {
-  content: '';
-  position: absolute;
-  top: -5px;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.2); /* Semi-transparent dark overlay */
-  z-index: 1;
-  pointer-events: none; /* Allows interaction with button */
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    pointer-events: none;
 }
-
