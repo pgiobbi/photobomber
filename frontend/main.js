@@ -37,17 +37,34 @@ document.addEventListener('DOMContentLoaded', () => {
                             <stop offset="83.33%" style="stop-color:#9c36b5;stop-opacity:1" />
                             <stop offset="100%" style="stop-color:#ff6b35;stop-opacity:1" />
                         </linearGradient>
+                        
+                        <linearGradient id="neon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#ff00ff;stop-opacity:1" />
+                            <stop offset="16.66%" style="stop-color:#ff6b35;stop-opacity:1" />
+                            <stop offset="33.33%" style="stop-color:#ffff00;stop-opacity:1" />
+                            <stop offset="50%" style="stop-color:#00ff00;stop-opacity:1" />
+                            <stop offset="66.66%" style="stop-color:#00ffff;stop-opacity:1" />
+                            <stop offset="83.33%" style="stop-color:#8000ff;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#ff00ff;stop-opacity:1" />
+                        </linearGradient>
+                        <filter id="neon-glow">
+                            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                            <feMerge> 
+                                <feMergeNode in="coloredBlur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
                     </defs>
                     <path class="logo-fill" d="M100,20 L100,180 M60,20 L140,20 M100,60 L130,90 L100,120 L70,90 Z M100,120 L120,140 L100,160 L80,140 Z"/>
-                    <path class="logo-path" d="M100,20 L100,180 M60,20 L140,20 M100,60 L130,90 L100,120 L70,90 Z M100,120 L120,140 L100,160 L80,140 Z"/>
+                    <path class="logo-path" d="M100,20 L100,180 M60,20 L140,20 M100,60 L130,90 L100,120 L70,90 Z M100,120 L120,140 L100,160 L80,140 Z" filter="url(#neon-glow)"/>
                     <circle class="logo-fill" cx="100" cy="40" r="8"/>
-                    <circle class="logo-path" cx="100" cy="40" r="8"/>
+                    <circle class="logo-path" cx="100" cy="40" r="8" filter="url(#neon-glow)"/>
                     <circle class="logo-fill" cx="85" cy="75" r="4"/>
-                    <circle class="logo-path" cx="85" cy="75" r="4"/>
+                    <circle class="logo-path" cx="85" cy="75" r="4" filter="url(#neon-glow)"/>
                     <circle class="logo-fill" cx="115" cy="75" r="4"/>
-                    <circle class="logo-path" cx="115" cy="75" r="4"/>
+                    <circle class="logo-path" cx="115" cy="75" r="4" filter="url(#neon-glow)"/>
                     <circle class="logo-fill" cx="100" cy="180" r="6"/>
-                    <circle class="logo-path" cx="100" cy="180" r="6"/>
+                    <circle class="logo-path" cx="100" cy="180" r="6" filter="url(#neon-glow)"/>
                 </svg>
                 <div class="particle"></div>
                 <div class="particle"></div>

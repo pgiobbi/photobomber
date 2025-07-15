@@ -905,15 +905,19 @@ footer {
 .upload-spinner .tomorrowland-logo {
     width: 100%;
     height: 100%;
-    filter: drop-shadow(0 0 10px rgba(194, 149, 63, 0.3));
+    filter: drop-shadow(0 0 20px rgba(255, 107, 53, 0.8));
+    animation: logoGlow 3s ease-in-out infinite alternate;
 }
 
 .upload-spinner .logo-path {
     fill: none;
-    stroke: var(--deep-crimson);
+    stroke: url(#neon-gradient);
     stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
     stroke-dasharray: 1000;
     stroke-dashoffset: 1000;
+    filter: drop-shadow(0 0 10px currentColor);
     animation: drawPath 4s ease-in-out infinite;
 }
 
@@ -927,8 +931,15 @@ footer {
     position: absolute;
     inset: -10px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(194, 149, 63, 0.3) 0%, transparent 70%);
-    animation: pulse 2s ease-in-out infinite;
+    background: radial-gradient(circle,
+    rgba(135, 206, 235, 0.3) 0%,
+    rgba(0, 255, 255, 0.2) 25%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(255, 140, 0, 0.1) 75%,
+    transparent 100%
+    );
+    animation: beatGlow 1s ease-in-out infinite;
+    filter: blur(20px);
 }
 
 .upload-spinner .particle {
@@ -984,7 +995,7 @@ footer {
 }
 
 .upload-spinner .loading-text {
-    color: var(--ice-blue);
+    color: white;
     font-size: 1rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
@@ -1000,7 +1011,7 @@ footer {
 }
 
 .upload-spinner .loading-subtext {
-    color: rgba(255, 255, 255, 0.7);
+    color: white;
     font-size: 0.75rem;
     text-align: center;
     animation: fadeInOut 2s ease-in-out infinite 0.5s;
@@ -1055,6 +1066,60 @@ footer {
     }
 }
 
+@keyframes beatPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes beatGlow {
+    0%, 100% {
+        transform: scale(0.9);
+        opacity: 0.4;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+@keyframes beatSync {
+    0%, 100% {
+        filter: drop-shadow(0 0 20px rgba(135, 206, 235, 0.8));
+        transform: scale(1);
+    }
+    50% {
+        filter: drop-shadow(0 0 35px rgba(220, 20, 60, 1));
+        transform: scale(1.03);
+    }
+}
+
+@keyframes drawPath {
+    0% {
+        stroke-dashoffset: 1000;
+        stroke: var(--deep-crimson);
+    }
+    25% {
+        stroke-dashoffset: 500;
+        stroke: var(--ice-blue);
+    }
+    50% {
+        stroke-dashoffset: 0;
+        stroke: var(--deep-crimson);
+    }
+    75% {
+        stroke-dashoffset: -500;
+        stroke: var(--ice-blue);
+    }
+    100% {
+        stroke-dashoffset: -1000;
+        stroke: var(--deep-crimson);
+    }
+}
+
 
 @keyframes fillLogo {
     0%, 30% {
@@ -1069,6 +1134,11 @@ footer {
         opacity: 0;
         fill: url(#rainbow-gradient);
     }
+}
+
+@keyframes logoGlow {
+            0% { filter: drop-shadow(0 0 20px rgba(135, 206, 235, 0.8)); }
+            100% { filter: drop-shadow(0 0 40px rgba(220, 20, 60, 1)); }
 }
 
 @keyframes floatSpinner {
