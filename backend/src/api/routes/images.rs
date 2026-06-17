@@ -12,6 +12,7 @@ use actix_multipart::form::text::Text;
 use actix_web::cookie::Cookie;
 use actix_web::http::header::{ContentDisposition, DispositionParam, DispositionType};
 use actix_web::{Error, HttpRequest, HttpResponse, Responder, get, post, web};
+use chrono::Utc;
 use log::{debug, error, info, warn};
 use mime::IMAGE;
 use sanitize_filename::sanitize;
@@ -142,25 +143,42 @@ pub async fn upload_images(
             actix_web::error::ErrorInternalServerError(format!("Failed to read file: {}", e))
         })?;
 
-        // Generate hash-based filename
+        // Hash the content for de-duplication. Filenames are now timestamp-based (see below),
+        // so the hash no longer lives in the filename; it is stored in the DB instead.
         let mut hasher = XxHash64::default();
         hasher.write(&content);
-        let file_id = format!("{:x}", hasher.finish());
-        let file_name_with_ext = format!("{}.{}", file_id, extension);
-        let file_path = format!("{}/{}", app_state.upload_dir, file_name_with_ext);
+        let content_hash = format!("{:x}", hasher.finish());
 
-        // Check if file already exists
-        if Path::new(&file_path).exists() {
-            warn!("File already exists: {}", file_name_with_ext);
+        // De-dup: if we have already stored an image with this exact content, reuse it instead
+        // of writing a new file (and do not issue a new upvote token).
+        let existing: Option<(String,)> =
+            sqlx::query_as("SELECT filename FROM images WHERE content_hash = $1 LIMIT 1")
+                .bind(&content_hash)
+                .fetch_optional(&app_state.db_pool)
+                .await
+                .map_err(|e| {
+                    error!("Failed to query for duplicate image: {:?}", e);
+                    actix_web::error::ErrorInternalServerError("Database error")
+                })?;
+
+        if let Some((existing_filename,)) = existing {
+            warn!("Duplicate content, reusing existing file: {}", existing_filename);
             responses.push(ImageUploadResponse {
-                file_id: file_id.clone(),
-                file_name: file_name_with_ext,
+                file_id: content_hash.clone(),
+                file_name: existing_filename,
                 is_public: form.is_public.0,
                 _is_new: false,
             });
             num_non_duplicates += 1;
             continue;
         }
+
+        // Timestamp-based filename so the upload directory sorts chronologically. The timestamp
+        // is UTC ISO8601 with colons replaced by dashes (colons are unsafe in filenames and are
+        // stripped by sanitize_filename on retrieval); a UUID keeps it unique within a second.
+        let timestamp = Utc::now().format("%Y-%m-%dT%H-%M-%SZ");
+        let file_name_with_ext = format!("{}-{}.{}", timestamp, Uuid::new_v4(), extension);
+        let file_path = format!("{}/{}", app_state.upload_dir, file_name_with_ext);
 
         // Persist the file
         match file.file.persist(&file_path) {
@@ -200,11 +218,13 @@ pub async fn upload_images(
         }
 
         // Insert metadata into the database
-        let insert_res = sqlx::query("INSERT INTO images (filename, is_public) VALUES ($1, $2)")
-            .bind(&file_name_with_ext)
-            .bind(form.is_public.0)
-            .execute(&app_state.db_pool)
-            .await;
+        let insert_res =
+            sqlx::query("INSERT INTO images (filename, is_public, content_hash) VALUES ($1, $2, $3)")
+                .bind(&file_name_with_ext)
+                .bind(form.is_public.0)
+                .bind(&content_hash)
+                .execute(&app_state.db_pool)
+                .await;
 
         // Delete image if database insert was not successful
         if let Err(e) = insert_res {
@@ -219,7 +239,7 @@ pub async fn upload_images(
         };
 
         responses.push(ImageUploadResponse {
-            file_id,
+            file_id: content_hash,
             file_name: file_name_with_ext,
             is_public: form.is_public.0,
             _is_new: true,
