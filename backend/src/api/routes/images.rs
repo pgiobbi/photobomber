@@ -120,8 +120,11 @@ pub async fn upload_images(
 
         // Validate file size
         if file.size > app_state.max_file_size as usize {
-            warn!("File size {} exceeds 1MB limit", file.size);
-            return Ok(HttpResponse::BadRequest().json("File size exceeds 1MB limit"));
+            warn!(
+                "File size {} exceeds limit of {} bytes",
+                file.size, app_state.max_file_size
+            );
+            return Ok(HttpResponse::BadRequest().json("File size exceeds the allowed limit"));
         }
 
         // Get or generate original filename

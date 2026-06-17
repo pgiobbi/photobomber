@@ -6,7 +6,11 @@ use serde::{Deserialize, Serialize};
 // Structure for the multipart form
 #[derive(Debug, MultipartForm)]
 pub struct ImageUploadRequest {
-    #[multipart(rename = "images", limit = "1MB")]
+    // Keep this >= the handler's max_file_size (DEFAULT_MAX_FILE_SIZE, 6MB) and <= the nginx
+    // proxy body cap (12M). The handler enforces the real per-file limit and returns a clean
+    // 400; a smaller limit here makes the MultipartForm extractor reject larger files with a
+    // bare 400 before the handler ever runs.
+    #[multipart(rename = "images", limit = "12MB")]
     pub images: Vec<TempFile>,
     #[multipart(rename = "isPublic")]
     pub is_public: Text<bool>,

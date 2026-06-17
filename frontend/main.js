@@ -1,294 +1,249 @@
-import {secondsToHumanReadable, showModal} from './utils.js';
+import {showModal} from './utils.js';
 import {compressImage} from './compress.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const cameraInput = document.getElementById('cameraInput');
-    const bomberCount = document.getElementById('bomber-count');
+    const galleryInput = document.getElementById('galleryInput');
     const step1 = document.getElementById('step1');
     const step2 = document.getElementById('step2');
     const step3 = document.getElementById('step3');
-    const previewImage = document.getElementById('previewImage');
-    const finalImage = document.getElementById('finalImage');
-    const retakeBtn = document.getElementById('retakeBtn');
+    const previewGrid = document.getElementById('previewGrid');
+    const selectedCount = document.getElementById('selectedCount');
     const uploadBtn = document.getElementById('uploadBtn');
-    const newPhotoBtn = document.getElementById('newPhotoBtn');
-    const locationElement = document.getElementById('currentLocation');
-    const lastUpdatedSpan = document.getElementById('lastUpdated');
-    const galleryTrigger = document.getElementById('galleryTrigger');
-    const strobeOverlay = document.getElementById('strobeOverlay');
-    const isPublic = document.getElementById('isPublic');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const addMoreBtn = document.getElementById('addMoreBtn');
+    const photoCount = document.getElementById('photoCount');
+    const successMessage = document.getElementById('successMessage');
 
-    //Create the Festival logo spinner
+    // Files chosen for the current upload, plus their object URLs (for cleanup).
+    let selectedFiles = [];
+    let objectUrls = [];
+
+    // --- Helpers ------------------------------------------------------------
+
+    function showStep(step) {
+        [step1, step2, step3].forEach((el) => el.classList.add('hidden'));
+        step.classList.remove('hidden');
+    }
+
+    function revokeObjectUrls() {
+        objectUrls.forEach((url) => URL.revokeObjectURL(url));
+        objectUrls = [];
+    }
+
+    function resetToStart() {
+        revokeObjectUrls();
+        selectedFiles = [];
+        previewGrid.innerHTML = '';
+        cameraInput.value = '';
+        galleryInput.value = '';
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = 'Share photos';
+        showStep(step1);
+    }
+
     function createSpinner() {
         const spinner = document.createElement('div');
         spinner.id = 'uploadSpinner';
         spinner.className = 'upload-spinner';
         spinner.innerHTML = `
-            <div class="logo-container">
-                <div class="logo-glow"></div>
-                <svg class="tomorrowland-logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <linearGradient id="rainbow-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#ff6b35;stop-opacity:1" />
-                            <stop offset="16.66%" style="stop-color:#f7931e;stop-opacity:1" />
-                            <stop offset="33.33%" style="stop-color:#ffcc02;stop-opacity:1" />
-                            <stop offset="50%" style="stop-color:#37b24d;stop-opacity:1" />
-                            <stop offset="66.66%" style="stop-color:#1c7ed6;stop-opacity:1" />
-                            <stop offset="83.33%" style="stop-color:#9c36b5;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#ff6b35;stop-opacity:1" />
-                        </linearGradient>
-                        
-                        <linearGradient id="neon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#ff00ff;stop-opacity:1" />
-                            <stop offset="16.66%" style="stop-color:#ff6b35;stop-opacity:1" />
-                            <stop offset="33.33%" style="stop-color:#ffff00;stop-opacity:1" />
-                            <stop offset="50%" style="stop-color:#00ff00;stop-opacity:1" />
-                            <stop offset="66.66%" style="stop-color:#00ffff;stop-opacity:1" />
-                            <stop offset="83.33%" style="stop-color:#8000ff;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#ff00ff;stop-opacity:1" />
-                        </linearGradient>
-                        <filter id="neon-glow">
-                            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                            <feMerge> 
-                                <feMergeNode in="coloredBlur"/>
-                                <feMergeNode in="SourceGraphic"/>
-                            </feMerge>
-                        </filter>
-                    </defs>
-                    <path class="logo-fill" d="M100,20 L100,180 M60,20 L140,20 M100,60 L130,90 L100,120 L70,90 Z M100,120 L120,140 L100,160 L80,140 Z"/>
-                    <path class="logo-path" d="M100,20 L100,180 M60,20 L140,20 M100,60 L130,90 L100,120 L70,90 Z M100,120 L120,140 L100,160 L80,140 Z" filter="url(#neon-glow)"/>
-                    <circle class="logo-fill" cx="100" cy="40" r="8"/>
-                    <circle class="logo-path" cx="100" cy="40" r="8" filter="url(#neon-glow)"/>
-                    <circle class="logo-fill" cx="85" cy="75" r="4"/>
-                    <circle class="logo-path" cx="85" cy="75" r="4" filter="url(#neon-glow)"/>
-                    <circle class="logo-fill" cx="115" cy="75" r="4"/>
-                    <circle class="logo-path" cx="115" cy="75" r="4" filter="url(#neon-glow)"/>
-                    <circle class="logo-fill" cx="100" cy="180" r="6"/>
-                    <circle class="logo-path" cx="100" cy="180" r="6" filter="url(#neon-glow)"/>
-                </svg>
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-            </div>
-            <div class="loading-text">Uploading</div>
-            <div class="loading-subtext">Feel the magic happening...</div>
-            <div class="progress-container">
-                <div class="progress-bar"></div>
-            </div>
+            <div class="ring"></div>
+            <div class="loading-text">Sharing your photos</div>
+            <div class="loading-subtext" id="uploadProgress">Preparing...</div>
         `;
         document.body.appendChild(spinner);
-        setTimeout(() => {
-            spinner.classList.add('active');
-        }, 10)
-
+        requestAnimationFrame(() => spinner.classList.add('active'));
     }
 
-    // Remove the spinner
+    function updateProgress(current, total) {
+        const el = document.getElementById('uploadProgress');
+        if (el) el.textContent = `Photo ${current} of ${total}`;
+    }
+
     function removeSpinner() {
         const spinner = document.getElementById('uploadSpinner');
-        if (spinner) {
-            spinner.classList.remove('active');
-            setTimeout(() => {
-                spinner.remove();
-            }, 300);
+        if (!spinner) return;
+        spinner.classList.remove('active');
+        setTimeout(() => spinner.remove(), 300);
+    }
+
+    function celebrate() {
+        const colors = ['#E7C6BE', '#BFA15C', '#7C8B73'];
+        for (let i = 0; i < 26; i++) {
+            const petal = document.createElement('div');
+            petal.className = 'celebrate';
+            petal.style.left = `${Math.random() * 100}vw`;
+            petal.style.top = '-5vh';
+            petal.style.background = colors[Math.floor(Math.random() * colors.length)];
+            petal.style.animationDelay = `${Math.random() * 1.2}s`;
+            petal.style.opacity = '0.8';
+            document.body.appendChild(petal);
+            setTimeout(() => petal.remove(), 5000);
         }
     }
 
-    // Fetch and display current location
-    async function fetchCurrentLocation() {
-        try {
-            const response = await fetch('/api/public/location', {
-                method: 'GET',
-                headers: {'Content-Type': 'application/json'}
-            });
-            if (!response.ok) throw new Error('Failed to fetch current location');
-            const data = await response.json();
-            const currentLocation = data.location;
-            const updatedAgo = data.updatedAgo;
-            locationElement.textContent = currentLocation?.name || 'Not set';
-            // if (currentLocation?.name) locationElement.classList.add('text-yellow-300');
-            lastUpdatedSpan.textContent = updatedAgo !== null && updatedAgo !== undefined
-                ? secondsToHumanReadable(Math.floor(updatedAgo / 1000))
-                : 'Not set';
-        } catch (err) {
-            console.error('Failed to fetch current location:', err);
-            locationElement.textContent = 'Failed to load';
-            lastUpdatedSpan.textContent = 'Failed to load';
-        }
-    }
+    // --- Backend calls ------------------------------------------------------
 
-    // Fetch photo bomber count
-    async function fetchBomberCount() {
-        try {
-            const response = await fetch('/api/public/images/count');
-            if (!response.ok) throw new Error('API request failed');
-            const data = await response.json();
-            bomberCount.textContent = data.count.toLocaleString();
-        } catch (err) {
-            console.error('Failed to fetch count:', err);
-            bomberCount.textContent = 'N/A';
-        }
-    }
-
-    // Perform login
+    // Obtain a public session cookie so uploads are authorized.
     async function login() {
         try {
             await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: '{}'
+                body: '{}',
             });
         } catch (err) {
             console.error('Failed to login:', err);
         }
     }
 
-    // Load initial data
-    login().then(() => {
-        fetchBomberCount();
-        fetchCurrentLocation();
-    });
-
-    // Handle gallery trigger click with dynamic import
-    let leaderboardModule = null;
-    galleryTrigger.addEventListener('click', async () => {
+    async function fetchPhotoCount() {
         try {
-            if (!leaderboardModule) {
-                leaderboardModule = await import('./leaderboard.js');
-            }
-            await leaderboardModule.showGallery();
+            const response = await fetch('/api/public/images/count');
+            if (!response.ok) throw new Error('API request failed');
+            const data = await response.json();
+            photoCount.textContent = data.count.toLocaleString();
         } catch (err) {
-            console.error('Failed to load leaderboard:', err);
-            showModal('Oops!', 'Failed to load the gallery. Please try again!', 'Close');
-        }
-    });
-
-    // Retake button
-    retakeBtn.addEventListener('click', () => {
-        step2.classList.add('hidden');
-        step1.classList.remove('hidden');
-        cameraInput.value = '';
-        if (isPublic) isPublic.checked = false;
-    });
-
-    // Trigger success animations
-    function triggerSuccessAnimations() {
-        strobeOverlay.classList.add('strobe-active');
-        setTimeout(() => strobeOverlay.classList.remove('strobe-active'), 4800);
-        const colors = [
-            'linear-gradient(45deg, #ff00ff, #d7ef00)',
-            'linear-gradient(45deg, #ff4444, #41B0E8)',
-            'linear-gradient(45deg, #d7ef00, #ff00ff)'
-        ];
-        for (let i = 0; i < 30; i++) {
-            const confetti = document.createElement('div');
-            confetti.className = 'confetti';
-            confetti.style.top = `-10vh`;
-            confetti.style.left = `${Math.random() * 100}vw`;
-            confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
-            confetti.style.animationDelay = `${Math.random() * 2}s`;
-            document.body.appendChild(confetti);
-            setTimeout(() => confetti.remove(), 4000);
-        }
-    }
-    
-    async function onUploadClicked() {
-        const files = cameraInput.files;
-        if (!files.length) return;
-        const formData = new FormData();
-        try {
-            createSpinner();
-            uploadBtn.textContent = 'Uploading...';
-            uploadBtn.disabled = true;
-            const file = files[0];
-            const res = await compressImage(file);
-            const {compressedBlob, fileSizeKB} = res;
-            if (fileSizeKB > 1024) {
-                showModal('File Too Large', 'Images must be under 1MB. Try a smaller file!');
-                uploadBtn.textContent = "Upload! 🚀";
-                uploadBtn.disabled = false;
-                removeSpinner();
-                return;
-            }
-            formData.append('images', compressedBlob);
-            formData.append('isPublic', isPublic?.checked || false);
-            const response = await fetch('/api/public/images/upload', {
-                method: 'POST',
-                body: formData,
-            });
-            if (!response.ok) {
-                const errorData = await response.text();
-                throw new Error(errorData || 'Upload failed');
-            }
-            await fetchBomberCount();
-            finalImage.src = previewImage.src;
-            step2.classList.add('hidden');
-            step3.classList.remove('hidden');
-            const stats = [
-                "🌟 PHOTOBOMB HERO 🌟",
-                "🔥 TOP BOMBER 🔥",
-                "💯 FESTIVAL PRO 💯",
-                "🎪 STAGE CRUSHER 🎪",
-                "🌌 COSMIC PHOTOBOMBER 🌌",
-                "⚡️ ELECTRIC VIBE IGNITER ⚡️",
-                "🎇 FESTIVAL FUSE BLAZER 🎇",
-                "🌈 RAVE LEGEND UNLEASHED 🌈",
-                "🔥 PULSE POUNDING MAVERICK 🔥",
-                "✨ STARDUST SCENE STEALER ✨",
-                "🎉 BASSLINE TRAILBLAZER 🎉",
-                "💥 BOOMDROP RENEGADE 💥",
-                "🪐 ORBITAL RHYTHM RIDER 🪐",
-                "🌠 METEORIC MOMENT MAKER 🌠",
-                "🎶 SONIC WAVE WARRIOR 🎶",
-                "⚡ VOLT-CHARGED VISIONARY ⚡",
-                "🌀 NEON SPIRAL SORCERER 🌀",
-                "🎡 RAVE RINGMASTER 🎡",
-                "💫 GALACTIC GROOVE GURU 💫",
-                "🔊 BEAT QUAKE CREATOR 🔊"
-            ];
-            const badge = document.querySelector('.badge');
-            badge.textContent = stats[Math.floor(Math.random() * stats.length)];
-            triggerSuccessAnimations();
-            uploadBtn.textContent = "Upload! 🚀";
-            uploadBtn.disabled = false;
-            removeSpinner();
-        } catch (err) {
-            console.error('Upload error:', err);
-            showModal('Oops! 😅', `Failed to upload: ${err.message}. Try again!`, 'Retry');
-            uploadBtn.textContent = "Upload! 🚀";
-            uploadBtn.disabled = false;
-            removeSpinner();
+            console.error('Failed to fetch count:', err);
+            photoCount.textContent = '--';
         }
     }
 
-    // Upload button
-    uploadBtn.addEventListener('click', async () => await onUploadClicked());
-    
-    // Handle file input change
-    cameraInput.addEventListener('change', async (event) => {
-        const files = event.target.files;
-        if (files.length !== 1) return;
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        if (!allowedTypes.includes(files[0].type)) {
-            showModal('Invalid File', 'Please upload only JPG, PNG, GIF, HEIC, HEIF, or WebP images.');
+    function extensionFor(blob, fallbackName) {
+        if (blob.type === 'image/webp') return 'webp';
+        if (blob.type === 'image/png') return 'png';
+        if (blob.type === 'image/gif') return 'gif';
+        if (blob.type === 'image/jpeg') return 'jpg';
+        const match = (fallbackName || '').match(/\.([a-z0-9]+)$/i);
+        return match ? match[1].toLowerCase() : 'jpg';
+    }
+
+    // --- Selection flow -----------------------------------------------------
+
+    // Render the preview grid for a set of files and move to the review step.
+    // Used both for a fresh selection and when re-presenting photos that failed to upload.
+    function renderSelection(files, countLabel) {
+        revokeObjectUrls();
+        selectedFiles = files;
+        previewGrid.innerHTML = '';
+
+        files.forEach((file) => {
+            const url = URL.createObjectURL(file);
+            objectUrls.push(url);
+            const thumb = document.createElement('div');
+            thumb.className = 'thumb';
+            const img = document.createElement('img');
+            img.src = url;
+            img.alt = 'Selected photo';
+            thumb.appendChild(img);
+            previewGrid.appendChild(thumb);
+        });
+
+        const n = files.length;
+        selectedCount.textContent = countLabel || `${n} photo${n === 1 ? '' : 's'} selected`;
+        showStep(step2);
+    }
+
+    function handleSelection(fileList) {
+        const files = Array.from(fileList).filter((f) => f.type.startsWith('image/'));
+        if (!files.length) {
+            showModal('No photos found', 'Please choose one or more image files.', 'OK');
             return;
         }
-        const file = files[0];
-        const fileURL = URL.createObjectURL(file);
-        previewImage.src = fileURL;
-        step1.classList.add('hidden');
-        // step2.classList.remove('hidden');
-        onUploadClicked();
-    });
+        renderSelection(files);
+    }
 
-    // New photo button
-    newPhotoBtn.addEventListener('click', () => {
-        step3.classList.add('hidden');
-        step1.classList.remove('hidden');
+    async function uploadAll() {
+        if (!selectedFiles.length) return;
+
+        uploadBtn.disabled = true;
+        uploadBtn.textContent = 'Sharing...';
+        createSpinner();
+
+        let succeeded = 0;
+        const failedFiles = [];
+        const total = selectedFiles.length;
+        // Snapshot the list: renderSelection (on the retry path) reassigns selectedFiles.
+        const filesToUpload = selectedFiles.slice();
+
+        for (let i = 0; i < total; i++) {
+            updateProgress(i + 1, total);
+            const file = filesToUpload[i];
+            try {
+                const {blob} = await compressImage(file);
+                const ext = extensionFor(blob, file.name);
+                const formData = new FormData();
+                formData.append('images', blob, `photo.${ext}`);
+                formData.append('isPublic', 'false');
+
+                const response = await fetch('/api/public/images/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText || 'Upload failed');
+                }
+                succeeded++;
+            } catch (err) {
+                console.error(`Failed to upload photo ${i + 1}:`, err);
+                failedFiles.push(file);
+            }
+        }
+
+        const failed = failedFiles.length;
+
+        removeSpinner();
+        await fetchPhotoCount();
+
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = 'Share photos';
+
+        // Any failures: keep the failed photos selected so the guest can retry just those.
+        if (failed > 0) {
+            const fp = failed === 1 ? 'photo' : 'photos';
+            renderSelection(failedFiles, `${failed} ${fp} to retry`);
+            cameraInput.value = '';
+            galleryInput.value = '';
+
+            if (succeeded === 0) {
+                showModal(
+                    'Something went wrong',
+                    'We could not share your photos. They are still here - please check your connection and tap "Share photos" to try again.',
+                    'Try again',
+                );
+            } else {
+                const sp = succeeded === 1 ? 'photo' : 'photos';
+                showModal(
+                    'Almost there',
+                    `${succeeded} ${sp} shared with Federica & Matteo. ${failed} ${fp} could not be sent - they are still here, tap "Share photos" to try again.`,
+                    'Retry',
+                );
+            }
+            return;
+        }
+
+        const plural = succeeded === 1 ? 'photo' : 'photos';
+        successMessage.textContent = `${succeeded} ${plural} shared with Federica & Matteo.`;
+
+        revokeObjectUrls();
+        selectedFiles = [];
+        previewGrid.innerHTML = '';
         cameraInput.value = '';
-        if (isPublic) isPublic.checked = false;
-    });
+        galleryInput.value = '';
+
+        showStep(step3);
+        celebrate();
+    }
+
+    // --- Wiring -------------------------------------------------------------
+
+    cameraInput.addEventListener('change', (e) => handleSelection(e.target.files));
+    galleryInput.addEventListener('change', (e) => handleSelection(e.target.files));
+    uploadBtn.addEventListener('click', uploadAll);
+    cancelBtn.addEventListener('click', resetToStart);
+    addMoreBtn.addEventListener('click', resetToStart);
+
+    // Initial load
+    login().then(fetchPhotoCount);
 });

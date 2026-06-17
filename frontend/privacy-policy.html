@@ -3,164 +3,216 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#0e1b2b">
-    <meta name="description" content="Privacy Policy for Photobomb Us at Tomorrowland ORBYZ 2025">
-    <title>Privacy Policy - Photobomb Us!</title>
+    <meta name="theme-color" content="#FBF8F3">
+    <meta name="description" content="Privacy Policy for Federica & Matteo's wedding photo sharing app">
+    <title>Privacy Policy - Federica & Matteo</title>
     <link rel="icon" type="image/png" href="/assets/icons/favicon-96x96.png" sizes="96x96"/>
     <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg"/>
     <link rel="shortcut icon" href="/assets/icons/favicon.ico"/>
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png"/>
-    <meta name="apple-mobile-web-app-title" content="Photobomb"/>
+    <meta name="apple-mobile-web-app-title" content="F & M"/>
     <link rel="manifest" href="/assets/icons/site.webmanifest"/>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.cdnfonts.com/css/impact" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- TODO: replace support@photobomber.xyz below with your preferred contact email. -->
     <style>
+        :root {
+            --ivory: #FBF8F3;
+            --cream: #F3ECE1;
+            --sage: #7C8B73;
+            --sage-deep: #5E6B57;
+            --gold: #BFA15C;
+            --ink: #403B34;
+            --muted: #8A8378;
+            --line: #E3D9C9;
+        }
+
+        * { box-sizing: border-box; }
+
         html, body {
             margin: 0;
             padding: 0;
-            background-color: rgba(14, 27, 43, 0.1);
-            background-image: linear-gradient(135deg, rgba(14, 27, 43, 0.85), rgba(25, 40, 65, 0.7)), url('/assets/orbyz-notext.webp');
-            background-size: cover;
-            background-position: center;
-            background-blend-mode: overlay;
-            font-family: 'Arial', sans-serif;
-            height: 100vh;
-            color: white;
+            min-height: 100vh;
+            min-height: 100dvh;
+            background: radial-gradient(120% 80% at 50% -10%, #FFFFFF 0%, var(--ivory) 45%, var(--cream) 100%);
+            color: var(--ink);
+            font-family: 'Jost', 'Helvetica Neue', Arial, sans-serif;
+            font-weight: 300;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .glow {
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.7),
-            0 0 12px rgba(65, 176, 232, 0.5),
-            0 0 20px rgba(65, 176, 232, 0.4);
+        .wrap {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 48px 22px calc(48px + env(safe-area-inset-bottom));
         }
 
-        .title-glow {
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.9),
-            0 0 20px rgba(65, 176, 232, 0.8),
-            0 0 40px rgba(147, 51, 234, 0.6),
-            0 0 60px rgba(239, 68, 68, 0.4);
-            letter-spacing: 3px;
+        header.doc-head {
+            text-align: center;
+            margin-bottom: 32px;
         }
 
-        .festival-text {
-            font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-            font-weight: 800;
-            letter-spacing: 2px;
+        .monogram {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 18px;
+            border: 1.5px solid var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 25px;
+            font-weight: 600;
+            color: var(--sage-deep);
+        }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 500;
+            font-size: 2.6rem;
+            margin: 0 0 6px;
+            color: var(--ink);
+        }
+
+        .subtitle {
             text-transform: uppercase;
-            line-height: 1;
+            letter-spacing: 0.28em;
+            font-size: 0.74rem;
+            color: var(--muted);
         }
 
-        .gradient-animate {
-            background-size: 400% 400%;
-            background-image: linear-gradient(
-                    45deg,
-                    #3b82f6,
-                    #8b5cf6,
-                    #ec4899,
-                    #3b82f6
-            );
-            animation: gradient 8s ease infinite;
+        .panel {
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            padding: 30px 26px;
+            box-shadow: 0 20px 60px -30px rgba(94, 107, 87, 0.45);
         }
 
-        @keyframes gradient {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
+        h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: var(--sage-deep);
+            margin: 26px 0 10px;
         }
+
+        h2:first-of-type { margin-top: 0; }
+
+        p, li {
+            font-size: 0.97rem;
+            line-height: 1.65;
+            color: var(--ink);
+        }
+
+        ul {
+            padding-left: 22px;
+            margin: 0 0 14px;
+        }
+
+        li { margin-bottom: 6px; }
+
+        a {
+            color: var(--sage-deep);
+            text-decoration: underline;
+            text-decoration-color: var(--gold);
+        }
+
+        a:hover { color: var(--gold); }
+
+        .updated {
+            margin-top: 22px;
+            font-size: 0.85rem;
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        footer.doc-foot {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.88rem;
+            color: var(--muted);
+        }
+
+        footer.doc-foot p { margin: 6px 0; }
     </style>
 </head>
-<body class="h-screen flex flex-col items-center justify-between text-white">
-<!-- Header -->
-<div class="w-full pt-10 px-5">
-    <div class="text-center">
-        <h1 class="text-4xl sm:text-5xl font-bold festival-text title-glow">Privacy Policy</h1>
-        <div class="h-2 w-48 mx-auto bg-gradient-to-r from-pink-500 via-blue-500 to-purple-500 rounded-full mt-2 mb-4"></div>
-        <p class="text-lg sm:text-xl festival-text glow">Photobomb Us</p>
-    </div>
-</div>
+<body>
+<div class="wrap">
+    <header class="doc-head">
+        <div class="monogram">F&amp;M</div>
+        <h1>Privacy Policy</h1>
+        <p class="subtitle">Federica &amp; Matteo</p>
+    </header>
 
-<!-- Main Content -->
-<div class="text-left p-4 sm:p-6 max-w-2xl mx-auto flex-grow overflow-y-auto">
-    <div class="bg-white bg-opacity-10 backdrop-filter backdrop-blur-sm rounded-xl p-4 sm:p-5 shadow-lg border border-white border-opacity-20">
-        <h2 class="text-2xl font-bold mb-4 glow">1. Who We Are</h2>
-        <p class="mb-4">This website (“Photobomb Us”) is a non-commercial project operated by Photobomb Crew, based in
-            Italy. Contact us at: <a href="mailto:support@photobomber.xyz"
-                                     class="text-blue-300 hover:underline">support@photobomber.xyz</a>.
-        </p>
+    <div class="panel">
+        <h2>1. Who We Are</h2>
+        <p>This website is a private, non-commercial project run by Federica and Matteo to collect
+            photos shared by guests around their wedding on 20 June 2026. You can reach us at
+            <a href="mailto:support@photobomber.xyz">support@photobomber.xyz</a>.</p>
 
-        <h2 class="text-2xl font-bold mb-4 glow">2. Data We Collect</h2>
-        <p class="mb-4">We collect:</p>
-        <ul class="list-disc pl-6 mb-4">
-            <li><strong>Photos</strong>: Images you upload to photobomb us.</li>
-            <li><strong>Technical Data</strong>: IP addresses, browser details, and cookies for site functionality.</li>
+        <h2>2. Data We Collect</h2>
+        <ul>
+            <li><strong>Photos</strong>: the images you choose to upload.</li>
+            <li><strong>Technical data</strong>: IP address, basic browser details, and essential
+                cookies needed for the site to work.</li>
         </ul>
 
-        <h2 class="text-2xl font-bold mb-4 glow">3. How We Use Your Data</h2>
-        <p class="mb-4">We use your data to:</p>
-        <ul class="list-disc pl-6 mb-4">
-            <li>Store and display your photobomb photos on our server.</li>
-            <li>Track the number of photo bombers (anonymized count).</li>
-            <li>Ensure the site works properly (e.g., via cookies).</li>
+        <h2>3. How We Use Your Data</h2>
+        <ul>
+            <li>To store your photos privately so we can keep them as memories of our day.</li>
+            <li>To show an anonymous count of how many photos have been shared.</li>
+            <li>To keep the site working and secure (for example, via cookies).</li>
         </ul>
 
-        <h2 class="text-2xl font-bold mb-4 glow">4. Legal Basis</h2>
-        <p class="mb-4">We process data based on:</p>
-        <ul class="list-disc pl-6 mb-4">
-            <li><strong>Consent</strong>: You consent to photo uploads via the upload form.</li>
-            <li><strong>Legitimate Interest</strong>: Technical data for site functionality and security.</li>
+        <h2>4. Legal Basis</h2>
+        <ul>
+            <li><strong>Consent</strong>: you consent to your upload when you share a photo.</li>
+            <li><strong>Legitimate interest</strong>: technical data for site functionality and security.</li>
         </ul>
 
-        <h2 class="text-2xl font-bold mb-4 glow">5. Data Storage and Security</h2>
-        <p class="mb-4">Your data is stored on a secure server in Italy. We use HTTPS and other measures to protect it.
-            Photos are accessible only to site administrators and will be deleted by [date post-festival, e.g., August
-            1, 2025].</p>
+        <h2>5. Data Storage and Security</h2>
+        <p>Your photos are stored on a secure server and are accessible only to us (the couple). The
+            site is served over HTTPS. Uploaded photos are private: they are not published or shown to
+            other guests. We keep them for our personal use and will delete them on request.</p>
 
-        <h2 class="text-2xl font-bold mb-4 glow">6. Your GDPR Rights</h2>
-        <p class="mb-4">As an EU user, you can:</p>
-        <ul class="list-disc pl-6 mb-4">
+        <h2>6. Your GDPR Rights</h2>
+        <p>As an EU user, you can:</p>
+        <ul>
             <li>Access, correct, or delete your data.</li>
             <li>Restrict or object to processing.</li>
             <li>Request data portability.</li>
         </ul>
-        <p class="mb-4">Email <a href="mailto:support@photobomber.xyz" class="text-blue-300 hover:underline">support@photobomber.xyz</a>
-            to exercise these rights. We’ll respond within 30 days.</p>
+        <p>Email <a href="mailto:support@photobomber.xyz">support@photobomber.xyz</a> to exercise these
+            rights. We will respond within 30 days.</p>
 
-        <h2 class="text-2xl font-bold mb-4 glow">7. Cookies</h2>
-        <p class="mb-4">We use essential cookies for site functionality (e.g., authentication). No tracking or analytics
-            cookies are used.</p>
+        <h2>7. Cookies</h2>
+        <p>We use only essential cookies for site functionality (for example, to authorize your upload).
+            No tracking or analytics cookies are used.</p>
 
-        <h2 class="text-2xl font-bold mb-4 glow">8. Data Sharing</h2>
-        <p class="mb-4">We don’t share your data with third parties, except if required by law.</p>
+        <h2>8. Data Sharing</h2>
+        <p>We do not share your data with third parties, except where required by law. Your photos stay
+            between you and us.</p>
 
-        <h2 class="text-2xl font-bold mb-4 glow">9. Data Breach</h2>
-        <p class="mb-4">If a breach occurs, we’ll notify you and the Italian Data Protection Authority within 72 hours,
-            as required by GDPR.</p>
+        <h2>9. Data Breach</h2>
+        <p>If a breach occurs, we will notify affected users and the relevant Data Protection Authority
+            within 72 hours, as required by GDPR.</p>
 
-        <h2 class="text-2xl font-bold mb-4 glow">10. Contact</h2>
-        <p class="mb-4">Questions? Email <a href="mailto:support@photobomber.xyz" class="text-blue-300 hover:underline">support@photobomber.xyz</a>.
-        </p>
+        <h2>10. Contact</h2>
+        <p>Questions? Email <a href="mailto:support@photobomber.xyz">support@photobomber.xyz</a>.</p>
 
-        <p class="mt-4">Last updated: April 23, 2025</p>
+        <p class="updated">Last updated: 17 June 2026</p>
     </div>
-</div>
 
-<!-- Footer -->
-<div class="w-full pb-10 px-5">
-    <p class="text-center text-sm sm:text-base mb-3">Back to <a href="index.html"
-                                                                class="text-blue-300 hover:underline glow">Photobomb
-        Us</a></p>
-    <p class="text-center text-sm sm:text-base mb-3">
-        Photobomb Crew, Italy, <a href="mailto:support@photobomber.xyz"
-                                  class="text-blue-300 hover:underline">support@photobomber.xyz</a>
-    </p>
+    <footer class="doc-foot">
+        <p>Back to <a href="index.html">Federica &amp; Matteo</a></p>
+        <p>Federica &amp; Matteo, Italy &middot;
+            <a href="mailto:support@photobomber.xyz">support@photobomber.xyz</a></p>
+    </footer>
 </div>
-<!--<script src="pull-to-refresh.js"></script>-->
 </body>
 </html>
-
