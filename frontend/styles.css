@@ -36,31 +36,31 @@ input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; po
 .hidden { display: none !important; }
 
 /* --- Background FX ------------------------------------------------------ */
-.lasers {
-    position: fixed;
-    top: -40%;
-    left: 50%;
-    width: 180vmax;
-    height: 180vmax;
-    translate: -50% 0;
-    transform-origin: center;
-    opacity: 0.8;
-    pointer-events: none;
-    z-index: 0;
-    animation: laser-spin 34s linear infinite;
-    background: repeating-conic-gradient(from 0deg at 50% 50%,
-        rgba(242,200,121,0) 0deg, rgba(242,200,121,.28) 3deg, rgba(242,200,121,0) 9deg,
-        rgba(56,225,214,0) 22deg, rgba(56,225,214,.26) 25deg, rgba(56,225,214,0) 31deg,
-        rgba(255,61,166,0) 44deg, rgba(255,61,166,.24) 47deg, rgba(255,61,166,0) 53deg);
-}
-@keyframes laser-spin { to { transform: rotate(360deg); } }
-
-.vignette {
+/* Consciencia surreal desert scene: floating cracked face + sunburst rays.
+   The image supplies the atmosphere the rotating lasers used to. */
+.scene {
     position: fixed;
     inset: 0;
+    z-index: 0;
     pointer-events: none;
+    background: url('/assets/consciencia/consciencia-bg.webp') no-repeat center top;
+    background-size: cover;
+}
+/* Legibility scrim: darkens top (logo) and bottom (CTA/ticker) hard, keeps a
+   sliver of the sunburst glow behind the headline. */
+.scene-scrim {
+    position: fixed;
+    inset: 0;
     z-index: 1;
-    background: radial-gradient(90% 60% at 50% 42%, rgba(6,9,13,0) 30%, rgba(6,9,13,.55) 78%, var(--night) 100%);
+    pointer-events: none;
+    background:
+        linear-gradient(180deg,
+            rgba(6,9,13,.78) 0%,
+            rgba(6,9,13,.44) 26%,
+            rgba(6,9,13,.6) 54%,
+            rgba(6,9,13,.84) 78%,
+            var(--night) 100%),
+        radial-gradient(120% 60% at 50% 8%, rgba(6,9,13,0) 40%, rgba(6,9,13,.5) 100%);
 }
 
 .embers { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; }
@@ -385,6 +385,6 @@ input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; po
 @keyframes rise-in { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (prefers-reduced-motion: reduce) {
-    .lasers, .ember, .cta, .hero-char, .cta-shine, .ticker-dot, .ticker-count, .nudge, .sprite { animation: none !important; }
+    .ember, .cta, .hero-char, .cta-shine, .ticker-dot, .ticker-count, .nudge, .sprite { animation: none !important; }
     .hero-char { transform: none; }
 }
