@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const fp = failed === 1 ? 'photo' : 'photos';
             showModal(
                 'Almost there',
-                `${succeeded} made it! ${failed} ${fp} could not be sent - tap "BOMB US AGAIN!" to retry.`,
+                `${succeeded} made it! ${failed} ${fp} could not be sent - tap "SNAP US AGAIN!" to retry.`,
                 'Got it',
             );
         }

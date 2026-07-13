@@ -44,14 +44,14 @@ input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; po
     height: 180vmax;
     translate: -50% 0;
     transform-origin: center;
-    opacity: 0.5;
+    opacity: 0.8;
     pointer-events: none;
     z-index: 0;
     animation: laser-spin 34s linear infinite;
     background: repeating-conic-gradient(from 0deg at 50% 50%,
-        rgba(242,200,121,0) 0deg, rgba(242,200,121,.11) 3deg, rgba(242,200,121,0) 9deg,
-        rgba(56,225,214,0) 22deg, rgba(56,225,214,.10) 25deg, rgba(56,225,214,0) 31deg,
-        rgba(255,61,166,0) 44deg, rgba(255,61,166,.09) 47deg, rgba(255,61,166,0) 53deg);
+        rgba(242,200,121,0) 0deg, rgba(242,200,121,.28) 3deg, rgba(242,200,121,0) 9deg,
+        rgba(56,225,214,0) 22deg, rgba(56,225,214,.26) 25deg, rgba(56,225,214,0) 31deg,
+        rgba(255,61,166,0) 44deg, rgba(255,61,166,.24) 47deg, rgba(255,61,166,0) 53deg);
 }
 @keyframes laser-spin { to { transform: rotate(360deg); } }
 
@@ -179,9 +179,11 @@ input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; po
     margin: 0;
     font-family: 'Unbounded', 'Jost', sans-serif;
     font-weight: 800;
-    font-size: clamp(2.4rem, 13vw, 3.6rem);
+    font-size: clamp(1.9rem, 10.5vw, 3.2rem);
     line-height: .92;
     letter-spacing: -.02em;
+    max-width: 100%;
+    overflow-wrap: break-word;
     color: var(--gold-bright);
     text-shadow: 0 0 30px rgba(242,200,121,.45), 0 3px 0 rgba(196,101,47,.6);
 }
@@ -239,14 +241,14 @@ input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; po
     color: #2A1C05;
     font-family: 'Unbounded', 'Jost', sans-serif;
     font-weight: 800;
-    font-size: clamp(1.35rem, 6vw, 1.7rem);
+    font-size: clamp(1.1rem, 5.2vw, 1.7rem);
     letter-spacing: .01em;
     border: 2px solid rgba(255,240,206,.7);
     animation: cta-pulse 2s ease-in-out infinite;
 }
 .cta:active { transform: scale(.98); }
 .cta-ico { width: 30px; height: 30px; fill: #2A1C05; flex-shrink: 0; position: relative; }
-.cta-label { position: relative; }
+.cta-label { position: relative; white-space: nowrap; }
 .cta-shine {
     position: absolute;
     top: 0; left: 0;
