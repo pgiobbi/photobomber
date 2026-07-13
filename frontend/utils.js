@@ -8,40 +8,43 @@ export function secondsToHumanReadable(seconds) {
     return `${days} day${days === 1 ? '' : 's'} ago`;
 }
 
-export function showModal(title, message, buttonText = 'Keep Dancing! 🕺', imageUrls = []) {
+export function showModal(title, message, buttonText = 'OK', imageUrls = []) {
     const existingModal = document.querySelector('.modal');
-    if (existingModal) document.body.removeChild(existingModal);
+    if (existingModal) existingModal.remove();
+
     const modal = document.createElement('div');
-    modal.className = 'modal fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50';
-    const modalContent = document.createElement('div');
-    modalContent.className = 'bg-gray-900 bg-opacity-90 p-6 rounded-xl max-w-sm w-full mx-4 text-center';
+    modal.className = 'modal';
+
+    const content = document.createElement('div');
+    content.className = 'modal-content';
+
     const titleEl = document.createElement('h2');
-    titleEl.className = 'text-2xl font-bold mb-4 text-white glow';
     titleEl.textContent = title;
+
     const messageEl = document.createElement('p');
-    messageEl.className = 'mb-6 text-white';
     messageEl.innerHTML = message;
+
+    content.appendChild(titleEl);
+    content.appendChild(messageEl);
+
     if (imageUrls.length > 0) {
-        const previewContainer = document.createElement('div');
-        previewContainer.className = 'flex flex-wrap justify-center gap-2 mb-4';
-        imageUrls.forEach(url => {
+        const thumbs = document.createElement('div');
+        thumbs.className = 'modal-thumbs';
+        imageUrls.forEach((url) => {
             const img = document.createElement('img');
             img.src = url;
-            img.className = 'w-16 h-16 object-cover rounded';
-            img.alt = 'Uploaded photobomb';
-            previewContainer.appendChild(img);
+            img.alt = 'Shared photo';
+            thumbs.appendChild(img);
         });
-        modalContent.appendChild(previewContainer);
+        content.appendChild(thumbs);
     }
+
     const button = document.createElement('button');
-    button.className = 'gradient-animate text-white font-bold py-3 px-6 rounded-full';
+    button.className = 'btn btn-primary';
     button.textContent = buttonText;
-    button.addEventListener('click', () => {
-        document.body.removeChild(modal);
-    });
-    modalContent.appendChild(titleEl);
-    modalContent.appendChild(messageEl);
-    modalContent.appendChild(button);
-    modal.appendChild(modalContent);
+    button.addEventListener('click', () => modal.remove());
+
+    content.appendChild(button);
+    modal.appendChild(content);
     document.body.appendChild(modal);
 }

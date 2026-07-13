@@ -33,15 +33,39 @@ pub async fn connect_or_initialize_db(db_path: PathBuf) -> Result<Pool<Sqlite>> 
                 filename TEXT NOT NULL,
                 is_public BOOLEAN NOT NULL DEFAULT FALSE,
                 karma INTEGER DEFAULT 0,
+                content_hash TEXT,
                 created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
             CREATE INDEX idx_is_public ON images(is_public);
             CREATE INDEX idx_karma ON images(karma);
+            CREATE INDEX idx_content_hash ON images(content_hash);
             "#,
         )
         .execute(&pool)
         .await
         .context("Failed to create images table")?;
+    }
+
+    // Migration: ensure the `content_hash` column exists on pre-existing databases. Newly
+    // created tables already have it (the check below returns true and this is skipped). The
+    // hash backs de-duplication now that filenames are timestamp-based instead of hash-based.
+    let content_hash_exists: bool = sqlx::query_scalar(
+        "SELECT EXISTS (SELECT 1 FROM pragma_table_info('images') WHERE name = 'content_hash')",
+    )
+    .fetch_one(&pool)
+    .await
+    .context("Failed to check if images.content_hash column exists")?;
+
+    if !content_hash_exists {
+        sqlx::query(
+            r#"
+            ALTER TABLE images ADD COLUMN content_hash TEXT;
+            CREATE INDEX IF NOT EXISTS idx_content_hash ON images(content_hash);
+            "#,
+        )
+        .execute(&pool)
+        .await
+        .context("Failed to add content_hash column to images table")?;
     }
 
     // Check if the database is new by checking if the `params` table exists

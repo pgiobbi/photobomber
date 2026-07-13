@@ -1,6 +1,6 @@
 {
-  "name": "Photobomb",
-  "short_name": "Photobomb",
+  "name": "Federica & Matteo",
+  "short_name": "F & M",
   "icons": [
     {
       "src": "/assets/icons/web-app-manifest-192x192.png",
@@ -15,7 +15,7 @@
       "purpose": "maskable"
     }
   ],
-  "theme_color": "#fade00",
-  "background_color": "#fade00",
+  "theme_color": "#FBF8F3",
+  "background_color": "#FBF8F3",
   "display": "standalone"
 }
