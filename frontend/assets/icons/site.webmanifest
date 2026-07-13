@@ -1,6 +1,6 @@
 {
-  "name": "Federica & Matteo",
-  "short_name": "F & M",
+  "name": "Photobomb Us - Consciencia",
+  "short_name": "Photobomb",
   "icons": [
     {
       "src": "/assets/icons/web-app-manifest-192x192.png",
@@ -15,7 +15,7 @@
       "purpose": "maskable"
     }
   ],
-  "theme_color": "#FBF8F3",
-  "background_color": "#FBF8F3",
+  "theme_color": "#10181F",
+  "background_color": "#10181F",
   "display": "standalone"
 }

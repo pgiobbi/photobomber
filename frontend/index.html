@@ -3,68 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#FBF8F3">
-    <meta name="description" content="Federica & Matteo are getting married. Share your photos with us!">
-    <title>Federica & Matteo - Share Your Photos</title>
+    <meta name="theme-color" content="#10181F">
+    <meta name="description" content="You scanned the shirt at Tomorrowland. Now photobomb us - take a picture with us and send it straight to our phones.">
+    <title>Photobomb Us - Tomorrowland Consciencia 2026</title>
     <link rel="icon" type="image/png" href="/assets/icons/favicon-96x96.png" sizes="96x96"/>
     <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg"/>
     <link rel="shortcut icon" href="/assets/icons/favicon.ico"/>
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png"/>
-    <meta name="apple-mobile-web-app-title" content="F & M"/>
+    <meta name="apple-mobile-web-app-title" content="Photobomb"/>
     <link rel="manifest" href="/assets/icons/site.webmanifest"/>
 
+    <link rel="preload" as="image" href="/assets/consciencia/bg-consciencia.webp">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
     <link href="./styles.css" rel="stylesheet" crossorigin="use-credentials">
 </head>
 <body>
 
-<!-- Soft floating petals -->
-<div class="petals" aria-hidden="true">
-    <span class="petal"></span>
-    <span class="petal"></span>
-    <span class="petal"></span>
-    <span class="petal"></span>
-    <span class="petal"></span>
-    <span class="petal"></span>
+<!-- Rising desert embers -->
+<div class="embers" aria-hidden="true">
+    <span class="ember"></span>
+    <span class="ember"></span>
+    <span class="ember"></span>
+    <span class="ember"></span>
+    <span class="ember"></span>
+    <span class="ember"></span>
 </div>
+
+<!-- Consciencia key art: the mask over the desert -->
+<header class="hero" aria-hidden="true">
+    <div class="hero-art"></div>
+    <img class="hero-logo" src="/assets/consciencia/logo-consciencia.webp"
+         alt="Consciencia" width="560" height="120">
+    <p class="hero-eyebrow">Tomorrowland &middot; Boom &middot; 2026</p>
+</header>
 
 <main class="page">
     <!-- Step 1: Welcome + choose how to add photos -->
     <section id="step1" class="card">
-        <div class="monogram">F<span class="amp">&amp;</span>M</div>
-
-        <p class="eyebrow">Together with joy</p>
-        <h1 class="names">Federica <span class="amp-lg">&amp;</span> Matteo</h1>
-
-        <div class="divider" aria-hidden="true">
-            <span class="line"></span>
-            <svg viewBox="0 0 24 24" class="leaf" width="22" height="22">
-                <path d="M12 2C8 6 6 9 6 13a6 6 0 0 0 12 0c0-4-2-7-6-11Z"/>
-            </svg>
-            <span class="line"></span>
-        </div>
-
-        <p class="date">20 June 2026</p>
+        <p class="eyebrow">You scanned the shirt</p>
+        <h1 class="headline">Now photobomb&nbsp;us</h1>
 
         <p class="lede">
-            Help us remember every moment. Snap a photo right now, or pick your
-            favourites from your gallery - they come straight to us.
+            This code lives on our t-shirts, somewhere in the Consciencia crowd.
+            You found us - that was the hard part. The rest is simple:
         </p>
+
+        <ol class="mission">
+            <li><span class="m-step">I</span><span>Jump in a picture <em>with</em> us - or sneak into the background and bomb it</span></li>
+            <li><span class="m-step">II</span><span>Send it here. It lands straight on our phones</span></li>
+            <li><span class="m-step">III</span><span>Claim your high five. We owe you one</span></li>
+        </ol>
 
         <div class="actions">
             <label for="cameraInput" class="btn btn-primary">
                 <svg viewBox="0 0 24 24" class="ico"><path d="M9 3l-1.5 2H4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.5L15 3H9Zm3 5a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/></svg>
-                Take a photo
+                Take the photo now
             </label>
             <label for="galleryInput" class="btn btn-secondary">
                 <svg viewBox="0 0 24 24" class="ico"><path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9l-4.5-4.5L11 16l-2.5-2.5L4 18V5Zm0 14h12.2l-4-4-2.5 2.5L7 14l-3 3v2Zm12-9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/></svg>
-                Choose from gallery
+                Already took it? Upload it
             </label>
         </div>
 
-        <p class="count-line"><span id="photoCount">...</span> photos shared so far</p>
+        <p class="count-line"><span id="photoCount">...</span> photobombs captured so far</p>
 
         <input type="file" id="cameraInput" accept="image/*" capture="environment">
         <input type="file" id="galleryInput" accept="image/*" multiple>
@@ -78,29 +81,27 @@
 
     <!-- Step 2: Review selection -->
     <section id="step2" class="card hidden">
-        <h2 class="step-title">Ready to share?</h2>
+        <h2 class="step-title">Ready to drop it?</h2>
         <p class="step-sub" id="selectedCount">0 photos selected</p>
 
         <div class="preview-grid" id="previewGrid"></div>
 
-        <p class="privacy-note">These go privately to Federica &amp; Matteo. Thank you for sharing.</p>
+        <p class="privacy-note">Goes straight to the shirt wearers only. No feed, no socials, no gallery.</p>
 
         <div class="actions actions-row">
             <button id="cancelBtn" class="btn btn-ghost">Cancel</button>
-            <button id="uploadBtn" class="btn btn-primary">Share photos</button>
+            <button id="uploadBtn" class="btn btn-primary">Send it</button>
         </div>
     </section>
 
     <!-- Step 3: Success -->
     <section id="step3" class="card hidden">
-        <div class="success-mark" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="40" height="40"><path d="M20 6 9 17l-5-5"/></svg>
-        </div>
-        <h2 class="step-title">Thank you!</h2>
-        <p class="step-sub" id="successMessage">Your photos are on their way to us.</p>
-        <p class="lede">Every picture means the world to us. Got more? Keep them coming.</p>
+        <div class="success-mask" aria-hidden="true"></div>
+        <h2 class="step-title">Mission complete</h2>
+        <p class="step-sub" id="successMessage">Your photo is on its way to our phones.</p>
+        <p class="lede">Legend. Now come collect that high five - and if you catch us again later, bomb us again.</p>
         <div class="actions">
-            <button id="addMoreBtn" class="btn btn-primary">Share more photos</button>
+            <button id="addMoreBtn" class="btn btn-primary">Send another one</button>
         </div>
     </section>
 </main>

@@ -1,8 +1,9 @@
-// Light, quality-first image preparation for upload.
+// Aggressive, bandwidth-first image preparation for upload.
 //
-// Goal: preserve wedding memories. We only re-encode when we have to (image too
-// large in bytes or in pixels). When a photo is already a reasonable size and
-// format we pass the original file through untouched, with zero quality loss.
+// Goal: get the photo through the festival network. Cell coverage at the venue
+// is saturated, so we compress hard on the device: downscale to a phone-friendly
+// resolution and re-encode to WebP at moderate quality. Originals are passed
+// through only when they are already tiny.
 
 const PASSTHROUGH_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
@@ -32,16 +33,16 @@ function canvasToBlob(canvas, type, quality) {
 }
 
 /**
- * Prepare a file for upload, keeping quality as high as possible.
+ * Prepare a file for upload, keeping the payload as small as possible.
  *
  * @returns {Promise<{blob: Blob, fileSizeKB: number, format: string, passthrough: boolean}>}
  */
 export async function compressImage(file, options = {}) {
     const {
-        maxSizeKB = 3000,     // re-encode only above this byte size
-        maxDimension = 2880,  // re-encode only above this pixel dimension
-        quality = 0.92,       // starting quality for re-encode (visually near-lossless)
-        minQuality = 0.8,     // never degrade below this
+        maxSizeKB = 350,      // target upload size; step quality down until under this
+        maxDimension = 1600,  // plenty for phone screens and small prints
+        quality = 0.75,       // starting quality for re-encode
+        minQuality = 0.5,     // never degrade below this
     } = options;
 
     if (!file.type.startsWith('image/')) {
@@ -54,7 +55,7 @@ export async function compressImage(file, options = {}) {
         const withinSize = file.size / 1024 <= maxSizeKB;
         const withinDimensions = img.width <= maxDimension && img.height <= maxDimension;
 
-        // Already small enough and in a web-friendly format: keep the original bytes.
+        // Already tiny and in a web-friendly format: keep the original bytes.
         if (PASSTHROUGH_TYPES.includes(file.type) && withinSize && withinDimensions) {
             return {
                 blob: file,
@@ -83,7 +84,12 @@ export async function compressImage(file, options = {}) {
         // Fallback to JPEG if the browser produced no WebP (rare on modern devices).
         if (!blob || blob.type !== 'image/webp') {
             format = 'image/jpeg';
-            blob = await canvasToBlob(canvas, format, Math.max(q, 0.85));
+            q = quality;
+            blob = await canvasToBlob(canvas, format, q);
+            while (blob && blob.size / 1024 > maxSizeKB && q > minQuality) {
+                q = Number((q - 0.05).toFixed(2));
+                blob = await canvasToBlob(canvas, format, q);
+            }
         }
 
         if (!blob) throw new Error('Could not process this image.');

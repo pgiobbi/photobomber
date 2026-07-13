@@ -16,7 +16,7 @@ services:
     # reach it via host.docker.internal:3002. 172.17.0.1 is the docker0 gateway,
     # which is not externally routable, so the backend stays private.
     ports:
-      - "172.17.0.1:3002:3002"
+      - "127.0.0.1:3002:3002"
     environment:
       - RUST_LOG=debug
       - UPLOAD_DIR=/var/local/uploads

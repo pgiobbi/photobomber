@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cameraInput.value = '';
         galleryInput.value = '';
         uploadBtn.disabled = false;
-        uploadBtn.textContent = 'Share photos';
+        uploadBtn.textContent = 'Send it';
         showStep(step1);
     }
 
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         spinner.className = 'upload-spinner';
         spinner.innerHTML = `
             <div class="ring"></div>
-            <div class="loading-text">Sharing your photos</div>
+            <div class="loading-text">Dropping your photobomb</div>
             <div class="loading-subtext" id="uploadProgress">Preparing...</div>
         `;
         document.body.appendChild(spinner);
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function celebrate() {
-        const colors = ['#E7C6BE', '#BFA15C', '#7C8B73'];
+        const colors = ['#D9A648', '#F2C879', '#C4652F', '#4E8E8A'];
         for (let i = 0; i < 26; i++) {
             const petal = document.createElement('div');
             petal.className = 'celebrate';
@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!selectedFiles.length) return;
 
         uploadBtn.disabled = true;
-        uploadBtn.textContent = 'Sharing...';
+        uploadBtn.textContent = 'Sending...';
         createSpinner();
 
         let succeeded = 0;
@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await fetchPhotoCount();
 
         uploadBtn.disabled = false;
-        uploadBtn.textContent = 'Share photos';
+        uploadBtn.textContent = 'Send it';
 
         // Any failures: keep the failed photos selected so the guest can retry just those.
         if (failed > 0) {
@@ -209,22 +209,22 @@ document.addEventListener('DOMContentLoaded', () => {
             if (succeeded === 0) {
                 showModal(
                     'Something went wrong',
-                    'We could not share your photos. They are still here - please check your connection and tap "Share photos" to try again.',
+                    'We could not send your photos. They are still here - festival network, right? Check your connection and tap "Send it" to try again.',
                     'Try again',
                 );
             } else {
                 const sp = succeeded === 1 ? 'photo' : 'photos';
                 showModal(
                     'Almost there',
-                    `${succeeded} ${sp} shared with Federica & Matteo. ${failed} ${fp} could not be sent - they are still here, tap "Share photos" to try again.`,
+                    `${succeeded} ${sp} made it to our phones. ${failed} ${fp} could not be sent - they are still here, tap "Send it" to try again.`,
                     'Retry',
                 );
             }
             return;
         }
 
-        const plural = succeeded === 1 ? 'photo' : 'photos';
-        successMessage.textContent = `${succeeded} ${plural} shared with Federica & Matteo.`;
+        const plural = succeeded === 1 ? 'photobomb' : 'photobombs';
+        successMessage.textContent = `${succeeded} ${plural} delivered to our phones.`;
 
         revokeObjectUrls();
         selectedFiles = [];

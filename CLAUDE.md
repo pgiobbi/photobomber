@@ -4,29 +4,39 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-This is a guest photo-upload web app. The repo name and backend are still "photobomb"
-(originally a Tomorrowland festival app), but the current frontend is themed as a WEDDING
-photo collector for Federica & Matteo (20 June 2026): guests take a photo or pick several
-from their gallery, and the photos are uploaded privately to the couple. Keep this split in
-mind - the backend is generic and still carries festival-era concepts (locations/stages,
-leaderboard, upvotes) that the wedding frontend no longer uses but has NOT removed.
+This is a guest photo-upload web app. The frontend is themed for TOMORROWLAND 2026 and its
+"Consciencia" theme (Boom, Belgium, July 2026): the owners wear t-shirts printed with a QR
+code pointing at this site, and whoever scans it is pushed to take a picture WITH the wearers
+(or photobomb them) and upload it privately to their phones. The backend is generic and still
+carries older festival concepts (locations/stages, leaderboard, upvotes) that the current
+frontend no longer uses but has NOT removed.
 
 Three pieces:
 - `backend/` - Rust (actix-web) HTTP API, listens on `0.0.0.0:3002`. Generic; unaware of the
-  wedding theme.
+  frontend theme.
 - `frontend/` - static vanilla JS/HTML/CSS, no build step or framework. `index.html` is the
   guest camera + multi-select upload flow (`main.js`, `compress.js`); `admin-only.html` is the
-  standalone admin UI (still festival-era). `leaderboard.js` exists but is no longer wired in.
+  standalone admin UI (older festival-era). `leaderboard.js` exists but is no longer wired in.
 - `nginx/` - reverse proxy: serves the static frontend and proxies `/api/` to the backend.
 
 ### Frontend theme vs backend
 
-The wedding frontend uploads everything with `isPublic=false` (private to the couple), uploads
-each selected file as its own request (multi-select supported), and lightly compresses for
-quality (`compress.js`: pass-through when already <=~3MB/2880px, else WebP at high quality).
-It does NOT use the location/stage UI, the leaderboard gallery, or upvotes. Those backend
-endpoints still exist and work; they are simply unused by `index.html`. If you reskin or
-repurpose again, the backend contract below is what matters.
+The Consciencia frontend uploads everything with `isPublic=false` (private to the shirt
+wearers), uploads each selected file as its own request (multi-select supported), and
+compresses HARD on-device before upload (`compress.js`: max 1600px, WebP starting at q0.75
+stepping down to q0.5, ~350KB target; pass-through only for already-tiny files). The venue
+network is slow and saturated, so keep page assets tiny too: everything under
+`frontend/assets/consciencia/` is deliberately giga-compressed (~36KB total) and new assets
+must follow suit. Theme tokens live in `styles.css` (:root): desert gold `#D9A648`,
+terracotta `#C4652F`, bone `#EFE3C8` on midnight `#10181F`; display font Marcellus, body
+Jost. The frontend does NOT use the location/stage UI, the leaderboard gallery, or upvotes.
+Those backend endpoints still exist and work; they are simply unused by `index.html`. If you
+reskin or repurpose again, the backend contract below is what matters.
+
+Official theme assets came from https://consciencia.tomorrowland.com (Webflow CDN
+`cdn.prod.website-files.com`). Gotcha: some of the CDN's "transparent" PNG/AVIF variants have
+an opaque green key plate (`#47714D`) baked in - verify alpha before using them, and prefer
+`cwebp -resize` directly on the source (ffmpeg conversions can silently flatten alpha).
 
 ## Commands
 
@@ -94,9 +104,10 @@ handler (e.g. `post_location`).
 `upvote_token`; karma is only incremented for `is_public` rows; the cookie is removed when the
 count hits zero. Upvote budget lives only in the in-memory cache, so it resets on restart.
 
-Frontend prepares images client-side for quality (`compress.js`): files already <=~3MB and
-<=2880px in a web format are uploaded untouched, larger ones are scaled and re-encoded to WebP
-at high quality. The backend enforces a hard 6MB cap (`DEFAULT_MAX_FILE_SIZE`), and nginx caps
+Frontend compresses images client-side for bandwidth (`compress.js`): only files already
+<=~350KB and <=1600px in a web format are uploaded untouched, everything else is scaled to
+max 1600px and re-encoded to WebP, stepping quality from 0.75 down to 0.5 until under the
+~350KB target. The backend enforces a hard 6MB cap (`DEFAULT_MAX_FILE_SIZE`), and nginx caps
 the proxied body at 12M (`nginx/nginx.dev.conf`) - raise both together if you need larger
 uploads. Each selected photo is sent as its own request.
 
