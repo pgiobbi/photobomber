@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#10181F">
+    <meta name="theme-color" content="#06090D">
     <meta name="description" content="You scanned the shirt at Tomorrowland. Now photobomb us - take a picture with us and send it straight to our phones.">
     <title>Photobomb Us - Tomorrowland Consciencia 2026</title>
     <link rel="icon" type="image/png" href="/assets/icons/favicon-96x96.png" sizes="96x96"/>
@@ -13,95 +13,100 @@
     <meta name="apple-mobile-web-app-title" content="Photobomb"/>
     <link rel="manifest" href="/assets/icons/site.webmanifest"/>
 
-    <link rel="preload" as="image" href="/assets/consciencia/bg-consciencia.webp">
+    <link rel="preload" as="image" href="/assets/consciencia/logo-consciencia.webp">
+    <link rel="preload" as="image" href="/assets/photobomber-pixelated-nobg-128.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="./styles.css" rel="stylesheet" crossorigin="use-credentials">
 </head>
 <body>
 
-<!-- Rising desert embers -->
+<!-- Rotating festival laser beams -->
+<div class="lasers" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+
+<!-- Rising embers -->
 <div class="embers" aria-hidden="true">
-    <span class="ember"></span>
-    <span class="ember"></span>
-    <span class="ember"></span>
-    <span class="ember"></span>
-    <span class="ember"></span>
-    <span class="ember"></span>
+    <span class="ember"></span><span class="ember"></span><span class="ember"></span>
+    <span class="ember"></span><span class="ember"></span><span class="ember"></span>
+    <span class="ember"></span><span class="ember"></span><span class="ember"></span>
+    <span class="ember"></span><span class="ember"></span><span class="ember"></span>
 </div>
 
-<!-- Consciencia key art: the mask over the desert -->
-<header class="hero" aria-hidden="true">
-    <div class="hero-art"></div>
-    <img class="hero-logo" src="/assets/consciencia/logo-consciencia.webp"
-         alt="Consciencia" width="560" height="120">
-    <p class="hero-eyebrow">Tomorrowland &middot; Boom &middot; 2026</p>
-</header>
-
 <main class="page">
-    <!-- Step 1: Welcome + choose how to add photos -->
-    <section id="step1" class="card">
-        <p class="eyebrow">You scanned the shirt</p>
-        <h1 class="headline">Now photobomb&nbsp;us</h1>
-
-        <p class="lede">
-            This code lives on our t-shirts, somewhere in the Consciencia crowd.
-            You found us - that was the hard part. The rest is simple:
-        </p>
-
-        <ol class="mission">
-            <li><span class="m-step">I</span><span>Jump in a picture <em>with</em> us - or sneak into the background and bomb it</span></li>
-            <li><span class="m-step">II</span><span>Send it here. It lands straight on our phones</span></li>
-            <li><span class="m-step">III</span><span>Claim your high five. We owe you one</span></li>
-        </ol>
-
-        <div class="actions">
-            <label for="cameraInput" class="btn btn-primary">
-                <svg viewBox="0 0 24 24" class="ico"><path d="M9 3l-1.5 2H4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.5L15 3H9Zm3 5a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/></svg>
-                Take the photo now
-            </label>
-            <label for="galleryInput" class="btn btn-secondary">
-                <svg viewBox="0 0 24 24" class="ico"><path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9l-4.5-4.5L11 16l-2.5-2.5L4 18V5Zm0 14h12.2l-4-4-2.5 2.5L7 14l-3 3v2Zm12-9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/></svg>
-                Already took it? Upload it
-            </label>
+    <!-- HOME: welcome + one giant action -->
+    <section id="stepHome" class="screen">
+        <div class="brand">
+            <div class="kicker">Tomorrowland &middot; 2026</div>
+            <img class="brand-logo" src="/assets/consciencia/logo-consciencia.webp"
+                 alt="Consciencia" width="560" height="120">
         </div>
 
-        <p class="count-line"><span id="photoCount">...</span> photobombs captured so far</p>
+        <div class="hero">
+            <div class="hero-char">
+                <img src="/assets/photobomber-pixelated-nobg-128.png" alt="" width="128" height="128">
+            </div>
+            <p class="eyebrow">You found us!</p>
+            <h1 class="headline">PHOTOBOMB<br>US!</h1>
+            <p class="lede">Snap a pic with us <strong>(or sneak in behind!)</strong> &mdash; it flies straight to our phones.</p>
+        </div>
+
+        <div class="nudge" aria-hidden="true">
+            <span>Tap to bomb</span>
+            <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 16 4 8h16z"/></svg>
+        </div>
+
+        <div class="actions">
+            <label for="cameraInput" class="cta">
+                <span class="cta-shine" aria-hidden="true"></span>
+                <svg viewBox="0 0 24 24" class="cta-ico"><path d="M9 3l-1.5 2H4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.5L15 3H9Zm3 5a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/></svg>
+                <span class="cta-label">TAKE THE PHOTO!</span>
+            </label>
+
+            <label for="galleryInput" class="upload-link">
+                <svg viewBox="0 0 24 24" width="16" height="16"><path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9l-4.5-4.5L11 16l-2.5-2.5L4 18V5Zm0 14h12.2l-4-4-2.5 2.5L7 14l-3 3v2Z"/></svg>
+                or upload one you already took
+            </label>
+
+            <div class="ticker">
+                <span class="ticker-dot"></span>
+                <span class="ticker-count" id="photoCount">0</span>
+                <span class="ticker-label">bombs &amp; counting</span>
+            </div>
+
+            <div class="legal">
+                <a href="privacy-policy.html">Privacy</a>
+                <span class="dot">&middot;</span>
+                <a href="terms-of-use.html">Terms</a>
+            </div>
+        </div>
 
         <input type="file" id="cameraInput" accept="image/*" capture="environment">
         <input type="file" id="galleryInput" accept="image/*" multiple>
+    </section>
 
-        <div class="legal">
-            <a href="privacy-policy.html">Privacy Policy</a>
-            <span class="dot">&middot;</span>
-            <a href="terms-of-use.html">Terms of Use</a>
+    <!-- SENDING -->
+    <section id="stepSending" class="screen hidden">
+        <div class="sending">
+            <div class="ring"></div>
+            <div class="sending-title">DROPPING YOUR BOMB</div>
+            <div class="sending-sub" id="uploadProgress">Preparing&hellip;</div>
         </div>
     </section>
 
-    <!-- Step 2: Review selection -->
-    <section id="step2" class="card hidden">
-        <h2 class="step-title">Ready to drop it?</h2>
-        <p class="step-sub" id="selectedCount">0 photos selected</p>
-
-        <div class="preview-grid" id="previewGrid"></div>
-
-        <p class="privacy-note">Goes straight to the shirt wearers only. No feed, no socials, no gallery.</p>
-
-        <div class="actions actions-row">
-            <button id="cancelBtn" class="btn btn-ghost">Cancel</button>
-            <button id="uploadBtn" class="btn btn-primary">Send it</button>
-        </div>
-    </section>
-
-    <!-- Step 3: Success -->
-    <section id="step3" class="card hidden">
-        <div class="success-mask" aria-hidden="true"></div>
-        <h2 class="step-title">Mission complete</h2>
-        <p class="step-sub" id="successMessage">Your photo is on its way to our phones.</p>
-        <p class="lede">Legend. Now come collect that high five - and if you catch us again later, bomb us again.</p>
-        <div class="actions">
-            <button id="addMoreBtn" class="btn btn-primary">Send another one</button>
+    <!-- SUCCESS -->
+    <section id="stepSuccess" class="screen hidden">
+        <div class="success">
+            <div class="success-sprites" aria-hidden="true">
+                <img class="sprite" src="/assets/ravers-pixelated-nobg-128.png" alt="" width="128" height="128">
+                <img class="sprite sprite-flip" src="/assets/ravers-pixelated-nobg-128.png" alt="" width="128" height="128">
+            </div>
+            <h2 class="headline">BOOM!<br>GOT IT!</h2>
+            <p class="success-msg" id="successMessage">Your photobomb is on its way to our phones!</p>
+            <p class="privacy-note">Private &mdash; only our phones see these. No feed, no socials.</p>
+            <p class="high-five">You legend! Come claim that high five!</p>
+            <button id="againBtn" class="cta cta-again">BOMB US AGAIN!</button>
         </div>
     </section>
 </main>

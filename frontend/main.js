@@ -4,87 +4,61 @@ import {compressImage} from './compress.js';
 document.addEventListener('DOMContentLoaded', () => {
     const cameraInput = document.getElementById('cameraInput');
     const galleryInput = document.getElementById('galleryInput');
-    const step1 = document.getElementById('step1');
-    const step2 = document.getElementById('step2');
-    const step3 = document.getElementById('step3');
-    const previewGrid = document.getElementById('previewGrid');
-    const selectedCount = document.getElementById('selectedCount');
-    const uploadBtn = document.getElementById('uploadBtn');
-    const cancelBtn = document.getElementById('cancelBtn');
-    const addMoreBtn = document.getElementById('addMoreBtn');
+    const stepHome = document.getElementById('stepHome');
+    const stepSending = document.getElementById('stepSending');
+    const stepSuccess = document.getElementById('stepSuccess');
     const photoCount = document.getElementById('photoCount');
+    const uploadProgress = document.getElementById('uploadProgress');
     const successMessage = document.getElementById('successMessage');
+    const againBtn = document.getElementById('againBtn');
 
-    // Files chosen for the current upload, plus their object URLs (for cleanup).
-    let selectedFiles = [];
-    let objectUrls = [];
+    let displayCount = 0;
+    let countRaf = null;
 
-    // --- Helpers ------------------------------------------------------------
+    // --- Screen switching ---------------------------------------------------
 
     function showStep(step) {
-        [step1, step2, step3].forEach((el) => el.classList.add('hidden'));
+        [stepHome, stepSending, stepSuccess].forEach((el) => el.classList.add('hidden'));
         step.classList.remove('hidden');
     }
 
-    function revokeObjectUrls() {
-        objectUrls.forEach((url) => URL.revokeObjectURL(url));
-        objectUrls = [];
+    // --- Hype ticker (odometer count-up) ------------------------------------
+
+    function animateCountTo(target) {
+        if (typeof target !== 'number' || target < 0) return;
+        cancelAnimationFrame(countRaf);
+        const from = displayCount;
+        const start = performance.now();
+        const dur = 1100;
+        const step = (now) => {
+            const t = Math.min(1, (now - start) / dur);
+            const eased = 1 - Math.pow(1 - t, 3);
+            displayCount = Math.round(from + (target - from) * eased);
+            photoCount.textContent = displayCount.toLocaleString();
+            if (t < 1) countRaf = requestAnimationFrame(step);
+        };
+        countRaf = requestAnimationFrame(step);
     }
 
-    function resetToStart() {
-        revokeObjectUrls();
-        selectedFiles = [];
-        previewGrid.innerHTML = '';
-        cameraInput.value = '';
-        galleryInput.value = '';
-        uploadBtn.disabled = false;
-        uploadBtn.textContent = 'Send it';
-        showStep(step1);
-    }
-
-    function createSpinner() {
-        const spinner = document.createElement('div');
-        spinner.id = 'uploadSpinner';
-        spinner.className = 'upload-spinner';
-        spinner.innerHTML = `
-            <div class="ring"></div>
-            <div class="loading-text">Dropping your photobomb</div>
-            <div class="loading-subtext" id="uploadProgress">Preparing...</div>
-        `;
-        document.body.appendChild(spinner);
-        requestAnimationFrame(() => spinner.classList.add('active'));
-    }
-
-    function updateProgress(current, total) {
-        const el = document.getElementById('uploadProgress');
-        if (el) el.textContent = `Photo ${current} of ${total}`;
-    }
-
-    function removeSpinner() {
-        const spinner = document.getElementById('uploadSpinner');
-        if (!spinner) return;
-        spinner.classList.remove('active');
-        setTimeout(() => spinner.remove(), 300);
-    }
+    // --- Confetti -----------------------------------------------------------
 
     function celebrate() {
-        const colors = ['#D9A648', '#F2C879', '#C4652F', '#4E8E8A'];
-        for (let i = 0; i < 26; i++) {
-            const petal = document.createElement('div');
-            petal.className = 'celebrate';
-            petal.style.left = `${Math.random() * 100}vw`;
-            petal.style.top = '-5vh';
-            petal.style.background = colors[Math.floor(Math.random() * colors.length)];
-            petal.style.animationDelay = `${Math.random() * 1.2}s`;
-            petal.style.opacity = '0.8';
-            document.body.appendChild(petal);
-            setTimeout(() => petal.remove(), 5000);
+        const colors = ['#F2C879', '#F8D48A', '#38E1D6', '#FF3DA6', '#C4652F'];
+        for (let i = 0; i < 42; i++) {
+            const piece = document.createElement('div');
+            piece.className = 'confetti';
+            piece.style.left = `${Math.random() * 100}vw`;
+            piece.style.background = colors[i % colors.length];
+            piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+            piece.style.animationDuration = `${2.4 + Math.random() * 1.8}s`;
+            piece.style.animationDelay = `${Math.random() * 1.2}s`;
+            document.body.appendChild(piece);
+            setTimeout(() => piece.remove(), 5200);
         }
     }
 
     // --- Backend calls ------------------------------------------------------
 
-    // Obtain a public session cookie so uploads are authorized.
     async function login() {
         try {
             await fetch('/api/auth/login', {
@@ -102,10 +76,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/api/public/images/count');
             if (!response.ok) throw new Error('API request failed');
             const data = await response.json();
-            photoCount.textContent = data.count.toLocaleString();
+            animateCountTo(data.count);
         } catch (err) {
             console.error('Failed to fetch count:', err);
-            photoCount.textContent = '--';
         }
     }
 
@@ -118,57 +91,30 @@ document.addEventListener('DOMContentLoaded', () => {
         return match ? match[1].toLowerCase() : 'jpg';
     }
 
-    // --- Selection flow -----------------------------------------------------
-
-    // Render the preview grid for a set of files and move to the review step.
-    // Used both for a fresh selection and when re-presenting photos that failed to upload.
-    function renderSelection(files, countLabel) {
-        revokeObjectUrls();
-        selectedFiles = files;
-        previewGrid.innerHTML = '';
-
-        files.forEach((file) => {
-            const url = URL.createObjectURL(file);
-            objectUrls.push(url);
-            const thumb = document.createElement('div');
-            thumb.className = 'thumb';
-            const img = document.createElement('img');
-            img.src = url;
-            img.alt = 'Selected photo';
-            thumb.appendChild(img);
-            previewGrid.appendChild(thumb);
-        });
-
-        const n = files.length;
-        selectedCount.textContent = countLabel || `${n} photo${n === 1 ? '' : 's'} selected`;
-        showStep(step2);
-    }
+    // --- Collapsed flow: pick -> send immediately -> success ----------------
 
     function handleSelection(fileList) {
         const files = Array.from(fileList).filter((f) => f.type.startsWith('image/'));
+        cameraInput.value = '';
+        galleryInput.value = '';
         if (!files.length) {
             showModal('No photos found', 'Please choose one or more image files.', 'OK');
             return;
         }
-        renderSelection(files);
+        uploadAll(files);
     }
 
-    async function uploadAll() {
-        if (!selectedFiles.length) return;
-
-        uploadBtn.disabled = true;
-        uploadBtn.textContent = 'Sending...';
-        createSpinner();
+    async function uploadAll(files) {
+        showStep(stepSending);
+        const total = files.length;
+        uploadProgress.textContent = total > 1 ? `Photo 1 of ${total}` : 'Preparing\u2026';
 
         let succeeded = 0;
         const failedFiles = [];
-        const total = selectedFiles.length;
-        // Snapshot the list: renderSelection (on the retry path) reassigns selectedFiles.
-        const filesToUpload = selectedFiles.slice();
 
         for (let i = 0; i < total; i++) {
-            updateProgress(i + 1, total);
-            const file = filesToUpload[i];
+            if (total > 1) uploadProgress.textContent = `Photo ${i + 1} of ${total}`;
+            const file = files[i];
             try {
                 const {blob} = await compressImage(file);
                 const ext = extensionFor(blob, file.name);
@@ -191,59 +137,48 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        const failed = failedFiles.length;
-
-        removeSpinner();
         await fetchPhotoCount();
 
-        uploadBtn.disabled = false;
-        uploadBtn.textContent = 'Send it';
+        const failed = failedFiles.length;
 
-        // Any failures: keep the failed photos selected so the guest can retry just those.
-        if (failed > 0) {
-            const fp = failed === 1 ? 'photo' : 'photos';
-            renderSelection(failedFiles, `${failed} ${fp} to retry`);
-            cameraInput.value = '';
-            galleryInput.value = '';
-
-            if (succeeded === 0) {
-                showModal(
-                    'Something went wrong',
-                    'We could not send your photos. They are still here - festival network, right? Check your connection and tap "Send it" to try again.',
-                    'Try again',
-                );
-            } else {
-                const sp = succeeded === 1 ? 'photo' : 'photos';
-                showModal(
-                    'Almost there',
-                    `${succeeded} ${sp} made it to our phones. ${failed} ${fp} could not be sent - they are still here, tap "Send it" to try again.`,
-                    'Retry',
-                );
-            }
+        // All failed: back to home with a retry prompt.
+        if (succeeded === 0) {
+            showStep(stepHome);
+            showModal(
+                'Something went wrong',
+                'We could not send your photo - festival network, right? Check your connection and tap "TAKE THE PHOTO!" to try again.',
+                'Try again',
+            );
             return;
         }
 
         const plural = succeeded === 1 ? 'photobomb' : 'photobombs';
-        successMessage.textContent = `${succeeded} ${plural} delivered to our phones.`;
+        successMessage.textContent = `${succeeded} ${plural} delivered straight to our phones!`;
 
-        revokeObjectUrls();
-        selectedFiles = [];
-        previewGrid.innerHTML = '';
-        cameraInput.value = '';
-        galleryInput.value = '';
-
-        showStep(step3);
+        showStep(stepSuccess);
         celebrate();
+
+        // Some failed: let them know, but still celebrate the ones that made it.
+        if (failed > 0) {
+            const fp = failed === 1 ? 'photo' : 'photos';
+            showModal(
+                'Almost there',
+                `${succeeded} made it! ${failed} ${fp} could not be sent - tap "BOMB US AGAIN!" to retry.`,
+                'Got it',
+            );
+        }
     }
 
     // --- Wiring -------------------------------------------------------------
 
     cameraInput.addEventListener('change', (e) => handleSelection(e.target.files));
     galleryInput.addEventListener('change', (e) => handleSelection(e.target.files));
-    uploadBtn.addEventListener('click', uploadAll);
-    cancelBtn.addEventListener('click', resetToStart);
-    addMoreBtn.addEventListener('click', resetToStart);
+    againBtn.addEventListener('click', () => showStep(stepHome));
 
     // Initial load
     login().then(fetchPhotoCount);
+    // Keep the ticker feeling live while on the home screen.
+    setInterval(() => {
+        if (!stepHome.classList.contains('hidden')) fetchPhotoCount();
+    }, 15000);
 });
